@@ -15,7 +15,8 @@ window.addEventListener("unhandledrejection", e => showError("Async error", e.re
 const BASE = "https://campus.tum.de/tumonline/wbservicesbasic.";
 const NAV = "https://nav.tum.de/api/";
 const $ = (id) => document.getElementById(id);
-const START_H = 7, END_H = 21;
+const MIN_H = 7, MAX_H = 21; let START_H = MIN_H, END_H = MAX_H;
+let zoom = +localStorage.getItem("tumSchedZoom") || 1, trim = localStorage.getItem("tumSchedTrim") === "1";
 let events = [], cancelled = [], day = startOfDay(new Date()), pollTimer = null;
 const roomCache = new Map();
 
@@ -154,6 +155,16 @@ function baseName(title) {
   return (title || "").replace(/\s*\([^)]*\)\s*$/g, "").replace(/\s*[-–,]\s*(VO|UE|ZÜ|TUT|PR|SE|Vorlesung|Übung|Zentralübung|Tutorium|Tutorübung|Praktikum)\b.*$/i, "")
     .replace(/\b(VO|VI|UE|ZÜ|TUT|PR|SE)\b/g, "").replace(/\b(Zentral)?übung\b|\bTutor(ium|übung)\b|\bVorlesung\b/gi, "").replace(/\s{2,}/g, " ").trim() || title || "";
 }
+function shortName(title) {
+  let n = baseName(title)
+    .replace(/^(Übung|Übungen|Tutorium|Tutorübung|Zentralübung|Vorlesung|Praktikum|Seminar)\s+(zu|zur|zum)?\s*/i, "")
+    .replace(/^(Grundlagen|Einführung|Einf\.)\s+(der|des|in die|in das|in den|in)\s+/i, "")
+    .replace(/\s+für\s+/gi, " f. ").replace(/\s+und\s+/gi, " & ").replace(/Ingenieur(e|innen|wesen)?(\s*\/?\s*-?innen)?/gi, "Ing.")
+    .replace(/Maschinenbau(s)?/gi, "MB").replace(/Technische(n|r)?\s+/gi, "Techn. ").replace(/Mathematik/gi, "Mathe").replace(/\s*[-–:]\s+.*$/, "").trim();
+  n = n.replace(/(?<![\p{L}])(Übung|Übungen|Zentralübung|Tutorübung|Tutorium|Vorlesung)(?![\p{L}])/giu, "").replace(/Ing\. & Ing\./g, "Ing.").replace(/\s{2,}/g, " ").trim();
+  n = n.split(" ").map(x => x.length > (n.length > 20 ? 8 : 11) ? x.slice(0, 6).replace(/[aeiouäöü]+$/i, "") + "." : x).join(" ");
+  return n || baseName(title);
+}
 function hue(title) { const key = baseName(title).toLowerCase(); let h = 7; for (const ch of key) h = (h * 31 + ch.charCodeAt(0)) >>> 0; return h % 360; }
 function decorate(node, e) { const t = evType(e.title); node.style.setProperty("--h", hue(e.title)); node.dataset.type = t.k || "X"; return t; }
 function eventsOn(d) { const n = addDays(d, 1); return events.filter(e => e.start < n && e.end > d).sort((a, b) => a.start - b.start || b.end - a.end); }
@@ -177,7 +188,7 @@ function fillRoom(node, e) {
 function evBlock(e, compact) {
   const a = el("a", "ev" + (e.end < new Date() ? " past" : "") + (e.clash ? " clash" : "")); a.target = "_blank"; a.rel = "noopener";
   const t = decorate(a, e);
-  a.innerHTML = `<span class="nm">${t.k ? `<i class="tb">${t.k}</i>` : ""}${esc(baseName(e.title))}</span><span class="loc">${esc(locLine(e))}</span>` + (compact ? "" : `<span class="t">${fmt(e.start)}–${fmt(e.end)}</span>`);
+  a.innerHTML = `${t.k ? `<i class="tb">${t.k}</i>` : ""}<span class="nm" lang="de"><span class="fn">${esc(baseName(e.title))}</span><span class="sn">${esc(shortName(e.title))}</span></span><span class="loc">${esc(locLine(e))}</span>` + (compact ? "" : `<span class="t">${fmt(e.start)}–${fmt(e.end)}</span>`);
   a.title = details(e); fillRoom(a, e); return a;
 }
 function buildTrack(list, d, compact) {
@@ -203,7 +214,7 @@ function legendFor(list) {
 function hourAxis() { const ax = el("div", "axis"); for (let h = START_H; h <= END_H; h += 1) { const x = el("span", "", h % 2 ? "" : String(h)); x.style.left = ((h - START_H) / (END_H - START_H) * 100) + "%"; ax.appendChild(x); } return ax; }
 
 function renderDay(v) {
-  const list = eventsOn(day), today = sameDay(day, new Date()), { conflicts } = layout(list);
+  setRange(eventsOn(day)); const list = eventsOn(day), today = sameDay(day, new Date()), { conflicts } = layout(list);
   $("dayLabel").innerHTML = esc(dlabel(day)) + (today ? '<span class="badge">TODAY</span>' : "") + `<small>${list.length} event${list.length === 1 ? "" : "s"}</small>` + (conflicts ? `<span class="cbadge">${conflicts} overlap${conflicts > 1 ? "s" : ""}</span>` : "");
   if (!list.length) {
     const box = el("div", "empty", `<div class="big">${today ? "No classes today" : "No classes on this day"}</div>`);
@@ -228,6 +239,7 @@ function renderDay(v) {
 function weekDays(m) { const ds = []; for (let i = 0; i < 7; i++) { const d = addDays(m, i); if (i < 5 || eventsOn(d).length) ds.push(d); } return ds; }
 function renderWeek(v) {
   const m = monday(day), sun = addDays(m, 6);
+  setRange(weekDays(m).flatMap(eventsOn));
   const all = []; let conflicts = 0; for (const d of weekDays(m)) { const l = eventsOn(d); conflicts += layout(l).conflicts; all.push(...l); }
   $("dayLabel").innerHTML = `Week of ${esc(dlabel(m, { day: "numeric", month: "short" }))} – ${esc(dlabel(sun, { day: "numeric", month: "short", year: "numeric" }))}<small>${all.length} events</small>` + (conflicts ? `<span class="cbadge">${conflicts} overlap${conflicts > 1 ? "s" : ""}</span>` : "");
   v.appendChild(legendFor(all));
@@ -242,9 +254,24 @@ function renderWeek(v) {
   box.appendChild(inner); v.appendChild(box);
 }
 
+function setRange(list) {
+  START_H = MIN_H; END_H = MAX_H; if (!trim || !list.length) return;
+  START_H = Math.max(MIN_H, Math.min(...list.map(e => e.start.getHours())) - 1);
+  END_H = Math.min(MAX_H, Math.max(...list.map(e => Math.ceil((e.end.getHours() * 60 + e.end.getMinutes()) / 60))) + 1);
+  if (END_H - START_H < 4) END_H = Math.min(MAX_H, START_H + 4);
+}
+function zoomTarget() { const tl = $("view").querySelector(".tl"); return tl && [tl, tl.querySelector(".winner") || tl.querySelector(".track")]; }
+function applyZoom(z, clientX) {
+  zoom = Math.min(6, Math.max(1, Math.round(z * 100) / 100));
+  const zt = zoomTarget(); $("zFit").textContent = Math.round(zoom * 100) + "%"; $("zFit").disabled = zoom === 1;
+  if (localStorage.getItem("tumSchedTok")) localStorage.setItem("tumSchedZoom", zoom); else localStorage.removeItem("tumSchedZoom");
+  if (!zt) return; const [tl, inner] = zt, r = tl.getBoundingClientRect(), x = (clientX ?? r.left + r.width / 2) - r.left;
+  const frac = (tl.scrollLeft + x) / tl.scrollWidth; tl.style.scrollBehavior = "auto";
+  inner.style.width = (zoom * 100) + "%"; tl.scrollLeft = frac * tl.scrollWidth - x; tl.style.scrollBehavior = "";
+}
 function render(dx = 0) {
   const v = $("view");
-  const draw = () => { v.innerHTML = ""; try { mode === "day" ? renderDay(v) : renderWeek(v); } catch (e) { showError("Render", e); } v.classList.remove("fade"); };
+  const draw = () => { v.innerHTML = ""; try { mode === "day" ? renderDay(v) : renderWeek(v); applyZoom(zoom); } catch (e) { showError("Render", e); } v.classList.remove("fade"); };
   if (!dx) return draw();
   v.style.setProperty("--dx", (dx > 0 ? -24 : 24) + "px"); v.classList.add("fade"); setTimeout(draw, 140);
 }
@@ -278,7 +305,7 @@ function semesterModel() {
   }
   // Days with recurring slots but no events at all = no lectures
   const slotDays = new Set(slots.map(s => s.e.start.getDay())), noLect = [];
-  for (let d = new Date(first); d <= last; d = addDays(d, 1)) if (slotDays.has(d.getDay()) && !eventsOn(d).length && missing.some(m => sameDay(m.d, d))) noLect.push(new Date(d));
+  for (let d = new Date(first); d <= last; d = addDays(d, 1)) if (slotDays.has(d.getDay())) { const tot = slots.filter(s => s.e.start.getDay() === d.getDay() && d >= startOfDay(s.from) && d <= s.to).length, miss = missing.filter(m => sameDay(m.d, d)).length; if (miss && (miss >= tot * 0.6 || !eventsOn(d).length)) noLect.push(new Date(d)); }
   const isNo = d => noLect.some(x => sameDay(x, d));
   return { first, last, slots, oneOffs, roomChanges, missing: missing.filter(m => !isNo(m.d)), noLect };
 }
@@ -295,7 +322,7 @@ async function exportPdf() {
   fit.appendChild(el("div", "ph", `<h1>Semester timetable</h1><span>${esc(D(M.first))} – ${esc(D(M.last))} · typical week · TUM Schedule</span>`));
   const cols = [1, 2, 3, 4, 5]; if (M.slots.some(s => s.e.start.getDay() === 6)) cols.push(6); if (M.slots.some(s => s.e.start.getDay() === 0)) cols.push(0);
   let h0 = Math.min(...M.slots.map(s => s.e.start.getHours()), 10), h1 = Math.max(...M.slots.map(s => Math.ceil(hm(s.e.end) / 60)), 16);
-  h0 = Math.max(START_H, h0); h1 = Math.min(END_H, h1);
+  h0 = Math.max(MIN_H, h0); h1 = Math.min(MAX_H, h1);
   const P = d => Math.min(100, Math.max(0, (hm(d) / 60 - h0) / (h1 - h0) * 100));
   const grid = el("div", "pgrid"); grid.style.setProperty("--cols", cols.length);
   const axis = el("div", "pax"); axis.appendChild(el("div", "pdh", ""));
@@ -313,7 +340,7 @@ async function exportPdf() {
       b.style.top = P(s.e.start) + "%"; b.style.height = Math.max(P(s.e.end) - P(s.e.start), 3) + "%";
       b.style.left = (f.lane / lanes * 100) + "%"; b.style.width = (100 / lanes) + "%";
       const cad = s.step === 1 ? "weekly" : s.step === 2 ? "biweekly" : `every ${s.step} wks`;
-      b.innerHTML = `<b>${t.k ? `<i class="tb">${t.k}</i>` : ""}${esc(baseName(s.e.title))}</b><span>${esc(loc(s.room))}</span><small>${fmt(s.e.start)}–${fmt(s.e.end)} · ${cad} · ${s.from.getDate()}.${s.from.getMonth() + 1}.–${s.to.getDate()}.${s.to.getMonth() + 1}.</small>`;
+      b.title = s.e.title; b.innerHTML = `${t.k ? `<i class="tb">${t.k}</i>` : ""}<b lang="de"><span class="fn">${esc(baseName(s.e.title))}</span><span class="sn">${esc(shortName(s.e.title))}</span></b><span>${esc(loc(s.room))}</span><small>${fmt(s.e.start)}–${fmt(s.e.end)} · ${cad} · ${s.from.getDate()}.${s.from.getMonth() + 1}.–${s.to.getDate()}.${s.to.getMonth() + 1}.</small>`;
       cb.appendChild(b);
     }
     col.appendChild(cb); grid.appendChild(col);
@@ -321,7 +348,8 @@ async function exportPdf() {
   fit.appendChild(grid); fit.appendChild(legendFor(M.slots.map(s => s.e)));
   const items = [];
   for (const d of M.noLect) items.push([d, `<b>${dShort(d)}</b> – no lectures`]);
-  for (const m of M.missing) items.push([m.d, `<b>${dShort(m.d)}</b> ${esc(baseName(m.s.e.title))} ${evType(m.s.e.title).k} ${fmt(m.s.e.start)} – ${m.why || "does not take place"}`]);
+  const byDay = new Map(); for (const m of M.missing) { const k = m.d.getTime(); (byDay.get(k) || byDay.set(k, []).get(k)).push(m); }
+  for (const [k, ms] of byDay) { const d = new Date(k); items.push([d, `<b>${dShort(d)}</b> ` + ms.map(m => `${esc(shortName(m.s.e.title))} ${evType(m.s.e.title).k} ${fmt(m.s.e.start)}${m.why ? " (cancelled)" : ""}`).join(", ") + ` – ${ms.length > 1 ? "do" : "does"} not take place`]); }
   for (const r of M.roomChanges) items.push([r.e.start, `<b>${dShort(r.e.start)}</b> ${esc(baseName(r.e.title))} ${fmt(r.e.start)} – room change: ${esc(loc(r.e.location))}`]);
   for (const e of M.oneOffs) items.push([e.start, `<b>${dShort(e.start)}</b> ${fmt(e.start)}–${fmt(e.end)} ${esc(baseName(e.title))} ${evType(e.title).k} · ${esc(loc(e.location))} <i>(extra)</i>`]);
   items.sort((a, b) => a[0] - b[0]);
@@ -329,12 +357,12 @@ async function exportPdf() {
   out.appendChild(pg);
   // scale to guarantee a single page (A4 landscape minus 10mm margins ≈ 1046×718 CSS px)
   out.classList.add("measure"); fit.style.zoom = 1;
-  const W = 1040, H = 712, z = Math.min(1, W / fit.scrollWidth, H / fit.scrollHeight); fit.style.zoom = z.toFixed(3);
+  const W = 1040, H = 660, z = Math.min(1, W / fit.scrollWidth, H / fit.scrollHeight); fit.style.zoom = z.toFixed(3);
   out.classList.remove("measure");
   setTimeout(() => window.print(), 50);
 }
 
-function logout() { clearInterval(pollTimer); store.clear(); $("remember").checked = false; events = []; cancelled = []; roomCache.clear(); $("tumid").value = $("tokenIn").value = ""; $("msg").textContent = ""; $("msg2").textContent = "Waiting for activation – checking every 5 s…"; $("printout").innerHTML = ""; show("login"); }
+function logout() { clearInterval(pollTimer); store.clear(); $("remember").checked = false; events = []; cancelled = []; localStorage.removeItem("tumSchedZoom"); localStorage.removeItem("tumSchedTrim"); roomCache.clear(); $("tumid").value = $("tokenIn").value = ""; $("msg").textContent = ""; $("msg2").textContent = "Waiting for activation – checking every 5 s…"; $("printout").innerHTML = ""; show("login"); }
 function shift(n) { day = addDays(day, n * (mode === "week" ? 7 : 1)); render(n); }
 
 $("req").onclick = requestToken;
@@ -349,7 +377,23 @@ $("print").onclick = exportPdf;
 $("theme").onclick = () => { const r = document.documentElement, dark = r.dataset.theme ? r.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches; r.dataset.theme = dark ? "light" : "dark"; };
 document.addEventListener("keydown", e => { if ($("cal").hidden || e.target.tagName === "INPUT" || e.target.tagName === "SELECT") return; if (e.key === "ArrowLeft") shift(-1); if (e.key === "ArrowRight") shift(1); if (e.key === "t") $("today").click(); });
 let tx = null, ty = null;
-$("view").addEventListener("touchstart", e => { tx = e.touches[0].clientX; ty = e.touches[0].clientY; }, { passive: true });
+$("zIn").onclick = () => applyZoom(zoom * 1.4); $("zOut").onclick = () => applyZoom(zoom / 1.4); $("zFit").onclick = () => applyZoom(1);
+$("trim").checked = trim; $("trim").onchange = () => { trim = $("trim").checked; if (localStorage.getItem("tumSchedTok")) localStorage.setItem("tumSchedTrim", trim ? "1" : "0"); render(); };
+$("view").addEventListener("wheel", e => { if (!e.ctrlKey || !e.target.closest(".tl")) return; e.preventDefault(); applyZoom(zoom * Math.exp(-e.deltaY * 0.01), e.clientX); }, { passive: false });
+let pinch = null;
+const pop = el("div", "pop"); pop.hidden = true; document.body.appendChild(pop);
+document.addEventListener("click", e => {
+  const a = e.target.closest && e.target.closest(".ev");
+  if (!a || !matchMedia("(hover: none)").matches) { if (!e.target.closest?.(".pop")) pop.hidden = true; return; }
+  if (pop.dataset.for === a.title && !pop.hidden) return; // second tap opens the map
+  e.preventDefault(); pop.dataset.for = a.title; const [l1, ...rest] = a.title.split("\n");
+  pop.innerHTML = `<b>${esc(l1)}</b><div>${esc(rest.join(" "))}</div>` + (a.href ? `<a href="${esc(a.href)}" target="_blank" rel="noopener">Open map →</a>` : "");
+  const r = a.getBoundingClientRect(); pop.hidden = false; pop.style.left = Math.max(8, Math.min(innerWidth - 268, r.left)) + "px"; pop.style.top = (r.bottom + 6 + scrollY) + "px";
+}, true);
+$("view").addEventListener("touchstart", e => { if (e.touches.length === 2 && e.target.closest(".tl")) { const [a, b] = e.touches; pinch = { d: Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY), z: zoom }; tx = null; } }, { passive: true });
+$("view").addEventListener("touchmove", e => { if (!pinch || e.touches.length !== 2) return; e.preventDefault(); const [a, b] = e.touches; applyZoom(pinch.z * Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY) / pinch.d, (a.clientX + b.clientX) / 2); }, { passive: false });
+$("view").addEventListener("touchend", e => { if (e.touches.length < 2) pinch = null; }, { passive: true });
+$("view").addEventListener("touchstart", e => { if (e.touches.length > 1) return; tx = e.touches[0].clientX; ty = e.touches[0].clientY; }, { passive: true });
 $("view").addEventListener("touchend", e => { if (tx == null) return; const dx = e.changedTouches[0].clientX - tx, dy = e.changedTouches[0].clientY - ty; const tl = e.target.closest(".tl"); const atEdge = !tl || tl.scrollLeft <= 0 || tl.scrollLeft + tl.clientWidth >= tl.scrollWidth - 1;
   if (Math.abs(dx) > 70 && Math.abs(dx) > 2 * Math.abs(dy) && atEdge) shift(dx > 0 ? -1 : 1); tx = null; });
 setInterval(() => { const n = new Date(); document.querySelectorAll(".now").forEach(x => { x.style.left = pct(n) + "%"; if (x.dataset.t) x.dataset.t = fmt(n); }); }, 60000);

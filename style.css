@@ -111,3 +111,24 @@ footer{text-align:center;padding:28px 16px}
 .sw.clashsw{border:0;width:6px;height:6px;border-radius:50%;background:#d9825b}
 .pev{--card:hsl(var(--h,210) 75% 86%);color:#111}.pev.clash{outline:none}
 .pev[data-type=VO]{background:hsl(var(--h,210) 70% 78%)}
+
+/* v9: zoom */
+.zoom{display:inline-flex;align-items:center;gap:4px}.zoom button{min-width:36px;padding:6px 10px}#zFit{font-variant-numeric:tabular-nums;font-size:.8rem;color:var(--mu)}
+.trim{display:inline-flex;align-items:center;gap:5px;font-size:.8rem;color:var(--mu);margin-left:6px;cursor:pointer}.trim input{width:15px;height:15px;accent-color:var(--ac)}
+.track:not(.compact){min-width:1100px}.tl{touch-action:pan-x pan-y}
+
+/* v9: tight blocks */
+.ev,.pev{container-type:size}
+.ev .tb,.pev .tb{position:absolute;top:2px;right:3px;margin:0;font-size:9px;line-height:1.2;padding:0 3px;z-index:1}
+.ev .nm,.pev b{padding-right:24px;hyphens:manual;overflow-wrap:normal;word-break:normal}
+.ev.clash::after{top:auto;bottom:4px}
+.sn{display:none}
+@container (max-width:150px){.fn{display:none}.sn{display:inline}.ev .nm,.pev b{padding-right:0}.ev .tb,.pev .tb{font-size:0;width:7px;height:7px;padding:0;border-radius:50%;background:var(--c)}}
+@container (max-width:60px){.ev .loc,.pev>span,.pev small{display:none}.ev .nm{-webkit-line-clamp:4}}
+@container (max-height:46px){.ev .loc,.pev small{display:none}}
+@container (max-height:30px){.pev>span{display:none}}
+@container (max-height:62px){.ev .t{display:none}}
+.ev .nm{font-size:max(.72rem,11px)}.week .ev .nm{font-size:11px}.pev{font-size:10px}.pev b{-webkit-line-clamp:3}
+.pop{position:absolute;z-index:50;width:260px;background:var(--card);color:var(--fg);border:1px solid var(--bd);border-radius:12px;box-shadow:var(--sh);padding:10px 12px;font-size:.85rem;display:flex;flex-direction:column;gap:4px}.pop[hidden]{display:none}
+@media print{.pop{display:none!important}}
+.week .wd{position:sticky;left:0;z-index:4;background:var(--card)}.week .wrow.today .wd{background:color-mix(in srgb,var(--today) 100%,var(--card))}
