@@ -103,3 +103,11 @@ footer{text-align:center;padding:28px 16px}
 }
 .lg .sw{--c:#8a8f98}
 @media(max-width:800px){.week .winner{min-width:820px}.week .wd{position:sticky;left:0;z-index:4;background:var(--card)}}
+
+/* v8: subtle overlaps, colorful PDF */
+.ev.clash{outline:none}.ev.clash::after{content:"";top:5px;right:5px;width:6px;height:6px;background:#d9825b;opacity:.85}
+.card.clash{box-shadow:var(--sh)}.cb{color:var(--mu);font-weight:500}
+.cbadge{background:none;color:var(--mu);font-weight:500;padding:0;margin-left:10px}
+.sw.clashsw{border:0;width:6px;height:6px;border-radius:50%;background:#d9825b}
+.pev{--card:hsl(var(--h,210) 75% 86%);color:#111}.pev.clash{outline:none}
+.pev[data-type=VO]{background:hsl(var(--h,210) 70% 78%)}

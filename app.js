@@ -19,6 +19,7 @@ const START_H = 7, END_H = 21;
 let events = [], cancelled = [], day = startOfDay(new Date()), pollTimer = null;
 const roomCache = new Map();
 
+function semesterMonths() { const n = new Date(), m = n.getMonth(); const ws = m >= 9 || m < 3; const startM = ws ? (m >= 9 ? m - 9 : m + 3) : m - 3; return { pMonateVor: startM + 1, pMonateNach: 6 - startM }; }
 function startOfDay(d) { const x = new Date(d); x.setHours(0, 0, 0, 0); return x; }
 function show(id) { for (const s of ["login", "activate", "cal"]) $(s).hidden = s !== id; $("logout").hidden = id === "login"; }
 function esc(s) { return String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
@@ -69,7 +70,7 @@ function parseTumDate(s) { // "2026-10-27 10:15:00" (Berlin local), or ISO with 
 async function loadCalendar(tok) {
   show("cal"); $("view").innerHTML = "<p class='muted pad'>Loading…</p>";
   try {
-    const doc = await api("kalender", { pToken: tok, pMonateVor: 1, pMonateNach: 4 });
+    const doc = await api("kalender", { pToken: tok, ...semesterMonths() });
     const pick = (el, ...names) => { for (const n of names) { const x = [...el.children].find(c => c.localName.toLowerCase() === n); if (x && x.textContent.trim()) return x.textContent.trim(); } return ""; };
     let nodes = [...doc.getElementsByTagName("event")];
     if (!nodes.length) nodes = [...doc.getElementsByTagName("row")];
@@ -203,7 +204,7 @@ function hourAxis() { const ax = el("div", "axis"); for (let h = START_H; h <= E
 
 function renderDay(v) {
   const list = eventsOn(day), today = sameDay(day, new Date()), { conflicts } = layout(list);
-  $("dayLabel").innerHTML = esc(dlabel(day)) + (today ? '<span class="badge">TODAY</span>' : "") + `<small>${list.length} event${list.length === 1 ? "" : "s"}</small>` + (conflicts ? `<span class="cbadge">⚠ ${conflicts} overlap${conflicts > 1 ? "s" : ""}</span>` : "");
+  $("dayLabel").innerHTML = esc(dlabel(day)) + (today ? '<span class="badge">TODAY</span>' : "") + `<small>${list.length} event${list.length === 1 ? "" : "s"}</small>` + (conflicts ? `<span class="cbadge">${conflicts} overlap${conflicts > 1 ? "s" : ""}</span>` : "");
   if (!list.length) {
     const box = el("div", "empty", `<div class="big">${today ? "No classes today" : "No classes on this day"}</div>`);
     const nxt = events.filter(e => e.start >= addDays(day, 1)).sort((a, b) => a.start - b.start)[0];
@@ -217,7 +218,7 @@ function renderDay(v) {
   const cards = el("div", "cards"); const now = new Date();
   for (const e of list) {
     const c = el("div", "card" + (e.start <= now && e.end > now ? " live" : "") + (e.clash ? " clash" : "")); const t = decorate(c, e);
-    c.innerHTML = `<div class="row1"><span class="t">${fmt(e.start)}–${fmt(e.end)}</span>${t.k ? `<i class="tb">${esc(t.name)}</i>` : ""}${e.clash ? '<i class="cb">⚠ overlap</i>' : ""}</div>
+    c.innerHTML = `<div class="row1"><span class="t">${fmt(e.start)}–${fmt(e.end)}</span>${t.k ? `<i class="tb">${esc(t.name)}</i>` : ""}${e.clash ? '<i class="cb">overlap</i>' : ""}</div>
       <div class="nm">${esc(baseName(e.title))}</div><div class="loc">${esc(locLine(e))}</div><div class="full muted">${esc(e.location || "")}</div><a class="map" target="_blank" rel="noopener" hidden>Open map →</a>`;
     c.title = details(e); fillRoom(c, e); cards.appendChild(c);
   }
@@ -228,7 +229,7 @@ function weekDays(m) { const ds = []; for (let i = 0; i < 7; i++) { const d = ad
 function renderWeek(v) {
   const m = monday(day), sun = addDays(m, 6);
   const all = []; let conflicts = 0; for (const d of weekDays(m)) { const l = eventsOn(d); conflicts += layout(l).conflicts; all.push(...l); }
-  $("dayLabel").innerHTML = `Week of ${esc(dlabel(m, { day: "numeric", month: "short" }))} – ${esc(dlabel(sun, { day: "numeric", month: "short", year: "numeric" }))}<small>${all.length} events</small>` + (conflicts ? `<span class="cbadge">⚠ ${conflicts} overlap${conflicts > 1 ? "s" : ""}</span>` : "");
+  $("dayLabel").innerHTML = `Week of ${esc(dlabel(m, { day: "numeric", month: "short" }))} – ${esc(dlabel(sun, { day: "numeric", month: "short", year: "numeric" }))}<small>${all.length} events</small>` + (conflicts ? `<span class="cbadge">${conflicts} overlap${conflicts > 1 ? "s" : ""}</span>` : "");
   v.appendChild(legendFor(all));
   const box = el("div", "tl week"), inner = el("div", "winner");
   const head = el("div", "wrow whead"); head.append(el("div", "wd", ""), hourAxis()); inner.appendChild(head);
