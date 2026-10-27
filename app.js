@@ -281,7 +281,7 @@ function setMode(m) { mode = m; $("vDay").classList.toggle("on", m === "day"); $
 
 // --- Semester PDF: ONE A4 landscape page with a typical week + exceptions ---
 function isCancelled(e) { return /cancel|storn|abgesagt|entf(ä|ae)llt|f(ä|ae)llt aus/i.test((e.status || "").trim()) || /\b(abgesagt|entfällt|storniert|cancell?ed)\b/i.test(e.title || ""); }
-const APPV = 18;
+const APPV = 19;
 const hm = d => d.getHours() * 60 + d.getMinutes();
 const dShort = d => `${DOW[(d.getDay() + 6) % 7]} ${d.getDate()}.${d.getMonth() + 1}.`;
 function semesterModel() {
@@ -418,7 +418,7 @@ function examCourse(t) { return (t || "").replace(/\((schriftlich|mündlich|writ
 function examReg() { return events.filter(isExam).sort((a, b) => a.start - b.start).map(e => ({ e, course: examCourse(e.title), h: hue(examCourse(e.title)), min: Math.round((e.end - e.start) / 6e4) })); }
 // --- Planned exams: public TUMonline exam list (no personal data), baked into data/ and matched locally by course name or module number ---
 let PLAN = null, planP = null;
-function loadPlan() { return planP || (planP = fetch("data/exams-ws2026.json?v=" + APPV, { credentials: "omit" }).then(r => r.ok ? r.json() : null).catch(() => null).then(j => { PLAN = j; if (events.length) renderExams(); return j; })); }
+function loadPlan() { loadEcts(); return planP || (planP = fetch("data/exams-ws2026.json?v=" + APPV, { credentials: "omit" }).then(r => r.ok ? r.json() : null).catch(() => null).then(j => { PLAN = j; if (events.length) renderExams(); return j; })); }
 const normE = t => examCourse(t || "").replace(/\s+[-–:]\s+(klausur|exam|prüfung)\b.*$/i, "").toLowerCase().normalize("NFC").replace(/[^\p{L}\p{N}]+/gu, " ").trim();
 const normC = t => examCourse(baseName(t || "")).replace(/\s+[-–:]\s+(klausur|exam|prüfung)\b.*$/i, "").toLowerCase().normalize("NFC").replace(/[^\p{L}\p{N}]+/gu, " ").trim();
 const MODNR = /\b([A-Z]{2,4}\d{3,6}(?:-\d+)?)\b/;
@@ -440,6 +440,35 @@ function plannedExams(reg) {
   }
   return out;
 }
+// --- ECTS: public module-handbook credits baked into data/ects.json (code -> ECTS, no personal data) ---
+let ECTS = null, ectsP = null;
+function loadEcts() { return ectsP || (ectsP = fetch("data/ects.json?v=" + APPV, { credentials: "omit" }).then(r => r.ok ? r.json() : null).catch(() => null).then(j => { ECTS = j; if (events.length) renderExams(); return j; })); }
+const modBase = c => String(c || "").trim().toUpperCase().replace(/-\d+$/, "");
+const ectsOf = c => { const m = ECTS && ECTS.m; if (!m || !c) return null; for (const k of String(c).split(/\s*\/\s*/)) { const v = m[modBase(k)]; if (v) return v; } return null; };
+function examCode(x) {
+  if (x.planned) return x.code; const c = (x.e.title.match(MODNR) || [])[1]; if (c) return c;
+  if (PLAN && PLAN.exams) { const k = normC(x.course), h = PLAN.exams.find(p => normE(p.t) === k); if (h) return h.c; } return null;
+}
+const ectsTxt = v => (Math.round(v * 10) / 10).toString().replace(".", ",");
+// --- Optional credits earned: wbservicesbasic.noten, kept in memory only (never stored, grades never shown) ---
+let CRED = null, credOn = false, credBusy = false;
+function passed(g) { g = String(g || "").trim(); const n = parseFloat(g.replace(",", ".")); if (!isNaN(n)) return n >= 1 && n <= 4.0; return /^(b|be|bestanden|passed|p|mit erfolg)/i.test(g); }
+async function loadCredits() {
+  const tok = sessionStorage.getItem("tok"); if (!tok) { CRED = { err: "Credits need a TUMonline token (not available for .ics uploads)." }; return; }
+  credBusy = true; renderExams(); await loadEcts();
+  try {
+    const doc = await api("noten", { pToken: tok }), rows = [...doc.querySelectorAll("row")], got = new Map(), unk = new Set();
+    const f = (r, ...n) => { for (const k of n) { const v = r.querySelector(k)?.textContent?.trim(); if (v) return v; } return ""; };
+    for (const r of rows) {
+      if (!passed(f(r, "uninotenamekurz", "note", "grade"))) continue;
+      const code = modBase(f(r, "lv_nummer")), key = code || f(r, "lv_titel"); if (!key || got.has(key)) continue;
+      const own = parseFloat(f(r, "lv_credits", "credits", "ects", "ects_credits").replace(",", "."));
+      const v = own > 0 ? own : ectsOf(code); if (v) got.set(key, v); else { unk.add(key); got.set(key, 0); }
+    }
+    CRED = { sum: [...got.values()].reduce((a, b) => a + b, 0), passed: new Set(got.keys()), n: got.size, unk: unk.size, rows: rows.length };
+  } catch (e) { CRED = { err: /berechtigung|permission|rechte|not allowed|keine/i.test(e.message) ? "Your token doesn’t have the “Noten” permission. Enable it in the TUMonline token settings, then tick again." : "Couldn’t load credits: " + e.message }; }
+  credBusy = false; renderExams();
+}
 function examList() { const R = examReg(); return [...R, ...plannedExams(R)].sort((a, b) => a.e.start - b.e.start); }
 const planNote = () => PLAN ? `Planned = not registered yet. Date/room from the public TUMonline exam list (${PLAN.source.replace(/^https?:\/\//, "").replace(/\?.*$/, "")}), as of ${PLAN.updated}; matched to your courses by name/module number on this device. Binding info only in TUMonline after you register (WiSe 26/27 registration 16.11.2026–15.01.2027).` : "";
 const dayDiff = (a, b) => Math.round((startOfDay(b) - startOfDay(a)) / 864e5);
@@ -449,7 +478,8 @@ const durTxt = m => m >= 60 && m % 60 === 0 ? `${m / 60} h` : `${m} min`;
 const EXAM_NONE = "No exams found in your TUMonline calendar. Exams only appear here after you register for them in TUMonline (the token's Kalender permission is enough — TUMonline offers no separate exam webservice).";
 function examSummary(X) {
   const gaps = X.slice(1).map((x, i) => dayDiff(X[i].e.start, x.e.start));
-  return { n: X.length, span: X.length ? dayDiff(X[0].e.start, X[X.length - 1].e.start) : 0, gaps, min: gaps.length ? Math.min(...gaps) : null };
+  const done = CRED && CRED.passed; let ects = 0, noE = 0; for (const x of X) { const c = examCode(x); x.ects = ectsOf(c); if (done && c && done.has(modBase(String(c).split(/\s*\/\s*/)[0]))) continue; if (x.ects) ects += x.ects; else noE++; }
+  return { ects, noE, n: X.length, span: X.length ? dayDiff(X[0].e.start, X[X.length - 1].e.start) : 0, gaps, min: gaps.length ? Math.min(...gaps) : null };
 }
 function buildExamPdf(J, X, loc) {
   const doc = new J.jsPDF({ orientation: "portrait", unit: "mm", format: "a4", compress: true });
@@ -462,7 +492,7 @@ function buildExamPdf(J, X, loc) {
   if (!X.length) { doc.setFontSize(10); doc.setTextColor(60); doc.text(doc.splitTextToSize(pdfTxt(EXAM_NONE), W), X0, m + 20); return doc; }
   // summary chips
   let cx = X0, cy = m + 12;
-  for (const [k, v] of [["Exams", String(S.n)], ["Total span", `${S.span} days`], ["Fewest study days between exams", S.min == null ? "–" : String(Math.max(0, S.min - 1))]]) {
+  for (const [k, v] of [["Exams", String(S.n)], ["Total span", `${S.span} days`], ["Fewest study days between exams", S.min == null ? "–" : String(Math.max(0, S.min - 1))], ...(S.ects ? [["ECTS at stake", ectsTxt(S.ects)]] : []), ...(CRED && !CRED.err && credOn ? [["ECTS earned", ectsTxt(CRED.sum)], ["After this exam period", ectsTxt(CRED.sum + S.ects)]] : [])]) {
     doc.setFont("helvetica", "bold"); doc.setFontSize(11); const vw = doc.getTextWidth(v); doc.setFont("helvetica", "normal"); doc.setFontSize(7); const kw = doc.getTextWidth(k);
     const w = Math.max(vw, kw) + 8; doc.setFillColor(244, 245, 247); doc.roundedRect(cx, cy, w, 11, 1.5, 1.5, "F");
     doc.setTextColor(110); doc.text(k, cx + 4, cy + 4); doc.setFont("helvetica", "bold"); doc.setFontSize(11); doc.setTextColor(20); doc.text(v, cx + 4, cy + 9); cx += w + 3;
@@ -495,7 +525,7 @@ function buildExamPdf(J, X, loc) {
     const bw = x.planned ? 40 : 0, nm = wrapLines(doc, x.course, tw - 28 - bw, big ? 2 : 1); let yy = y + (big ? 6 : 4.6); nm.forEach(l => { doc.text(l, tx2, yy); yy += big ? 4.4 : 3.8; });
     if (x.planned) { doc.setFont("helvetica", "bold"); doc.setFontSize(5.6); const bt = pdfTxt(`PLANNED · NOT REGISTERED · ${x.code}`), w = Math.min(doc.getTextWidth(bt) + 3, bw + 18); doc.setFillColor(255, 243, 205); doc.roundedRect(X1 - 3 - 26 - w, y + (big ? 3.3 : 2.2), w, 3.6, 1.8, 1.8, "F"); doc.setTextColor(146, 96, 0); doc.text(fitLine(doc, bt, w - 3), X1 - 3 - 26 - w + 1.5, y + (big ? 5.9 : 4.8)); doc.setFont("helvetica", "bold"); doc.setFontSize(big ? 10.5 : 9); }
     doc.setFont("helvetica", "bold"); doc.setFontSize(big ? 9 : 8); doc.setTextColor(40); doc.text(pdfTxt(`${fmt(x.e.start)}–${fmt(x.e.end)}`), X1 - 3, y + (big ? 6 : 4.6), { align: "right" });
-    doc.setFont("helvetica", "normal"); doc.setFontSize(7); doc.setTextColor(110); doc.text(durTxt(x.min), X1 - 3, y + (big ? 10.4 : 8.4), { align: "right" });
+    doc.setFont("helvetica", "normal"); doc.setFontSize(7); doc.setTextColor(110); doc.text(durTxt(x.min) + (x.ects ? ` · ${ectsTxt(x.ects)} ECTS` : ""), X1 - 3, y + (big ? 10.4 : 8.4), { align: "right" });
     doc.setFontSize(big ? 7.8 : 7); doc.setTextColor(85); doc.text(fitLine(doc, loc(x.e.location), tw - 18), tx2, Math.min(yy + 0.2, y + rowH - 2.2));
     y += rowH;
   });
@@ -506,11 +536,14 @@ function renderExams() {
   const box = $("exams"); if (!box) return; if (!PLAN) loadPlan(); const X = examList(), nP = X.filter(x => x.planned).length; box.hidden = false; box.innerHTML = "";
   box.appendChild(el("h3", "", `Exams <small class="muted">${X.length || ""}</small>`));
   if (!X.length) { box.appendChild(el("p", "muted", esc(EXAM_NONE))); return; }
-  const S = examSummary(X); box.appendChild(el("p", "muted", `${S.n} exam${S.n > 1 ? "s" : ""}${nP ? ` (${S.n - nP} registered, ${nP} planned)` : ""} · span ${S.span} days${S.min != null ? ` · fewest study days between exams: ${Math.max(0, S.min - 1)}` : ""}`));
+  const S = examSummary(X); box.appendChild(el("p", "muted", `${S.n} exam${S.n > 1 ? "s" : ""}${nP ? ` (${S.n - nP} registered, ${nP} planned)` : ""} · span ${S.span} days${S.min != null ? ` · fewest study days between exams: ${Math.max(0, S.min - 1)}` : ""}${S.ects ? ` · <b>${ectsTxt(S.ects)} ECTS</b> at stake${S.noE ? ` (${S.noE} without ECTS data)` : ""}` : ""}`));
+  const cr = el("div", "excred"); cr.innerHTML = `<label class="check"><input type="checkbox" id="credChk"${credOn ? " checked" : ""}> <span>Also show my credits <small class="muted">(needs “Noten” permission; read once, kept in memory only)</small></span></label>`;
+  if (credOn) { const p = el("p", "credline", ""); if (credBusy || !CRED) p.textContent = "Loading credits…"; else if (CRED.err) { p.className = "credline err"; p.textContent = CRED.err; } else p.innerHTML = `<b>${ectsTxt(CRED.sum)} ECTS earned</b> · ${ectsTxt(CRED.sum)} + ${ectsTxt(S.ects)} = <b>${ectsTxt(CRED.sum + S.ects)} ECTS</b> after this exam period <small class="muted">(${CRED.n} passed module${CRED.n === 1 ? "" : "s"}${CRED.unk ? `, ${CRED.unk} without ECTS data counted as 0` : ""})</small>`; cr.appendChild(p); }
+  box.appendChild(cr); cr.querySelector("#credChk").onchange = ev => { credOn = ev.target.checked; if (credOn && !CRED) loadCredits(); else { if (!credOn) CRED = null; renderExams(); } };
   const ol = el("ol", "exl");
   X.forEach((x, i) => {
     if (i) { const g = dayDiff(X[i - 1].e.start, x.e.start); ol.appendChild(el("li", "exgap" + (g <= 2 ? " tight" : ""), g ? `${g - 1} study day${g === 2 ? "" : "s"} · Δ ${g} day${g > 1 ? "s" : ""}` : "same day · 0 study days")); }
-    const li = el("li", "exi" + (x.planned ? " plan" : ""), `<b class="exd">${esc(dShort(x.e.start))}</b><span class="exn">${esc(x.course)}${x.planned ? ` <i class="exbadge">planned · not registered</i> <small class="muted">${esc(x.code)}</small>` : ""}</span><span class="muted">${fmt(x.e.start)}–${fmt(x.e.end)} · ${durTxt(x.min)} · ${esc(x.e.location || "–")}</span>`);
+    const li = el("li", "exi" + (x.planned ? " plan" : ""), `<b class="exd">${esc(dShort(x.e.start))}</b><span class="exn">${esc(x.course)}${x.ects ? ` <i class="exects">${ectsTxt(x.ects)} ECTS</i>` : ""}${x.planned ? ` <i class="exbadge">planned · not registered</i> <small class="muted">${esc(x.code)}</small>` : ""}</span><span class="muted">${fmt(x.e.start)}–${fmt(x.e.end)} · ${durTxt(x.min)} · ${esc(x.e.location || "–")}</span>`);
     li.style.setProperty("--h", x.h); ol.appendChild(li);
   });
   box.appendChild(ol);
@@ -587,7 +620,7 @@ async function exportPdf() {
   setTimeout(() => window.print(), 50);
 }
 
-function logout() { clearInterval(pollTimer); store.clear(); $("remember").checked = false; events = []; cancelled = []; localStorage.removeItem("tumSchedZoom"); localStorage.removeItem("tumSchedTrim"); roomCache.clear(); $("tumid").value = $("tokenIn").value = ""; $("msg").textContent = ""; $("msg2").textContent = "Waiting for activation – checking every 5 s…"; $("printout").innerHTML = ""; show("login"); }
+function logout() { clearInterval(pollTimer); store.clear(); CRED = null; credOn = false; $("remember").checked = false; events = []; cancelled = []; localStorage.removeItem("tumSchedZoom"); localStorage.removeItem("tumSchedTrim"); roomCache.clear(); $("tumid").value = $("tokenIn").value = ""; $("msg").textContent = ""; $("msg2").textContent = "Waiting for activation – checking every 5 s…"; $("printout").innerHTML = ""; show("login"); }
 function shift(n) { day = addDays(day, n * (mode === "week" ? 7 : 1)); render(n); }
 
 $("req").onclick = requestToken;
