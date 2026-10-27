@@ -1,5 +1,17 @@
 "use strict";
-// Privacy: token lives in sessionStorage only (cleared when the tab closes). Nothing is sent anywhere except TUMonline and NavigaTUM.
+const store = {
+  get: () => sessionStorage.getItem("tok") || localStorage.getItem("tumSchedTok"),
+  set: (t) => { store.set(t); if (document.getElementById("remember")?.checked) localStorage.setItem("tumSchedTok", t); else localStorage.removeItem("tumSchedTok"); },
+  clear: () => { store.clear(); $("remember").checked = false; localStorage.removeItem("tumSchedTok"); }
+};
+function showError(where, err) {
+  const box = document.getElementById("errbox"); if (!box) return;
+  box.hidden = false;
+  box.querySelector("pre").textContent = `${where}: ${err && err.message ? err.message : err}\n${(err && err.stack) || ""}`.slice(0, 1500);
+}
+window.addEventListener("error", e => showError("Script error", e.error || e.message));
+window.addEventListener("unhandledrejection", e => showError("Async error", e.reason));
+// Privacy: token lives in sessionStorage (cleared on tab close), or in localStorage only if the user opts in via "Remember me". Nothing is sent anywhere except TUMonline and NavigaTUM.
 const BASE = "https://campus.tum.de/tumonline/wbservicesbasic.";
 const NAV = "https://nav.tum.de/api/";
 const $ = (id) => document.getElementById(id);
@@ -27,7 +39,7 @@ async function requestToken() {
     const doc = await api("requestToken", { pUsername: id, pTokenName: "TUM Schedule" });
     const tok = doc.querySelector("token")?.textContent?.trim();
     if (!tok) throw new Error("No token in response");
-    sessionStorage.setItem("tok", tok);
+    store.set(tok);
     startActivation(tok);
   } catch (e) { $("msg").textContent = "Error: " + e.message; }
 }
@@ -44,20 +56,29 @@ function startActivation(tok) {
   check(); pollTimer = setInterval(check, 5000);
 }
 
-function parseTumDate(s) { // "2026-10-27 10:15:00" (Europe/Berlin local)
-  const m = String(s).trim().match(/(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})(?::(\d{2}))?/);
-  return m ? new Date(+m[1], m[2] - 1, +m[3], +m[4], +m[5], +(m[6] || 0)) : null;
+function parseTumDate(s) { // "2026-10-27 10:15:00" (Berlin local), or ISO with Z/offset
+  s = String(s || "").trim(); if (!s) return null;
+  if (/[T ]\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|[+-]\d{2}:?\d{2})$/.test(s)) { const d = new Date(s.replace(" ", "T")); return isNaN(d) ? null : d; }
+  let m = s.match(/(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})(?::(\d{2}))?/);
+  if (m) return new Date(+m[1], m[2] - 1, +m[3], +m[4], +m[5], +(m[6] || 0));
+  m = s.match(/(\d{1,2})\.(\d{1,2})\.(\d{4})\s+(\d{1,2}):(\d{2})/);
+  if (m) return new Date(+m[3], m[2] - 1, +m[1], +m[4], +m[5]);
+  const d = new Date(s); return isNaN(d) ? null : d;
 }
 
 async function loadCalendar(tok) {
   show("cal"); $("view").innerHTML = "<p class='muted pad'>Loading…</p>";
   try {
     const doc = await api("kalender", { pToken: tok, pMonateVor: 1, pMonateNach: 4 });
-    const txt = (el, n) => el.querySelector(n)?.textContent?.trim() || "";
-    events = [...doc.getElementsByTagName("event")].map(el => ({
-      title: txt(el, "title"), start: parseTumDate(txt(el, "dtstart")), end: parseTumDate(txt(el, "dtend")),
-      location: txt(el, "location"), status: txt(el, "status"), url: txt(el, "url")
-    })).filter(e => e.start && e.end && e.status !== "CANCEL");
+    const pick = (el, ...names) => { for (const n of names) { const x = [...el.children].find(c => c.localName.toLowerCase() === n); if (x && x.textContent.trim()) return x.textContent.trim(); } return ""; };
+    let nodes = [...doc.getElementsByTagName("event")];
+    if (!nodes.length) nodes = [...doc.getElementsByTagName("row")];
+    events = nodes.map(el => ({
+      title: pick(el, "title", "titel", "summary", "description"), start: parseTumDate(pick(el, "dtstart", "start", "beginn", "von")), end: parseTumDate(pick(el, "dtend", "end", "ende", "bis")),
+      location: pick(el, "location", "ort", "raum", "room"), status: pick(el, "status"), url: pick(el, "url")
+    })).filter(e => e.start && e.end && !/CANCEL/i.test(e.status));
+    if (!events.length && nodes.length) showError("Calendar", new Error(`Received ${nodes.length} entries but could not read their dates. First entry: ` + new XMLSerializer().serializeToString(nodes[0]).slice(0, 600)));
+    if (!nodes.length) showError("Calendar", new Error("No events found in TUMonline response. Start of response: " + new XMLSerializer().serializeToString(doc).slice(0, 600)));
     render();
   } catch (e) {
     if (/ungültig|invalid/i.test(e.message)) { logout(); $("msg").textContent = "Token invalid. Please request a new one."; }
@@ -147,7 +168,13 @@ function buildTrack(list, d, compact) {
 function renderDay(v) {
   const list = eventsOn(day), today = sameDay(day, new Date());
   $("dayLabel").innerHTML = esc(dlabel(day)) + (today ? '<span class="badge">TODAY</span>' : "") + `<small>${list.length} event${list.length === 1 ? "" : "s"}</small>`;
-  if (!list.length) { v.appendChild(el("div", "empty", "No classes on this day 🎉")); return; }
+  if (!list.length) {
+    const box = el("div", "empty", `<div class="big">${today ? "No classes today" : "No classes on this day"}</div>`);
+    const nxt = events.filter(e => e.start >= addDays(day, 1)).sort((a, b) => a.start - b.start)[0];
+    if (nxt) { const b = el("button", "primary", `Next class: ${esc(dlabel(nxt.start, { weekday: "short", day: "numeric", month: "short" }))}, ${fmt(nxt.start)} · ${esc(nxt.title)}`); b.onclick = () => { day = startOfDay(nxt.start); render(1); }; box.appendChild(b); }
+    else if (!events.length) box.appendChild(el("p", "muted", "No events were loaded. If this is unexpected, check that the token has the Kalender permission."));
+    v.appendChild(box); return;
+  }
   const tl = el("div", "tl"); tl.appendChild(buildTrack(list, day, false)); v.appendChild(tl);
   requestAnimationFrame(() => { const first = today ? new Date() : list[0].start; tl.scrollLeft = Math.max(0, (pct(first) / 100) * tl.scrollWidth - 80); });
   const cards = el("div", "cards"); const now = new Date();
@@ -178,7 +205,7 @@ function renderWeek(v) {
 
 function render(dx = 0) {
   const v = $("view");
-  const draw = () => { v.innerHTML = ""; mode === "day" ? renderDay(v) : renderWeek(v); v.classList.remove("fade"); };
+  const draw = () => { v.innerHTML = ""; try { mode === "day" ? renderDay(v) : renderWeek(v); } catch (e) { showError("Render", e); } v.classList.remove("fade"); };
   if (!dx) return draw();
   v.style.setProperty("--dx", (dx > 0 ? -24 : 24) + "px"); v.classList.add("fade"); setTimeout(draw, 140);
 }
@@ -212,12 +239,12 @@ async function exportPdf() {
   window.print();
 }
 
-function logout() { clearInterval(pollTimer); sessionStorage.clear(); events = []; roomCache.clear(); $("tumid").value = $("tokenIn").value = ""; $("msg").textContent = ""; $("msg2").textContent = "Waiting for activation – checking every 5 s…"; $("printout").innerHTML = ""; show("login"); }
+function logout() { clearInterval(pollTimer); store.clear(); $("remember").checked = false; events = []; roomCache.clear(); $("tumid").value = $("tokenIn").value = ""; $("msg").textContent = ""; $("msg2").textContent = "Waiting for activation – checking every 5 s…"; $("printout").innerHTML = ""; show("login"); }
 function shift(n) { day = addDays(day, n * (mode === "week" ? 7 : 1)); render(n); }
 
 $("req").onclick = requestToken;
 $("tumid").onkeydown = e => { if (e.key === "Enter") requestToken(); };
-$("useTok").onclick = () => { const t = $("tokenIn").value.trim(); if (!t) return; sessionStorage.setItem("tok", t); startActivation(t); };
+$("useTok").onclick = () => { const t = $("tokenIn").value.trim(); if (!t) return; store.set(t); startActivation(t); };
 $("ics").onchange = async e => { const f = e.target.files[0]; if (!f) return; events = parseICS(await f.text()); show("cal"); render(); };
 $("logout").onclick = logout;
 $("prev").onclick = () => shift(-1); $("next").onclick = () => shift(1);
@@ -231,4 +258,5 @@ $("view").addEventListener("touchstart", e => { tx = e.touches[0].clientX; ty = 
 $("view").addEventListener("touchend", e => { if (tx == null) return; const dx = e.changedTouches[0].clientX - tx, dy = e.changedTouches[0].clientY - ty; const tl = e.target.closest(".tl"); const atEdge = !tl || tl.scrollLeft <= 0 || tl.scrollLeft + tl.clientWidth >= tl.scrollWidth - 1;
   if (Math.abs(dx) > 70 && Math.abs(dx) > 2 * Math.abs(dy) && atEdge) shift(dx > 0 ? -1 : 1); tx = null; });
 setInterval(() => { const n = new Date(); document.querySelectorAll(".now").forEach(x => { x.style.left = pct(n) + "%"; if (x.dataset.t) x.dataset.t = fmt(n); }); }, 60000);
-const saved = sessionStorage.getItem("tok"); if (saved) startActivation(saved); else show("login");
+const saved = store.get(); if (localStorage.getItem("tumSchedTok")) $("remember").checked = true; if (saved) startActivation(saved); else show("login");
+$("remember").onchange = () => { const t = sessionStorage.getItem("tok"); if ($("remember").checked) { if (t) localStorage.setItem("tumSchedTok", t); } else localStorage.removeItem("tumSchedTok"); };
