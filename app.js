@@ -280,7 +280,7 @@ function setMode(m) { mode = m; $("vDay").classList.toggle("on", m === "day"); $
 
 // --- Semester PDF: ONE A4 landscape page with a typical week + exceptions ---
 function isCancelled(e) { return /cancel|storn|abgesagt|entf(ä|ae)llt|f(ä|ae)llt aus/i.test((e.status || "").trim()) || /\b(abgesagt|entfällt|storniert|cancell?ed)\b/i.test(e.title || ""); }
-const APPV = 14;
+const APPV = 15;
 const hm = d => d.getHours() * 60 + d.getMinutes();
 const dShort = d => `${DOW[(d.getDay() + 6) % 7]} ${d.getDate()}.${d.getMonth() + 1}.`;
 function semesterModel() {
@@ -327,19 +327,9 @@ function buildPdf(J, M, loc, items) {
   doc.setProperties({ title: "Semester timetable", creator: "TUM Schedule" });
   doc.setFont("helvetica", "bold"); doc.setFontSize(15); doc.setTextColor(17); doc.text("Semester timetable", X0, m + 5);
   doc.setFont("helvetica", "normal"); doc.setFontSize(8.5); doc.setTextColor(90); doc.text(pdfTxt(`${D(M.first)} – ${D(M.last)} · typical week · TUM Schedule`), X1, m + 5, { align: "right" });
-  // exceptions: choose font size + columns so everything fits under a grid of >= 112 mm
   const gTop = m + 9, legH = 7, minGrid = 112;
-  let ex = null;
-  if (items.length) {
-    const avail = PH - m - gTop - minGrid - legH;
-    for (const fs of [7, 6.5, 6, 5.5, 5, 4.6, 4.2, 3.8]) {
-      let ok = null; const lh = fs * 0.42;
-      for (let nc = 1; nc <= 5; nc++) { const rows = Math.ceil(items.length / nc), h = 5 + rows * lh; if (h <= avail) { ok = { fs, lh, nc, rows, h }; break; } }
-      if (ok) { ex = ok; break; }
-    }
-    if (!ex) { const fs = 3.8, lh = fs * 0.42, nc = 5, rows = Math.floor((PH - m - gTop - minGrid - legH - 5) / lh); ex = { fs, lh, nc, rows, h: 5 + rows * lh, cut: items.length - rows * nc }; }
-  }
-  const gBot = PH - m - (ex ? ex.h + 1 : 0) - legH;
+  const exA = items.length ? Math.min(PH - m - gTop - minGrid - legH, 8 + Math.max(...items.map(g => g.rows.reduce((h, r) => h + r.entries.length * 3 + 1.1, 0)))) : 0;
+  const gBot = PH - m - (exA ? exA + 1 : 0) - legH;
   const cols = [1, 2, 3, 4, 5]; if (M.slots.some(s => s.e.start.getDay() === 6)) cols.push(6); if (M.slots.some(s => s.e.start.getDay() === 0)) cols.push(0);
   let h0 = Math.max(MIN_H, Math.min(...M.slots.map(s => s.e.start.getHours()), 10)), h1 = Math.min(MAX_H, Math.max(...M.slots.map(s => Math.ceil(hm(s.e.end) / 60)), 16));
   const ax = 9, dh = 5, bodyT = gTop + dh, bodyH = gBot - bodyT, cw = (X1 - X0 - ax) / cols.length;
@@ -379,17 +369,7 @@ function buildPdf(J, M, loc, items) {
     if (k) { doc.setFillColor(...hex2rgb(TCOL[k])); doc.roundedRect(lx, ly - 2.4, pw, 3.2, 0.7, 0.7, "F"); doc.setTextColor(255); doc.text(pdfTxt(k), lx + 1, ly); } else { doc.setDrawColor(120); doc.rect(lx, ly - 2.2, pw, 2.8); }
     doc.setFont("helvetica", "normal"); doc.setFontSize(7); doc.setTextColor(60); doc.text(pdfTxt(name), lx + pw + 1.2, ly); lx += pw + doc.getTextWidth(pdfTxt(name)) + 6;
   }
-  // exceptions in columns
-  if (ex) {
-    const ey = gBot + legH + 1; doc.setFont("helvetica", "bold"); doc.setFontSize(8); doc.setTextColor(20); doc.text("Exceptions & extra dates", X0, ey + 2.6);
-    const colW = (X1 - X0) / ex.nc; doc.setFontSize(ex.fs);
-    items.slice(0, ex.rows * ex.nc).forEach(([, b, r], i) => {
-      const c = Math.floor(i / ex.rows), row = i % ex.rows, x = X0 + c * colW, y = ey + 5 + (row + 0.8) * ex.lh;
-      doc.setFont("helvetica", "bold"); doc.setTextColor(20); const bt = pdfTxt(b); doc.text(bt, x, y); const bw = doc.getTextWidth(bt + " ");
-      doc.setFont("helvetica", "normal"); doc.setTextColor(55); doc.text(fitLine(doc, r, colW - bw - 2), x + bw, y);
-    });
-    if (ex.cut > 0) { doc.setFont("helvetica", "italic"); doc.text(`+ ${ex.cut} more`, X1, ey + 2.6, { align: "right" }); }
-  }
+  if (exA) drawEx(doc, items, X0, gBot + legH + 1, X1 - X0, exA);
   return doc;
 }
 async function deliverPdf(doc) {
@@ -403,14 +383,71 @@ async function deliverPdf(doc) {
   document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 60000);
   window.__lastPdf = blob;
 }
-function pdfItems(M, loc) {
-  const items = [];
-  for (const d of M.noLect) items.push([d, dShort(d), "– no lectures"]);
-  const byDay = new Map(); for (const m of M.missing) { const k = m.d.getTime(); (byDay.get(k) || byDay.set(k, []).get(k)).push(m); }
-  for (const [k, ms] of byDay) { const d = new Date(k); items.push([d, dShort(d), ms.map(m => `${shortName(m.s.e.title)} ${evType(m.s.e.title).k} ${fmt(m.s.e.start)}${m.why ? " (cancelled)" : ""}`).join(", ") + ` – ${ms.length > 1 ? "do" : "does"} not take place`]); }
-  for (const r of M.roomChanges) items.push([r.e.start, dShort(r.e.start), `${baseName(r.e.title)} ${fmt(r.e.start)} – room change: ${loc(r.e.location)}`]);
-  for (const e of M.oneOffs) items.push([e.start, dShort(e.start), `${fmt(e.start)}–${fmt(e.end)} ${baseName(e.title)} ${evType(e.title).k} · ${loc(e.location)} (extra)`]);
-  return items.sort((a, b) => a[0] - b[0]);
+// --- Exceptions model shared by PDF + print fallback: categories with rows {date, entries:[{h, main, sub}]} ---
+const EXCAT = { off: ["No lectures", "#64748b"], can: ["Cancelled", "#e5484d"], room: ["Room changes", "#d97706"], extra: ["Extra dates", "#059669"] };
+function exGroups(M, loc) {
+  const dk = d => startOfDay(d).getTime(), byDate = (arr, f) => { const m = new Map(); for (const x of arr) { const d = f(x), k = dk(d); (m.get(k) || m.set(k, { d: startOfDay(d), list: [] }).get(k)).list.push(x); } return [...m.values()].sort((a, b) => a.d - b.d); };
+  const T = e => { const k = evType(e.title).k; return shortName(e.title) + (k ? " " + k : ""); };
+  // merge consecutive no-lecture days (gaps of days without any events are bridged)
+  // breaks: runs of weekdays where >=50% of the expected slots are missing become "no lectures" ranges
+  const exp = d => M.slots.filter(s => s.e.start.getDay() === d.getDay() && d >= startOfDay(s.from) && d <= s.to).length;
+  const missOn = new Map(); for (const m of M.missing) missOn.set(dk(m.d), (missOn.get(dk(m.d)) || 0) + 1);
+  const heavy = [...missOn].filter(([k, n]) => n >= Math.max(1, exp(new Date(k)) * 0.5)).map(([k]) => new Date(k)).sort((a, b) => a - b);
+  const runs = []; for (const d of heavy) { const r = runs[runs.length - 1]; if (r && (d - r[r.length - 1]) / 864e5 <= 4) r.push(d); else runs.push([d]); }
+  const brk = new Set(); for (const r of runs) if (r.length >= 3) for (const d of r) brk.add(d.getTime());
+  const missing = M.missing.filter(m => !brk.has(dk(m.d)));
+  const off = [], nl = [...M.noLect, ...[...brk].map(t => new Date(t))].sort((a, b) => a - b).filter((d, i, a) => !i || !sameDay(d, a[i - 1]));
+  for (const d of nl) { const r = off[off.length - 1]; let ok = false; if (r) { ok = true; for (let x = addDays(r.to, 1); x < d; x = addDays(x, 1)) if (eventsOn(x).length) { ok = false; break; } if ((d - r.to) / 864e5 > 6) ok = false; } if (ok) r.to = d; else off.push({ from: d, to: d }); }
+  const rng = r => sameDay(r.from, r.to) ? dShort(r.from) : `${dShort(r.from)}–${dShort(r.to)}`;
+  const xmas = r => { for (let x = r.from; x <= r.to; x = addDays(x, 1)) if (x.getMonth() === 11 && x.getDate() >= 24 && x.getDate() <= 26) return true; return false; };
+  const G = [];
+  if (off.length) G.push({ k: "off", rows: off.map(r => ({ date: rng(r), entries: [{ main: xmas(r) ? "Christmas break" : sameDay(r.from, r.to) ? "No lectures" : "Lecture-free", sub: sameDay(r.from, r.to) ? "" : `${Math.round((r.to - r.from) / 864e5) + 1} days` }] })) });
+  if (missing.length) G.push({ k: "can", rows: byDate(missing, m => m.d).map(g => ({ date: dShort(g.d), entries: g.list.sort((a, b) => hm(a.s.e.start) - hm(b.s.e.start)).map(m => ({ h: hue(m.s.e.title), main: T(m.s.e), sub: fmt(m.s.e.start) + (m.why ? " · cancelled" : "") })) })) });
+  if (M.roomChanges.length) G.push({ k: "room", rows: byDate(M.roomChanges, r => r.e.start).map(g => ({ date: dShort(g.d), entries: g.list.map(r => ({ h: hue(r.e.title), main: `${T(r.e)} ${fmt(r.e.start)}`, sub: `${loc(r.room)} → ${loc(r.e.location)}` })) })) });
+  if (M.oneOffs.length) G.push({ k: "extra", rows: byDate(M.oneOffs, e => e.start).map(g => ({ date: dShort(g.d), entries: g.list.map(e => ({ h: hue(e.title), main: T(e), sub: `${fmt(e.start)}–${fmt(e.end)} · ${loc(e.location)}` })) })) });
+  return G;
+}
+function planEx(doc, G, A, W) { // pick font size + split each category into sub-columns so all fits in A mm height
+  for (const fs of [6.8, 6.4, 6, 5.6, 5.2, 4.8, 4.4, 4]) {
+    const lh = fs * 0.44, gap = 1.1, head = 6.5, cols = [];
+    for (const g of G) { let cur = { g, rows: [], h: 0, first: true }; cols.push(cur); for (const r of g.rows) { const rh = r.entries.length * lh + gap; if (cur.rows.length && cur.h + rh > A - head) { cur = { g, rows: [], h: 0 }; cols.push(cur); } cur.rows.push(r); cur.h += rh; } }
+    if (cols.length * 40 <= W && cols.every(c => c.h <= A - head)) return { fs, lh, gap, head, cols };
+  }
+  return null;
+}
+function drawEx(doc, G, x0, y0, W, A) {
+  let P = planEx(doc, G, A, W);
+  if (!P) { const fs = 4, lh = fs * 0.44, gap = 0.8, head = 6.5, cols = [], per = Math.max(1, Math.floor(W / 46)); for (const g of G) cols.push({ g, rows: g.rows, h: 0, first: true }); P = { fs, lh, gap, head, cols: cols.slice(0, per) }; }
+  const wt = c => c.g.k === "room" || c.g.k === "extra" ? 1.6 : 1, tw = P.cols.reduce((a, c) => a + wt(c), 0), dw = P.fs * 2.55; let cx = x0;
+  P.cols.forEach((c, i) => {
+    const cw = Math.min(c.g.k === "off" ? 60 : 95, W * wt(c) / tw), x = cx, [title, col] = EXCAT[c.g.k]; cx += cw;
+    if (c.first) { doc.setFillColor(...hex2rgb(col)); doc.roundedRect(x, y0 + 0.6, 2.4, 2.4, 0.5, 0.5, "F"); doc.setFont("helvetica", "bold"); doc.setFontSize(7.2); doc.setTextColor(25); doc.text(title, x + 3.6, y0 + 2.7);
+      const n = c.g.rows.reduce((s, r) => s + r.entries.length, 0); doc.setFont("helvetica", "normal"); doc.setTextColor(140); doc.text(String(n), x + 4.6 + doc.getTextWidth(title) + 0.4, y0 + 2.7); }
+    doc.setDrawColor(...hex2rgb(col)); doc.setLineWidth(0.25); doc.line(x, y0 + 4.2, x + cw - 4, y0 + 4.2);
+    let y = y0 + P.head;
+    c.rows.forEach((r, ri) => {
+      if (ri) { doc.setDrawColor(232); doc.setLineWidth(0.1); doc.line(x, y - P.gap / 2 - P.lh * 0.25, x + cw - 4, y - P.gap / 2 - P.lh * 0.25); }
+      doc.setFontSize(P.fs); doc.setFont("helvetica", "bold"); doc.setTextColor(35); doc.text(fitLine(doc, r.date, c.g.k === "off" ? cw : dw - 0.8), x, y + P.lh * 0.75);
+      const ex = c.g.k === "off" ? x + doc.getTextWidth(pdfTxt(r.date)) + 2 : x + dw;
+      r.entries.forEach((e, ei) => {
+        const yy = y + ei * P.lh + P.lh * 0.75; let tx = ex;
+        if (e.h != null) { doc.setFillColor(...hsl2rgb(e.h, 62, 50)); doc.circle(tx + 0.7, yy - P.fs * 0.12, P.fs * 0.11, "F"); tx += 2.2; }
+        doc.setFont("helvetica", "normal"); doc.setTextColor(25); const avail = x + cw - 4 - tx; const mt = fitLine(doc, e.main, avail); doc.text(mt, tx, yy);
+        if (e.sub) { const mw = doc.getTextWidth(mt + "  "); doc.setTextColor(125); const st = fitLine(doc, e.sub.replace("→", "»"), avail - mw); if (avail - mw > 4) doc.text(st, tx + mw, yy); }
+      });
+      y += r.entries.length * P.lh + P.gap;
+    });
+  });
+}
+function exHtml(G) {
+  const box = el("div", "pex");
+  for (const g of G) { const [title, col] = EXCAT[g.k], s = el("section", "pxg"); s.dataset.k = g.k; s.style.setProperty("--xc", col);
+    s.appendChild(el("h4", "", `<i></i>${esc(title)}<small>${g.rows.reduce((n, r) => n + r.entries.length, 0)}</small>`));
+    for (const r of g.rows) { const row = el("div", "pxr" + (g.k === "off" ? " off" : ""), `<b>${esc(r.date)}</b>`); const ul = el("span", "pxe");
+      for (const e of r.entries) { const it = el("span", "", `${e.h != null ? "<i></i>" : ""}${esc(e.main)}${e.sub ? ` <small>${esc(e.sub)}</small>` : ""}`); if (e.h != null) it.style.setProperty("--h", e.h); ul.appendChild(it); }
+      row.appendChild(ul); s.appendChild(row); }
+    box.appendChild(s); }
+  return box;
 }
 async function exportPdf() {
   const M = semesterModel(); if (!M) return showError("PDF", new Error("No events loaded."));
@@ -419,7 +456,7 @@ async function exportPdf() {
   const jp = loadJsPDF().catch(e => e);
   const rooms = new Map(await Promise.all([...locs].map(async l => [l, await resolveRoom(l)])));
   const loc = l => { const r = rooms.get(l); return r ? [r.short, r.building].filter(Boolean).join(" · ") : (l || "–"); };
-  try { const J = await jp; if (J instanceof Error) throw J; await deliverPdf(buildPdf(J, M, loc, pdfItems(M, loc))); btn.disabled = false; btn.textContent = "Save semester PDF"; return; }
+  try { const J = await jp; if (J instanceof Error) throw J; await deliverPdf(buildPdf(J, M, loc, exGroups(M, loc))); btn.disabled = false; btn.textContent = "Save semester PDF"; return; }
   catch (e) { console.warn("PDF file failed, using print fallback", e); }
   btn.disabled = false; btn.textContent = "Save semester PDF";
   const out = $("printout"); out.innerHTML = "";
@@ -452,14 +489,7 @@ async function exportPdf() {
     col.appendChild(cb); grid.appendChild(col);
   }
   fit.appendChild(grid); fit.appendChild(legendFor(M.slots.map(s => s.e)));
-  const items = [];
-  for (const d of M.noLect) items.push([d, `<b>${dShort(d)}</b> – no lectures`]);
-  const byDay = new Map(); for (const m of M.missing) { const k = m.d.getTime(); (byDay.get(k) || byDay.set(k, []).get(k)).push(m); }
-  for (const [k, ms] of byDay) { const d = new Date(k); items.push([d, `<b>${dShort(d)}</b> ` + ms.map(m => `${esc(shortName(m.s.e.title))} ${evType(m.s.e.title).k} ${fmt(m.s.e.start)}${m.why ? " (cancelled)" : ""}`).join(", ") + ` – ${ms.length > 1 ? "do" : "does"} not take place`]); }
-  for (const r of M.roomChanges) items.push([r.e.start, `<b>${dShort(r.e.start)}</b> ${esc(baseName(r.e.title))} ${fmt(r.e.start)} – room change: ${esc(loc(r.e.location))}`]);
-  for (const e of M.oneOffs) items.push([e.start, `<b>${dShort(e.start)}</b> ${fmt(e.start)}–${fmt(e.end)} ${esc(baseName(e.title))} ${evType(e.title).k} · ${esc(loc(e.location))} <i>(extra)</i>`]);
-  items.sort((a, b) => a[0] - b[0]);
-  if (items.length) { const ex = el("div", "pex", `<h3>Exceptions &amp; extra dates</h3>`); const ul = el("ul"); for (const [, h] of items) ul.appendChild(el("li", "", h)); ex.appendChild(ul); fit.appendChild(ex); }
+  const G = exGroups(M, loc); if (G.length) { fit.appendChild(el("h3", "pexh", "Exceptions &amp; extra dates")); fit.appendChild(exHtml(G)); }
   out.appendChild(pg);
   // scale to guarantee a single page (A4 landscape minus 10mm margins ≈ 1046×718 CSS px)
   setTimeout(() => window.print(), 50);
