@@ -140,3 +140,5 @@ footer{text-align:center;padding:28px 16px}
 .ev.past .tb{filter:saturate(.7)}
 .legend .tb{position:static;font-size:10px;padding:1px 5px}
 @container (max-width:150px){.ev .tb[data-t],.pev .tb[data-t]{background:var(--t)!important;box-shadow:0 0 0 1.5px var(--card)}}
+/* v13 token link */
+.tlink{display:inline-block;margin-top:10px;padding:8px 14px;border-radius:10px;background:var(--ac);color:#fff;font-weight:600;text-decoration:none}.tlink:hover{filter:brightness(1.1)}

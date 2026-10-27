@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src https://campus.tum.de https://nav.tum.de; style-src 'self'; script-src 'self'; img-src 'self' data:; font-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'; worker-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="color-scheme" content="light dark">
-<title>TUM Schedule – rooms at a glance</title><link rel="stylesheet" href="style.css?v=12">
+<title>TUM Schedule – rooms at a glance</title><link rel="stylesheet" href="style.css?v=13">
 </head><body>
 <header class="top">
   <div class="brand"><span class="logo">S</span><div><b>TUM Schedule</b><small>Your classes &amp; rooms at a glance</small></div></div>
@@ -18,14 +18,15 @@
   <h1>Your timetable, with rooms.</h1>
   <p class="lead">Enter your TUM ID. We request a read-only TUMonline token for your calendar – no password, ever.</p>
   <div class="field"><input id="tumid" placeholder="TUM ID, e.g. ab12cde" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="TUM ID"><button id="req" class="primary">Request token</button></div>
-  <label class="check"><input type="checkbox" id="remember"> <span>Remember me on this device <small class="muted">– keeps the token in this browser only, so you don't need a new one each visit. Off by default.</small></span></label>
+  <label class="check"><input type="checkbox" id="remember"> <span>Remember me on this device</span></label>
   <div class="hint">
-    <b>🔒 Only the calendar permission is needed</b>
     <ul>
-      <li>When activating the token in TUMonline, enable <b>only “Kalender” (calendar)</b>. Leave every other permission off.</li>
-      <li>No server, no database. By default the token lives only in this tab and is gone when you close it. With “Remember me” it stays in this browser only (localStorage) until you press Log out.</li>
-      <li>You can revoke the token anytime in TUMonline → Token-Management.</li>
+      <li>No server, nothing saved by the site; data goes only between your browser and TUM (TUMonline, nav.tum.de).</li>
+      <li>Enable only the <b>“Kalender”</b> permission.</li>
+      <li>“Remember me” keeps the token in this browser only — don’t tick on shared devices.</li>
+      <li>Revoke anytime.</li>
     </ul>
+    <a class="tlink" href="https://campus.tum.de/tumonline/ee/ui/ca2/app/desktop/#/pl/ui/$ctx/wbservicesadmin.userTokenManagement?$ctx=" target="_blank" rel="noopener noreferrer">Open TUMonline token settings ↗</a>
   </div>
   <details><summary>I already have a token</summary>
     <div class="field"><input id="tokenIn" placeholder="Token" autocomplete="off" aria-label="Token"><button id="useTok">Use token</button></div></details>
@@ -38,11 +39,18 @@
 <section id="activate" class="panel" hidden>
   <h1>Activate your token</h1>
   <ol class="steps">
-    <li>Open the email from TUMonline, or go to <a href="https://campus.tum.de/tumonline/" target="_blank" rel="noopener">TUMonline</a> → your profile → <b>Token-Management</b>.</li>
-    <li>Activate the token <b>“TUM Schedule”</b>.</li>
-    <li>Enable <b>only “Kalender”</b> – nothing else is needed.</li>
+    <li>Open the TUMonline email, or the token settings below.</li>
+    <li>Activate <b>“TUM Schedule”</b> with only <b>“Kalender”</b> enabled.</li>
   </ol>
-  <div class="hint"><b>🔒 Privacy</b><ul><li>Calendar permission only. Nothing is stored on any server. Revoke anytime in TUMonline → Token-Management.</li></ul></div>
+  <div class="hint">
+    <ul>
+      <li>No server, nothing saved by the site; data goes only between your browser and TUM (TUMonline, nav.tum.de).</li>
+      <li>Enable only the <b>“Kalender”</b> permission.</li>
+      <li>“Remember me” keeps the token in this browser only — don’t tick on shared devices.</li>
+      <li>Revoke anytime.</li>
+    </ul>
+    <a class="tlink" href="https://campus.tum.de/tumonline/ee/ui/ca2/app/desktop/#/pl/ui/$ctx/wbservicesadmin.userTokenManagement?$ctx=" target="_blank" rel="noopener noreferrer">Open TUMonline token settings ↗</a>
+  </div>
   <p class="wait"><span class="spinner"></span><span id="msg2">Waiting for activation – checking every 5 s…</span></p>
   <details><summary>Show token (to reuse later)</summary><code id="tokShow"></code></details>
 </section>
@@ -61,5 +69,5 @@
 <section id="printout" aria-hidden="true"></section>
 </main>
 <footer class="muted">Unofficial · not affiliated with TUM · Data: TUMonline &amp; <a href="https://nav.tum.de" target="_blank" rel="noopener">NavigaTUM</a> · No server, no tracking · <a href="https://github.com/Darius17TARS/schedule" target="_blank" rel="noopener">Source</a></footer>
-<script src="app.js?v=12"></script>
+<script src="app.js?v=13"></script>
 </body></html>
