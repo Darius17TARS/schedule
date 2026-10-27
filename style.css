@@ -102,3 +102,4 @@ footer{text-align:center;padding:28px 16px}
   main{padding:0;max-width:none;margin:0}#printout{display:block}.ppage{break-inside:avoid;overflow:hidden;height:186mm}
 }
 .lg .sw{--c:#8a8f98}
+@media(max-width:800px){.week .winner{min-width:820px}.week .wd{position:sticky;left:0;z-index:4;background:var(--card)}}
