@@ -95,18 +95,12 @@ footer{text-align:center;padding:28px 16px}
 .pev b{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.pev span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pev small{font-size:8px;color:#333;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pev.clash{outline:1.5px solid #e5484d}
 .pfit .legend{margin:5px 0;color:#333;font-size:10px}.pfit .sw{--card:#fff}
-.pexh{font-size:11px;margin:6px 0 3px}
-.pex{display:flex;gap:6mm;align-items:flex-start;font-size:7.5pt;line-height:1.35;color:#222}
-.pxg{flex:1 1 0;min-width:0}.pxg[data-k=can]{flex-grow:2.6;columns:3;column-gap:5mm}.pxg[data-k=can] h4{column-span:all}.pxr b{white-space:nowrap}.pxg h4{display:flex;align-items:center;gap:5px;margin:0 0 3px;padding-bottom:2px;border-bottom:.6px solid var(--xc);font-size:8pt}
-.pxg h4 i{width:8px;height:8px;border-radius:2px;background:var(--xc)}.pxg h4 small{color:#888;font-weight:400}
-.pxr{display:grid;grid-template-columns:5.6em 1fr;break-inside:avoid;gap:6px;padding:2px 0;border-top:.3px solid #e6e6e6}.pxr:first-of-type{border-top:0}.pxr.off{grid-template-columns:auto 1fr}
-.pxe{display:flex;flex-wrap:wrap;column-gap:8px;min-width:0}.pxe span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pxe small{color:#888;font-size:inherit}
-.pxe i{display:inline-block;width:5px;height:5px;border-radius:50%;margin-right:4px;vertical-align:1px;background:hsl(var(--h) 62% 50%)}
+.pex h3{font-size:11px;margin:4px 0 2px}.pex ul{columns:3;column-gap:16px;margin:0;padding:0;list-style:none;font-size:9px;line-height:1.3}.pex li{break-inside:avoid}
 @media print{
   body{background:#fff;color:#000}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}
   .top,main>section:not(#printout),footer,.errbox{display:none!important}
   main{padding:0;max-width:none;margin:0;width:auto}#printout{display:block;width:100%}.ppage{break-inside:avoid;page-break-inside:avoid;overflow:hidden;max-height:186mm;width:100%}
-  .pfit{width:100%!important;zoom:1!important;transform:none!important}.pgrid{height:112mm}.pex{font-size:6pt;line-height:1.25}.pev{font-size:7pt}.pev small{font-size:6pt}
+  .pfit{width:100%!important;zoom:1!important;transform:none!important}.pgrid{height:112mm}.pex ul{columns:4;column-gap:4mm;font-size:6.5pt;line-height:1.2}.pev{font-size:7pt}.pev small{font-size:6pt}
 }
 .lg .sw{--c:#8a8f98}
 @media(max-width:800px){.week .winner{min-width:820px}.week .wd{position:sticky;left:0;z-index:4;background:var(--card)}}
