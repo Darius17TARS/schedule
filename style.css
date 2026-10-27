@@ -100,7 +100,7 @@ footer{text-align:center;padding:28px 16px}
   body{background:#fff;color:#000}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}
   .top,main>section:not(#printout),footer,.errbox{display:none!important}
   main{padding:0;max-width:none;margin:0;width:auto}#printout{display:block;width:100%}.ppage{break-inside:avoid;page-break-inside:avoid;overflow:hidden;max-height:186mm;width:100%}
-  .pfit{width:100%!important;zoom:1!important;transform:none!important}.pgrid{height:112mm}.pex ul{columns:4;column-gap:4mm;font-size:6.5pt;line-height:1.2}.pev{font-size:7pt}.pev small{font-size:6pt}
+  .pfit{width:100%!important;zoom:1!important;transform:none!important}.pgrid{height:112mm}.pex ul{columns:3;column-gap:4mm;font-size:6.5pt;line-height:1.2}.pev{font-size:7pt}.pev small{font-size:6pt}
 }
 .lg .sw{--c:#8a8f98}
 @media(max-width:800px){.week .winner{min-width:820px}.week .wd{position:sticky;left:0;z-index:4;background:var(--card)}}
@@ -143,3 +143,11 @@ footer{text-align:center;padding:28px 16px}
 @container (max-width:150px){.ev .tb[data-t],.pev .tb[data-t]{background:var(--t)!important;box-shadow:0 0 0 1.5px var(--card)}}
 /* v13 token link */
 .tlink{display:inline-block;margin-top:10px;padding:8px 14px;border-radius:10px;background:var(--ac);color:#fff;font-weight:600;text-decoration:none}.tlink:hover{filter:brightness(1.1)}
+
+.pdf{display:flex;gap:6px;flex-wrap:wrap}
+.exams{margin:18px 0 8px;max-width:720px}.exams h3{margin:0 0 2px;font-size:15px}.exams>p{margin:0 0 8px;font-size:13px}
+.exl{list-style:none;margin:0;padding:0}.exi{display:grid;grid-template-columns:5.5em 1fr;column-gap:10px;padding:7px 10px;border-radius:8px;background:hsl(var(--h) 70% 95%);border-left:4px solid hsl(var(--h) 62% 50%);font-size:13px}
+.exi .exn{font-weight:600}.exi .muted{grid-column:2;font-size:12px}.exd{grid-row:span 2;color:hsl(var(--h) 55% 38%)}
+.exgap{font-size:11px;color:#667;margin:3px 0 3px 2.6em;padding-left:10px;border-left:2px dashed #ccd}.exgap.tight{color:#c8323a}
+[data-theme=dark] .exi{background:hsl(var(--h) 30% 20%)}[data-theme=dark] .exd{color:hsl(var(--h) 70% 72%)}
+@media print{.exams,#examPdf{display:none!important}}

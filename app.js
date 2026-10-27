@@ -271,6 +271,7 @@ function applyZoom(z, clientX) {
   inner.style.width = (zoom * 100) + "%"; tl.scrollLeft = frac * tl.scrollWidth - x; tl.style.scrollBehavior = "";
 }
 function render(dx = 0) {
+  try { renderExams(); } catch (e) { console.warn(e); }
   const v = $("view"); if (events.length) loadJsPDF().catch(() => {});
   const draw = () => { v.innerHTML = ""; try { mode === "day" ? renderDay(v) : renderWeek(v); applyZoom(zoom); } catch (e) { showError("Render", e); } v.classList.remove("fade"); };
   if (!dx) return draw();
@@ -280,11 +281,11 @@ function setMode(m) { mode = m; $("vDay").classList.toggle("on", m === "day"); $
 
 // --- Semester PDF: ONE A4 landscape page with a typical week + exceptions ---
 function isCancelled(e) { return /cancel|storn|abgesagt|entf(ä|ae)llt|f(ä|ae)llt aus/i.test((e.status || "").trim()) || /\b(abgesagt|entfällt|storniert|cancell?ed)\b/i.test(e.title || ""); }
-const APPV = 16;
+const APPV = 17;
 const hm = d => d.getHours() * 60 + d.getMinutes();
 const dShort = d => `${DOW[(d.getDay() + 6) % 7]} ${d.getDate()}.${d.getMonth() + 1}.`;
 function semesterModel() {
-  const all = events.slice().sort((a, b) => a.start - b.start);
+  const all = events.filter(e => !isExam(e)).sort((a, b) => a.start - b.start);
   if (!all.length) return null;
   const first = startOfDay(all[0].start), last = startOfDay(all[all.length - 1].start);
   const groups = new Map();
@@ -327,17 +328,25 @@ function buildPdf(J, M, loc, items) {
   doc.setProperties({ title: "Semester timetable", creator: "TUM Schedule" });
   doc.setFont("helvetica", "bold"); doc.setFontSize(15); doc.setTextColor(17); doc.text("Semester timetable", X0, m + 5);
   doc.setFont("helvetica", "normal"); doc.setFontSize(8.5); doc.setTextColor(90); doc.text(pdfTxt(`${D(M.first)} – ${D(M.last)} · typical week · TUM Schedule`), X1, m + 5, { align: "right" });
-  // exceptions: choose font size + columns so everything fits under a grid of >= 112 mm
-  const gTop = m + 9, legH = 7, minGrid = 112;
+  // exceptions: 3 columns flowing top-to-bottom, lines wrap inside the column (no truncation)
+  const gTop = m + 9, legH = 7, minGrid = 105;
   let ex = null;
   if (items.length) {
-    const avail = PH - m - gTop - minGrid - legH;
-    for (const fs of [7, 6.5, 6, 5.5, 5, 4.6, 4.2, 3.8]) {
-      let ok = null; const lh = fs * 0.42;
-      for (let nc = 1; nc <= 5; nc++) { const rows = Math.ceil(items.length / nc), h = 5 + rows * lh; if (h <= avail) { ok = { fs, lh, nc, rows, h }; break; } }
-      if (ok) { ex = ok; break; }
+    const avail = PH - m - gTop - minGrid - legH, gap = 6, colW = (X1 - X0 - 2 * gap) / 3;
+    for (const fs of [6.5, 6, 5.5, 5, 4.6, 4.2, 3.8]) {
+      const lh = fs * 0.43; doc.setFontSize(fs);
+      const L = items.map(([, b, r]) => { doc.setFont("helvetica", "bold"); const bw = doc.getTextWidth(pdfTxt(b) + " "); doc.setFont("helvetica", "normal");
+        const f = doc.splitTextToSize(pdfTxt(r), colW - bw)[0] || ""; const rest = pdfTxt(r).slice(f.length).trim(); return { b: pdfTxt(b), bw, lines: [f, ...(rest ? doc.splitTextToSize(rest, colW) : [])] }; });
+      const tot = L.reduce((a, x) => a + x.lines.length, 0);
+      for (let H = Math.max(...L.map(x => x.lines.length), Math.ceil(tot / 3)); H * lh + 5 <= avail; H++) {
+        const cols = [[]]; let used = 0; for (const x of L) { if (used + x.lines.length > H) { cols.push([]); used = 0; } cols[cols.length - 1].push(x); used += x.lines.length; }
+        if (cols.length <= 3) { ex = { fs, lh, colW, gap, cols, h: 5 + H * lh }; break; }
+      }
+      if (ex) break;
     }
-    if (!ex) { const fs = 3.8, lh = fs * 0.42, nc = 5, rows = Math.floor((PH - m - gTop - minGrid - legH - 5) / lh); ex = { fs, lh, nc, rows, h: 5 + rows * lh, cut: items.length - rows * nc }; }
+    if (!ex) { const fs = 3.8, lh = fs * 0.43; doc.setFontSize(fs); const H = Math.floor((avail - 5) / lh), cols = [[]]; let used = 0, cut = 0;
+      for (const [, b, r] of items) { const lines = doc.splitTextToSize(pdfTxt(r), colW - 8); if (used + lines.length > H) { if (cols.length === 3) { cut++; continue; } cols.push([]); used = 0; } doc.setFont("helvetica", "bold"); cols[cols.length - 1].push({ b: pdfTxt(b), bw: doc.getTextWidth(pdfTxt(b) + " "), lines }); used += lines.length; }
+      ex = { fs, lh, colW, gap, cols, h: 5 + H * lh, cut }; }
   }
   const gBot = PH - m - (ex ? ex.h + 1 : 0) - legH;
   const cols = [1, 2, 3, 4, 5]; if (M.slots.some(s => s.e.start.getDay() === 6)) cols.push(6); if (M.slots.some(s => s.e.start.getDay() === 0)) cols.push(0);
@@ -379,29 +388,111 @@ function buildPdf(J, M, loc, items) {
     if (k) { doc.setFillColor(...hex2rgb(TCOL[k])); doc.roundedRect(lx, ly - 2.4, pw, 3.2, 0.7, 0.7, "F"); doc.setTextColor(255); doc.text(pdfTxt(k), lx + 1, ly); } else { doc.setDrawColor(120); doc.rect(lx, ly - 2.2, pw, 2.8); }
     doc.setFont("helvetica", "normal"); doc.setFontSize(7); doc.setTextColor(60); doc.text(pdfTxt(name), lx + pw + 1.2, ly); lx += pw + doc.getTextWidth(pdfTxt(name)) + 6;
   }
-  // exceptions in columns
+  // exceptions in 3 columns
   if (ex) {
     const ey = gBot + legH + 1; doc.setFont("helvetica", "bold"); doc.setFontSize(8); doc.setTextColor(20); doc.text("Exceptions & extra dates", X0, ey + 2.6);
-    const colW = (X1 - X0) / ex.nc; doc.setFontSize(ex.fs);
-    items.slice(0, ex.rows * ex.nc).forEach(([, b, r], i) => {
-      const c = Math.floor(i / ex.rows), row = i % ex.rows, x = X0 + c * colW, y = ey + 5 + (row + 0.8) * ex.lh;
-      doc.setFont("helvetica", "bold"); doc.setTextColor(20); const bt = pdfTxt(b); doc.text(bt, x, y); const bw = doc.getTextWidth(bt + " ");
-      doc.setFont("helvetica", "normal"); doc.setTextColor(55); doc.text(fitLine(doc, r, colW - bw - 2), x + bw, y);
-    });
+    doc.setFontSize(ex.fs);
+    ex.cols.forEach((col, c) => { const x = X0 + c * (ex.colW + ex.gap); let y = ey + 5 + 0.8 * ex.lh;
+      for (const it of col) { doc.setFont("helvetica", "bold"); doc.setTextColor(20); doc.text(it.b, x, y); doc.setFont("helvetica", "normal"); doc.setTextColor(55);
+        it.lines.forEach((l, k) => { doc.text(l, k ? x : x + it.bw, y); y += ex.lh; }); } });
     if (ex.cut > 0) { doc.setFont("helvetica", "italic"); doc.text(`+ ${ex.cut} more`, X1, ey + 2.6, { align: "right" }); }
   }
   return doc;
 }
-async function deliverPdf(doc) {
-  const name = "semester-timetable.pdf", blob = doc.output("blob");
+async function deliverPdf(doc, name = "semester-timetable.pdf", ttl = "Semester timetable") {
+  const blob = doc.output("blob");
   const file = typeof File === "function" ? new File([blob], name, { type: "application/pdf" }) : null;
   const touch = matchMedia("(pointer:coarse)").matches;
   if (touch && file && navigator.canShare && navigator.canShare({ files: [file] })) {
-    try { await navigator.share({ files: [file], title: "Semester timetable" }); return; } catch (e) { if (e && e.name === "AbortError") return; }
+    try { await navigator.share({ files: [file], title: ttl }); return; } catch (e) { if (e && e.name === "AbortError") return; }
   }
   const url = URL.createObjectURL(blob), a = document.createElement("a"); a.href = url; a.download = name; a.rel = "noopener";
   document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 60000);
   window.__lastPdf = blob;
+}
+// --- Exams: read from the personal calendar (Kalender permission). TUMonline has no public "registered exams" webservice. ---
+const EXAM_RE = /(^|[\s:(\[–-])(wiederholungs|end|haupt|modul|semestral)?(pr(ü|ue)fung|klausur)|\bexam(ination)?\b|\bendterm\b|\bmidterm\b|\bretake\b|wiederholungs(prüfung|klausur)/i;
+const EXAM_NOT = /einsicht|anmeldung|vorbereitung|repetitorium|review|prep|probe|mock|exkursion/i;
+function isExam(e) { const s = `${e.title} ${e.status || ""}`; return EXAM_RE.test(s) && !EXAM_NOT.test(s); } // "PR" alone = Praktikum, never an exam
+function examCourse(t) { return (t || "").replace(/\((schriftlich|mündlich|written|oral)[^)]*\)/gi, "").replace(/\b(schriftliche|mündliche|written|oral)\b/gi, "").replace(/\b(wiederholungs)?(pr(ü|ue)fung|klausur)(stermin)?\b|\b(final |re-?)?exam(ination)?\b|\b(endterm|midterm|retake)\b/gi, "").replace(/\(\s*\)/g, "").replace(/^[\s:–-]+|[\s:–-]+$/g, "").replace(/\s{2,}/g, " ").trim() || t; }
+function examList() { return events.filter(isExam).sort((a, b) => a.start - b.start).map(e => ({ e, course: examCourse(e.title), h: hue(examCourse(e.title)), min: Math.round((e.end - e.start) / 6e4) })); }
+const dayDiff = (a, b) => Math.round((startOfDay(b) - startOfDay(a)) / 864e5);
+function studyDays(a, b) { let n = 0; for (let d = addDays(startOfDay(a), 1); d < startOfDay(b); d = addDays(d, 1)) if (d.getDay() % 6) n++; return n; }
+const durTxt = m => m >= 60 && m % 60 === 0 ? `${m / 60} h` : `${m} min`;
+const EXAM_NONE = "No exams found in your TUMonline calendar. Exams only appear here after you register for them in TUMonline (the token's Kalender permission is enough — TUMonline offers no separate exam webservice).";
+function examSummary(X) {
+  const gaps = X.slice(1).map((x, i) => dayDiff(X[i].e.start, x.e.start));
+  return { n: X.length, span: X.length ? dayDiff(X[0].e.start, X[X.length - 1].e.start) : 0, gaps, min: gaps.length ? Math.min(...gaps) : null };
+}
+function buildExamPdf(J, X, loc) {
+  const doc = new J.jsPDF({ orientation: "portrait", unit: "mm", format: "a4", compress: true });
+  const PW = 210, PH = 297, m = 14, X0 = m, X1 = PW - m, W = X1 - X0, S = examSummary(X);
+  doc.setProperties({ title: "Exam calendar", creator: "TUM Schedule" });
+  doc.setFont("helvetica", "bold"); doc.setFontSize(18); doc.setTextColor(17); doc.text("Exam calendar", X0, m + 6);
+  const DL = d => dlabel(d, { weekday: "short", day: "numeric", month: "short", year: "numeric" });
+  doc.setFont("helvetica", "normal"); doc.setFontSize(8.5); doc.setTextColor(110);
+  doc.text(pdfTxt(X.length ? `${DL(X[0].e.start)} – ${DL(X[X.length - 1].e.start)} · TUM Schedule` : "TUM Schedule"), X1, m + 6, { align: "right" });
+  if (!X.length) { doc.setFontSize(10); doc.setTextColor(60); doc.text(doc.splitTextToSize(pdfTxt(EXAM_NONE), W), X0, m + 20); return doc; }
+  // summary chips
+  let cx = X0, cy = m + 12;
+  for (const [k, v] of [["Exams", String(S.n)], ["Total span", `${S.span} days`], ["Shortest gap", S.min == null ? "–" : `${S.min} day${S.min === 1 ? "" : "s"}`]]) {
+    doc.setFont("helvetica", "bold"); doc.setFontSize(11); const vw = doc.getTextWidth(v); doc.setFont("helvetica", "normal"); doc.setFontSize(7); const kw = doc.getTextWidth(k);
+    const w = Math.max(vw, kw) + 8; doc.setFillColor(244, 245, 247); doc.roundedRect(cx, cy, w, 11, 1.5, 1.5, "F");
+    doc.setTextColor(110); doc.text(k, cx + 4, cy + 4); doc.setFont("helvetica", "bold"); doc.setFontSize(11); doc.setTextColor(20); doc.text(v, cx + 4, cy + 9); cx += w + 3;
+  }
+  // proportional timeline strip
+  const ty = cy + 26, t0 = startOfDay(X[0].e.start), t1 = addDays(startOfDay(X[X.length - 1].e.start), 1), tx = d => X0 + 4 + (W - 8) * (d - t0) / Math.max(864e5, t1 - t0);
+  doc.setDrawColor(200); doc.setLineWidth(0.5); doc.line(X0 + 4, ty, X1 - 4, ty);
+  doc.setFontSize(6); doc.setTextColor(150); doc.setFont("helvetica", "normal");
+  const step = (t1 - t0) / 864e5 > 70 ? 14 : 7; for (let d = new Date(t0); d <= t1; d = addDays(d, step)) { const x = tx(d); doc.setDrawColor(210); doc.setLineWidth(0.2); doc.line(x, ty - 1, x, ty + 1); doc.text(`${d.getDate()}.${d.getMonth() + 1}.`, x, ty + 4, { align: "center" }); }
+  let lastX = -99, lvl = 0;
+  X.forEach(x => { const px = tx(startOfDay(x.e.start)) + (W - 8) / Math.max(1, (t1 - t0) / 864e5) / 2; doc.setFillColor(...hsl2rgb(x.h, 62, 50)); doc.setDrawColor(255); doc.setLineWidth(0.5); doc.circle(px, ty, 1.8, "FD");
+    lvl = px - lastX < 24 ? (lvl + 1) % 4 : 0; lastX = px; const ly = [ty - 3.6, ty + 8.2, ty - 7, ty + 11.4][lvl]; doc.setFont("helvetica", "bold"); doc.setFontSize(6.2); doc.setTextColor(40);
+    const lab = fitLine(doc, shortName(x.course), 26); doc.text(lab, px, ly, { align: "center" }); });
+  // list
+  const top = ty + 18, gapH = 6.5, n = X.length, rowH = Math.min(22, Math.max(11, (PH - m - 6 - top - (n - 1) * gapH) / n)), big = rowH >= 16;
+  let y = top;
+  X.forEach((x, i) => {
+    if (i) { const g = dayDiff(X[i - 1].e.start, x.e.start), sd = studyDays(X[i - 1].e.start, x.e.start), tight = g <= 2;
+      const txt = g === 0 ? "same day" : `${g} day${g > 1 ? "s" : ""} gap${sd ? ` · ${sd} study day${sd > 1 ? "s" : ""} in between` : ""}`;
+      doc.setDrawColor(215); doc.setLineWidth(0.3); doc.setLineDashPattern([0.8, 0.8], 0); doc.line(X0 + 11, y + 0.5, X0 + 11, y + gapH - 0.5); doc.setLineDashPattern([], 0);
+      doc.setFont("helvetica", "bold"); doc.setFontSize(7); const w = doc.getTextWidth(pdfTxt(txt)) + 5;
+      doc.setFillColor(...(tight ? [253, 236, 236] : [241, 243, 245])); doc.roundedRect(X0 + 15, y + gapH / 2 - 2.2, w, 4.4, 2.2, 2.2, "F");
+      doc.setTextColor(...(tight ? [200, 50, 55] : [90, 98, 110])); doc.text(pdfTxt(txt), X0 + 17.5, y + gapH / 2 + 0.9); y += gapH; }
+    const c = hsl2rgb(x.h, 62, 50), d = x.e.start;
+    doc.setFillColor(...hsl2rgb(x.h, 70, 96)); doc.roundedRect(X0, y, W, rowH, 1.6, 1.6, "F"); doc.setFillColor(...c); doc.rect(X0, y, 1.4, rowH, "F");
+    doc.setFont("helvetica", "bold"); doc.setFontSize(big ? 15 : 12); doc.setTextColor(...c); doc.text(String(d.getDate()), X0 + 11, y + rowH / 2 + (big ? 0.5 : 0.8), { align: "center" });
+    doc.setFontSize(6.5); doc.setTextColor(90); doc.text(pdfTxt(dlabel(d, { weekday: "short" }) + " " + dlabel(d, { month: "short" })), X0 + 11, y + rowH / 2 + (big ? 4.6 : 4), { align: "center" });
+    const tx2 = X0 + 22, tw = W - 26; doc.setFont("helvetica", "bold"); doc.setFontSize(big ? 10.5 : 9); doc.setTextColor(17);
+    const nm = wrapLines(doc, x.course, tw - 28, big ? 2 : 1); let yy = y + (big ? 6 : 4.6); nm.forEach(l => { doc.text(l, tx2, yy); yy += big ? 4.4 : 3.8; });
+    doc.setFont("helvetica", "bold"); doc.setFontSize(big ? 9 : 8); doc.setTextColor(40); doc.text(pdfTxt(`${fmt(x.e.start)}–${fmt(x.e.end)}`), X1 - 3, y + (big ? 6 : 4.6), { align: "right" });
+    doc.setFont("helvetica", "normal"); doc.setFontSize(7); doc.setTextColor(110); doc.text(durTxt(x.min), X1 - 3, y + (big ? 10.4 : 8.4), { align: "right" });
+    doc.setFontSize(big ? 7.8 : 7); doc.setTextColor(85); doc.text(fitLine(doc, loc(x.e.location), tw - 18), tx2, Math.min(yy + 0.2, y + rowH - 2.2));
+    y += rowH;
+  });
+  return doc;
+}
+function renderExams() {
+  const box = $("exams"); if (!box) return; const X = examList(); box.hidden = false; box.innerHTML = "";
+  box.appendChild(el("h3", "", `Exams <small class="muted">${X.length || ""}</small>`));
+  if (!X.length) { box.appendChild(el("p", "muted", esc(EXAM_NONE))); return; }
+  const S = examSummary(X); box.appendChild(el("p", "muted", `${S.n} exam${S.n > 1 ? "s" : ""} · span ${S.span} days${S.min != null ? ` · shortest gap ${S.min} day${S.min === 1 ? "" : "s"}` : ""}`));
+  const ol = el("ol", "exl");
+  X.forEach((x, i) => {
+    if (i) { const g = dayDiff(X[i - 1].e.start, x.e.start); ol.appendChild(el("li", "exgap" + (g <= 2 ? " tight" : ""), g ? `Δ ${g} day${g > 1 ? "s" : ""}` : "same day")); }
+    const li = el("li", "exi", `<b class="exd">${esc(dShort(x.e.start))}</b><span class="exn">${esc(x.course)}</span><span class="muted">${fmt(x.e.start)}–${fmt(x.e.end)} · ${durTxt(x.min)} · ${esc(x.e.location || "–")}</span>`);
+    li.style.setProperty("--h", x.h); ol.appendChild(li);
+  });
+  box.appendChild(ol);
+}
+async function exportExams() {
+  const X = examList(), btn = $("examPdf"); btn.disabled = true; btn.textContent = "Preparing…";
+  const jp = loadJsPDF().catch(e => e);
+  const rooms = new Map(await Promise.all([...new Set(X.map(x => x.e.location))].map(async l => [l, await resolveRoom(l)])));
+  const loc = l => { const r = rooms.get(l); return r ? [r.short, r.name, r.building].filter(Boolean).join(" · ") : (l || "–"); };
+  try { const J = await jp; if (J instanceof Error) throw J; await deliverPdf(buildExamPdf(J, X, loc), "exam-calendar.pdf", "Exam calendar"); }
+  catch (e) { showError("Exam PDF", e); }
+  btn.disabled = false; btn.textContent = "Download exam calendar";
 }
 function pdfItems(M, loc) {
   const items = [];
@@ -476,7 +567,7 @@ $("logout").onclick = logout;
 $("prev").onclick = () => shift(-1); $("next").onclick = () => shift(1);
 $("today").onclick = () => { day = startOfDay(new Date()); render(); };
 $("vDay").onclick = () => setMode("day"); $("vWeek").onclick = () => setMode("week");
-$("print").onclick = exportPdf;
+$("print").onclick = exportPdf; $("examPdf").onclick = exportExams;
 $("theme").onclick = () => { const r = document.documentElement, dark = r.dataset.theme ? r.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches; r.dataset.theme = dark ? "light" : "dark"; };
 document.addEventListener("keydown", e => { if ($("cal").hidden || e.target.tagName === "INPUT" || e.target.tagName === "SELECT") return; if (e.key === "ArrowLeft") shift(-1); if (e.key === "ArrowRight") shift(1); if (e.key === "t") $("today").click(); });
 let tx = null, ty = null;
