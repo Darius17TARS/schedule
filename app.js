@@ -38,7 +38,7 @@ async function requestToken() {
   if (!/^[a-z]{2}\d{2}[a-z]{3}$/.test(id)) { $("msg").textContent = "Please enter a valid TUM ID (e.g. ab12cde)."; return; }
   $("msg").textContent = "Requesting…";
   try {
-    const doc = await api("requestToken", { pUsername: id, pTokenName: "TUM Schedule" });
+    const doc = await api("requestToken", { pUsername: id, pTokenName: "Darius Schedule Improvisory App Token" });
     const tok = doc.querySelector("token")?.textContent?.trim();
     if (!tok) throw new Error("No token in response");
     store.set(tok);
