@@ -50,7 +50,7 @@ function parseTumDate(s) { // "2026-10-27 10:15:00" (Europe/Berlin local)
 }
 
 async function loadCalendar(tok) {
-  show("cal"); $("timeline").innerHTML = "<p class='muted pad'>Loading…</p>";
+  show("cal"); $("view").innerHTML = "<p class='muted pad'>Loading…</p>";
   try {
     const doc = await api("kalender", { pToken: tok, pMonateVor: 1, pMonateNach: 4 });
     const txt = (el, n) => el.querySelector(n)?.textContent?.trim() || "";
@@ -61,7 +61,7 @@ async function loadCalendar(tok) {
     render();
   } catch (e) {
     if (/ungültig|invalid/i.test(e.message)) { logout(); $("msg").textContent = "Token invalid. Please request a new one."; }
-    else $("timeline").innerHTML = "<p class='msg pad'>Error: " + esc(e.message) + "</p>";
+    else $("view").innerHTML = "<p class='msg pad'>Error: " + esc(e.message) + "</p>";
   }
 }
 
@@ -106,42 +106,114 @@ async function resolveRoom(loc) {
   roomCache.set(loc, p); return p;
 }
 
-// --- Rendering ---
+// --- Helpers ---
+let mode = "day";
+const DOW = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 function fmt(d) { return d.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" }); }
-function render() {
-  $("dayLabel").textContent = day.toLocaleDateString("de-DE", { weekday: "long", day: "2-digit", month: "2-digit", year: "numeric" });
-  const next = new Date(day); next.setDate(day.getDate() + 1);
-  const todays = events.filter(e => e.start < next && e.end > day).sort((a, b) => a.start - b.start);
-  // lanes for overlaps
-  const lanes = []; for (const e of todays) { let i = lanes.findIndex(end => end <= e.start); if (i < 0) { i = lanes.length; lanes.push(0); } lanes[i] = e.end; e.lane = i; }
-  const n = Math.max(1, lanes.length), laneH = 96, H = 24 + n * (laneH + 8);
-  const pct = d => ((d.getHours() + d.getMinutes() / 60 - START_H) / (END_H - START_H)) * 100;
-  const tl = $("timeline"); tl.innerHTML = ""; const track = document.createElement("div"); track.className = "track"; track.style.height = H + "px"; tl.appendChild(track);
-  for (let h = START_H; h <= END_H; h++) { const d = document.createElement("div"); d.className = "hour"; d.style.left = ((h - START_H) / (END_H - START_H) * 100) + "%"; d.textContent = h + ":00"; track.appendChild(d); }
-  const now = new Date(); if (now >= day && now < next) { const nm = document.createElement("div"); nm.className = "now"; nm.style.left = Math.min(100, Math.max(0, pct(now))) + "%"; track.appendChild(nm); }
-  const list = $("list"); list.innerHTML = "";
-  if (!todays.length) list.innerHTML = "<li class='muted'>No events on this day.</li>";
-  for (const e of todays) {
-    const a = document.createElement("a"); a.className = "ev"; a.target = "_blank"; a.rel = "noopener";
-    const l = Math.max(0, pct(e.start)), r = Math.min(100, pct(e.end));
-    a.style.left = l + "%"; a.style.width = `calc(${Math.max(r - l, 2)}% - 4px)`; a.style.top = (24 + e.lane * (laneH + 8)) + "px"; a.style.height = laneH + "px";
-    a.innerHTML = `<span class="room">${esc(e.location ? e.location.split(",")[0] : "–")}</span><span class="t">${fmt(e.start)}–${fmt(e.end)}</span><br>${esc(e.title)}`;
-    a.title = `${e.title}\n${e.location || ""}`;
+function dlabel(d, o = { weekday: "long", day: "numeric", month: "long" }) { return d.toLocaleDateString("en-GB", o); }
+function addDays(d, n) { const x = new Date(d); x.setDate(x.getDate() + n); return x; }
+function monday(d) { const x = startOfDay(d); return addDays(x, -((x.getDay() + 6) % 7)); }
+function sameDay(a, b) { return a.toDateString() === b.toDateString(); }
+function color(title) { // stable colour per course
+  const key = (title || "").replace(/\s*\((VO|UE|VI|SE|PR|TT|ZÜ|Übung|Vorlesung)[^)]*\)\s*/gi, "").trim().toLowerCase();
+  let h = 0; for (const ch of key) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+  return `hsl(${h % 360} 62% 48%)`;
+}
+function eventsOn(d) { const n = addDays(d, 1); return events.filter(e => e.start < n && e.end > d).sort((a, b) => a.start - b.start); }
+function roomText(e) { return e.location ? e.location.split(",")[0].trim() : "–"; }
+const pct = d => Math.min(100, Math.max(0, ((d.getHours() + d.getMinutes() / 60 - START_H) / (END_H - START_H)) * 100));
+function lanesFor(list) { const lanes = []; for (const e of list) { let i = lanes.findIndex(end => end <= e.start); if (i < 0) { i = lanes.length; lanes.push(0); } lanes[i] = e.end; e.lane = i; } return Math.max(1, lanes.length); }
+function el(tag, cls, html) { const x = document.createElement(tag); if (cls) x.className = cls; if (html != null) x.innerHTML = html; return x; }
+
+function buildTrack(list, d, compact) {
+  const n = lanesFor(list), laneH = compact ? 54 : 112, top = compact ? 6 : 26;
+  const track = el("div", "track"); track.style.height = (top + n * (laneH + 6) + 4) + "px";
+  if (!compact) for (let h = START_H; h <= END_H; h++) { const x = el("div", "hour", h + ":00"); x.style.left = ((h - START_H) / (END_H - START_H) * 100) + "%"; track.appendChild(x); }
+  else for (let h = START_H; h <= END_H; h += 2) { const x = el("div", "hour", ""); x.style.left = ((h - START_H) / (END_H - START_H) * 100) + "%"; track.appendChild(x); }
+  const now = new Date();
+  if (sameDay(now, d)) { const nm = el("div", "now"); nm.style.left = pct(now) + "%"; if (!compact) nm.dataset.t = fmt(now); track.appendChild(nm); }
+  for (const e of list) {
+    const a = el("a", "ev" + (e.end < now ? " past" : "")); a.target = "_blank"; a.rel = "noopener"; a.style.setProperty("--c", color(e.title));
+    const l = pct(e.start), r = pct(e.end);
+    a.style.left = `calc(${l}% + 2px)`; a.style.width = `calc(${Math.max(r - l, 1.5)}% - 4px)`; a.style.top = (top + e.lane * (laneH + 6)) + "px"; a.style.height = laneH + "px";
+    a.innerHTML = `<span class="room">${esc(roomText(e))}</span>` + (compact ? "" : `<span class="t">${fmt(e.start)}–${fmt(e.end)}</span><span class="n">${esc(e.title)}</span><span class="b"></span>`);
+    a.title = `${fmt(e.start)}–${fmt(e.end)}  ${e.title}\n${e.location || ""}`;
     track.appendChild(a);
-    const li = document.createElement("li");
-    li.innerHTML = `<div class="room">${esc(e.location ? e.location.split(",")[0] : "–")}</div><div>${fmt(e.start)}–${fmt(e.end)} · ${esc(e.title)}</div><div class="muted">${esc(e.location)}</div>`;
-    list.appendChild(li);
-    resolveRoom(e.location).then(rm => {
-      if (!rm) return; a.href = rm.map;
-      a.querySelector(".room").textContent = rm.short;
-      li.querySelector(".room").innerHTML = `<a href="${esc(rm.map)}" target="_blank" rel="noopener">${esc(rm.short)}</a>`;
-      li.querySelector(".muted").textContent = [rm.name, rm.building, rm.campus].filter(Boolean).join(" · ");
-    });
+    resolveRoom(e.location).then(rm => { if (!rm) return; a.href = rm.map; a.querySelector(".room").textContent = rm.short; const b = a.querySelector(".b"); if (b) b.textContent = [rm.building, rm.campus].filter(Boolean).join(" · "); });
   }
+  return track;
 }
 
-function logout() { clearInterval(pollTimer); sessionStorage.clear(); events = []; roomCache.clear(); $("tumid").value = $("tokenIn").value = ""; $("msg").textContent = $("msg2").textContent = ""; show("login"); }
-function shift(n) { day = new Date(day); day.setDate(day.getDate() + n); render(); }
+function renderDay(v) {
+  const list = eventsOn(day), today = sameDay(day, new Date());
+  $("dayLabel").innerHTML = esc(dlabel(day)) + (today ? '<span class="badge">TODAY</span>' : "") + `<small>${list.length} event${list.length === 1 ? "" : "s"}</small>`;
+  if (!list.length) { v.appendChild(el("div", "empty", "No classes on this day 🎉")); return; }
+  const tl = el("div", "tl"); tl.appendChild(buildTrack(list, day, false)); v.appendChild(tl);
+  requestAnimationFrame(() => { const first = today ? new Date() : list[0].start; tl.scrollLeft = Math.max(0, (pct(first) / 100) * tl.scrollWidth - 80); });
+  const cards = el("div", "cards"); const now = new Date();
+  for (const e of list) {
+    const c = el("div", "card" + (e.start <= now && e.end > now ? " live" : "")); c.style.setProperty("--c", color(e.title));
+    c.innerHTML = `<div class="row1"><span class="room">${esc(roomText(e))}</span><span class="t">${fmt(e.start)}–${fmt(e.end)}</span></div><div class="n">${esc(e.title)}</div><div class="b">${esc(e.location || "")}</div>`;
+    cards.appendChild(c);
+    resolveRoom(e.location).then(rm => { if (!rm) return; c.querySelector(".room").textContent = rm.short; c.querySelector(".b").textContent = [rm.name, rm.building, rm.campus].filter(Boolean).join(" · ");
+      const m = el("a", "map", "Open map →"); m.href = rm.map; m.target = "_blank"; m.rel = "noopener"; c.appendChild(m); });
+  }
+  v.appendChild(cards);
+}
+
+function renderWeek(v) {
+  const m = monday(day), sun = addDays(m, 6);
+  $("dayLabel").innerHTML = `Week of ${esc(dlabel(m, { day: "numeric", month: "short" }))} – ${esc(dlabel(sun, { day: "numeric", month: "short", year: "numeric" }))}`;
+  const box = el("div", "tl week");
+  for (let i = 0; i < 7; i++) {
+    const d = addDays(m, i), list = eventsOn(d);
+    if (i >= 5 && !list.length) continue;
+    const row = el("div", "wrow" + (sameDay(d, new Date()) ? " today" : ""));
+    const lab = el("div", "wd", `${DOW[i]}<small>${d.getDate()}.${d.getMonth() + 1}.</small>`); lab.onclick = () => { day = d; setMode("day"); };
+    const wrap = el("div", ""); wrap.style.overflowX = "auto"; wrap.appendChild(buildTrack(list, d, true));
+    row.append(lab, wrap); box.appendChild(row);
+  }
+  v.appendChild(box);
+}
+
+function render(dx = 0) {
+  const v = $("view");
+  const draw = () => { v.innerHTML = ""; mode === "day" ? renderDay(v) : renderWeek(v); v.classList.remove("fade"); };
+  if (!dx) return draw();
+  v.style.setProperty("--dx", (dx > 0 ? -24 : 24) + "px"); v.classList.add("fade"); setTimeout(draw, 140);
+}
+function setMode(m) { mode = m; $("vDay").classList.toggle("on", m === "day"); $("vWeek").classList.toggle("on", m === "week"); render(); }
+
+// --- PDF export (print CSS + window.print) ---
+async function exportPdf() {
+  const r = $("range").value; let from, to;
+  if (r === "day") { from = startOfDay(day); to = addDays(from, 1); }
+  else if (r === "week") { from = monday(day); to = addDays(from, 7); }
+  else { from = monday(day); to = addDays(from, 7 * +r); }
+  const days = []; for (let d = from; d < to; d = addDays(d, 1)) { const l = eventsOn(d); if (l.length) days.push([d, l]); }
+  const all = days.flatMap(x => x[1]);
+  const btn = $("print"); btn.disabled = true; btn.textContent = "Preparing…";
+  const rooms = await Promise.all(all.map(e => resolveRoom(e.location)));
+  const rm = new Map(all.map((e, i) => [e, rooms[i]]));
+  btn.disabled = false; btn.textContent = "Save as PDF";
+  const out = $("printout"); out.innerHTML = "";
+  const rangeTxt = `${dlabel(from, { day: "numeric", month: "short", year: "numeric" })} – ${dlabel(addDays(to, -1), { day: "numeric", month: "short", year: "numeric" })}`;
+  let wk = null, wkKey = "";
+  for (const [d, l] of days) {
+    const k = monday(d).toDateString();
+    if (k !== wkKey) { wkKey = k; wk = el("div", "pweek"); wk.appendChild(el("div", "ph", `<h1>TUM Schedule · week of ${esc(dlabel(monday(d), { day: "numeric", month: "long", year: "numeric" }))}</h1><span>${esc(rangeTxt)}</span>`)); out.appendChild(wk); }
+    const sec = el("div", "pday", `<h2>${esc(dlabel(d, { weekday: "long", day: "numeric", month: "long" }))}</h2>`);
+    const t = el("table", "", "<thead><tr><th>Time</th><th>Room</th><th>Course</th><th>Building · Campus</th></tr></thead>"); const tb = el("tbody");
+    for (const e of l) { const x = rm.get(e); const tr = el("tr", "", `<td class="tm">${fmt(e.start)}–${fmt(e.end)}</td><td class="rm">${esc(x ? x.short : roomText(e))}</td><td class="co">${esc(e.title)}</td><td class="bd">${esc(x ? [x.building, x.campus].filter(Boolean).join(" · ") : (e.location || ""))}</td>`);
+      tr.querySelector(".co").style.setProperty("--c", color(e.title)); tb.appendChild(tr); }
+    t.appendChild(tb); sec.appendChild(t); wk.appendChild(sec);
+  }
+  if (!days.length) out.appendChild(el("div", "ph", `<h1>TUM Schedule</h1><span>No events ${esc(rangeTxt)}</span>`));
+  window.print();
+}
+
+function logout() { clearInterval(pollTimer); sessionStorage.clear(); events = []; roomCache.clear(); $("tumid").value = $("tokenIn").value = ""; $("msg").textContent = ""; $("msg2").textContent = "Waiting for activation – checking every 5 s…"; $("printout").innerHTML = ""; show("login"); }
+function shift(n) { day = addDays(day, n * (mode === "week" ? 7 : 1)); render(n); }
 
 $("req").onclick = requestToken;
 $("tumid").onkeydown = e => { if (e.key === "Enter") requestToken(); };
@@ -150,7 +222,13 @@ $("ics").onchange = async e => { const f = e.target.files[0]; if (!f) return; ev
 $("logout").onclick = logout;
 $("prev").onclick = () => shift(-1); $("next").onclick = () => shift(1);
 $("today").onclick = () => { day = startOfDay(new Date()); render(); };
-document.addEventListener("keydown", e => { if ($("cal").hidden || e.target.tagName === "INPUT") return; if (e.key === "ArrowLeft") shift(-1); if (e.key === "ArrowRight") shift(1); });
-let tx = null; $("timeline").addEventListener("touchstart", e => tx = e.touches[0].clientX, { passive: true });
-$("timeline").addEventListener("touchend", e => { if (tx == null) return; const dx = e.changedTouches[0].clientX - tx; if (Math.abs(dx) > 80 && $("timeline").scrollLeft === 0) shift(dx > 0 ? -1 : 1); tx = null; });
+$("vDay").onclick = () => setMode("day"); $("vWeek").onclick = () => setMode("week");
+$("print").onclick = exportPdf;
+$("theme").onclick = () => { const r = document.documentElement, dark = r.dataset.theme ? r.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches; r.dataset.theme = dark ? "light" : "dark"; };
+document.addEventListener("keydown", e => { if ($("cal").hidden || e.target.tagName === "INPUT" || e.target.tagName === "SELECT") return; if (e.key === "ArrowLeft") shift(-1); if (e.key === "ArrowRight") shift(1); if (e.key === "t") $("today").click(); });
+let tx = null, ty = null;
+$("view").addEventListener("touchstart", e => { tx = e.touches[0].clientX; ty = e.touches[0].clientY; }, { passive: true });
+$("view").addEventListener("touchend", e => { if (tx == null) return; const dx = e.changedTouches[0].clientX - tx, dy = e.changedTouches[0].clientY - ty; const tl = e.target.closest(".tl"); const atEdge = !tl || tl.scrollLeft <= 0 || tl.scrollLeft + tl.clientWidth >= tl.scrollWidth - 1;
+  if (Math.abs(dx) > 70 && Math.abs(dx) > 2 * Math.abs(dy) && atEdge) shift(dx > 0 ? -1 : 1); tx = null; });
+setInterval(() => { const n = new Date(); document.querySelectorAll(".now").forEach(x => { x.style.left = pct(n) + "%"; if (x.dataset.t) x.dataset.t = fmt(n); }); }, 60000);
 const saved = sessionStorage.getItem("tok"); if (saved) startActivation(saved); else show("login");

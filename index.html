@@ -1,39 +1,62 @@
 <!doctype html>
-<html lang="de"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src https://campus.tum.de https://nav.tum.de; style-src 'self'; script-src 'self'; img-src 'self' data:">
 <meta name="referrer" content="no-referrer">
-<title>TUM Schedule – Räume</title><link rel="stylesheet" href="style.css">
+<meta name="color-scheme" content="light dark">
+<title>TUM Schedule – rooms at a glance</title><link rel="stylesheet" href="style.css">
 </head><body>
-<header><h1>TUM Schedule</h1><button id="logout" hidden>Log out</button></header>
+<header class="top">
+  <div class="brand"><span class="logo">S</span><div><b>TUM Schedule</b><small>Your classes &amp; rooms at a glance</small></div></div>
+  <div class="actions">
+    <button id="theme" class="ghost" aria-label="Toggle dark mode" title="Light / dark">◐</button>
+    <button id="logout" class="ghost" hidden>Log out</button>
+  </div>
+</header>
 <main>
-<section id="login" class="card">
-  <h2>1. Enter your TUM ID</h2>
-  <p class="muted">Only your TUM ID (e.g. <code>ab12cde</code>), never a password. Your data stays in this browser tab and is deleted when you close it.</p>
-  <div class="row"><input id="tumid" placeholder="ab12cde" autocomplete="off" autocapitalize="off" spellcheck="false"><button id="req">Request token</button></div>
+<section id="login" class="panel">
+  <h1>Your timetable, with rooms.</h1>
+  <p class="lead">Enter your TUM ID. We request a read-only TUMonline token for your calendar – no password, ever.</p>
+  <div class="field"><input id="tumid" placeholder="TUM ID, e.g. ab12cde" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="TUM ID"><button id="req" class="primary">Request token</button></div>
+  <div class="hint">
+    <b>🔒 Only the calendar permission is needed</b>
+    <ul>
+      <li>When activating the token in TUMonline, enable <b>only “Kalender” (calendar)</b>. Leave every other permission off.</li>
+      <li>Nothing is stored: no server, no database. The token lives only in this tab and is gone when you close it or press Log out.</li>
+      <li>You can revoke the token anytime in TUMonline → Token-Management.</li>
+    </ul>
+  </div>
   <details><summary>I already have a token</summary>
-    <div class="row"><input id="tokenIn" placeholder="Token" autocomplete="off"><button id="useTok">Use</button></div></details>
-  <details><summary>Alternative: upload an .ics file</summary>
-    <p class="muted">TUMonline → My calendar → Export (iCal). The file is read only locally.</p>
+    <div class="field"><input id="tokenIn" placeholder="Token" autocomplete="off" aria-label="Token"><button id="useTok">Use token</button></div></details>
+  <details><summary>Or upload an .ics calendar file</summary>
+    <p class="muted">TUMonline → My calendar → Export (iCal). The file is read locally and never uploaded.</p>
     <input type="file" id="ics" accept=".ics,text/calendar"></details>
-  <p id="msg" class="msg"></p>
+  <p id="msg" class="msg" role="alert"></p>
 </section>
-<section id="activate" class="card" hidden>
-  <h2>2. Activate the token in TUMonline</h2>
-  <ol>
-    <li>You will get an email from TUMonline, or open <a href="https://campus.tum.de/tumonline/" target="_blank" rel="noopener">TUMonline</a> → Visitenkarte / Profil → <b>Token-Management</b>.</li>
-    <li>Activate the token "TUM Schedule" and enable the <b>Kalender</b> (calendar) permission.</li>
-    <li>This page checks every 5 s automatically.</li>
+
+<section id="activate" class="panel" hidden>
+  <h1>Activate your token</h1>
+  <ol class="steps">
+    <li>Open the email from TUMonline, or go to <a href="https://campus.tum.de/tumonline/" target="_blank" rel="noopener">TUMonline</a> → your profile → <b>Token-Management</b>.</li>
+    <li>Activate the token <b>“TUM Schedule”</b>.</li>
+    <li>Enable <b>only “Kalender”</b> – nothing else is needed.</li>
   </ol>
-  <p class="muted">Token (keep it if you want to log in again later without a new request): <code id="tokShow"></code></p>
-  <p id="msg2" class="msg"></p>
+  <div class="hint"><b>🔒 Privacy</b><ul><li>Calendar permission only. Nothing is stored. Revoke anytime in TUMonline → Token-Management.</li></ul></div>
+  <p class="wait"><span class="spinner"></span><span id="msg2">Waiting for activation – checking every 5 s…</span></p>
+  <details><summary>Show token (to reuse later)</summary><code id="tokShow"></code></details>
 </section>
+
 <section id="cal" hidden>
-  <nav class="daynav"><button id="prev">‹</button><button id="today">Today</button><span id="dayLabel"></span><button id="next">›</button></nav>
-  <div id="timeline" class="timeline"></div>
-  <ul id="list" class="list"></ul>
+  <div class="toolbar">
+    <div class="seg" role="tablist"><button id="vDay" class="on">Day</button><button id="vWeek">Week</button></div>
+    <div class="nav"><button id="prev" aria-label="Previous">‹</button><button id="today">Today</button><button id="next" aria-label="Next">›</button></div>
+    <div class="pdf"><select id="range" aria-label="PDF range"><option value="day">This day</option><option value="week" selected>This week</option><option value="2">Next 2 weeks</option><option value="4">Next 4 weeks</option><option value="8">Next 8 weeks</option></select><button id="print" class="primary">Save as PDF</button></div>
+  </div>
+  <h2 id="dayLabel" class="daylabel"></h2>
+  <div id="view" class="view"></div>
 </section>
+<section id="printout" aria-hidden="true"></section>
 </main>
-<footer class="muted">Unofficial, not affiliated with TUM. Data: TUMonline &amp; <a href="https://nav.tum.de" target="_blank" rel="noopener">NavigaTUM</a>. Nothing is stored on a server. <a href="https://github.com/Darius17TARS/schedule" target="_blank" rel="noopener">Source</a></footer>
+<footer class="muted">Unofficial · not affiliated with TUM · Data: TUMonline &amp; <a href="https://nav.tum.de" target="_blank" rel="noopener">NavigaTUM</a> · Nothing stored · <a href="https://github.com/Darius17TARS/schedule" target="_blank" rel="noopener">Source</a></footer>
 <script src="app.js"></script>
 </body></html>
