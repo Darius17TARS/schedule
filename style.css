@@ -99,7 +99,8 @@ footer{text-align:center;padding:28px 16px}
 @media print{
   body{background:#fff;color:#000}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}
   .top,main>section:not(#printout),footer,.errbox{display:none!important}
-  main{padding:0;max-width:none;margin:0}#printout{display:block}.ppage{break-inside:avoid;overflow:hidden;height:186mm}
+  main{padding:0;max-width:none;margin:0;width:auto}#printout{display:block;width:100%}.ppage{break-inside:avoid;page-break-inside:avoid;overflow:hidden;max-height:165mm;width:100%}
+  .pfit{width:100%!important;zoom:1!important;transform:none!important}.pgrid{height:112mm}.pex ul{columns:4;column-gap:4mm;font-size:6.5pt;line-height:1.2}.pev{font-size:7pt}.pev small{font-size:6pt}
 }
 .lg .sw{--c:#8a8f98}
 @media(max-width:800px){.week .winner{min-width:820px}.week .wd{position:sticky;left:0;z-index:4;background:var(--card)}}

@@ -271,7 +271,7 @@ function applyZoom(z, clientX) {
   inner.style.width = (zoom * 100) + "%"; tl.scrollLeft = frac * tl.scrollWidth - x; tl.style.scrollBehavior = "";
 }
 function render(dx = 0) {
-  const v = $("view");
+  const v = $("view"); if (events.length) loadJsPDF().catch(() => {});
   const draw = () => { v.innerHTML = ""; try { mode === "day" ? renderDay(v) : renderWeek(v); applyZoom(zoom); } catch (e) { showError("Render", e); } v.classList.remove("fade"); };
   if (!dx) return draw();
   v.style.setProperty("--dx", (dx > 0 ? -24 : 24) + "px"); v.classList.add("fade"); setTimeout(draw, 140);
@@ -280,6 +280,7 @@ function setMode(m) { mode = m; $("vDay").classList.toggle("on", m === "day"); $
 
 // --- Semester PDF: ONE A4 landscape page with a typical week + exceptions ---
 function isCancelled(e) { return /cancel|storn|abgesagt|entf(ä|ae)llt|f(ä|ae)llt aus/i.test((e.status || "").trim()) || /\b(abgesagt|entfällt|storniert|cancell?ed)\b/i.test(e.title || ""); }
+const APPV = 14;
 const hm = d => d.getHours() * 60 + d.getMinutes();
 const dShort = d => `${DOW[(d.getDay() + 6) % 7]} ${d.getDate()}.${d.getMonth() + 1}.`;
 function semesterModel() {
@@ -310,13 +311,117 @@ function semesterModel() {
   const isNo = d => noLect.some(x => sameDay(x, d));
   return { first, last, slots, oneOffs, roomChanges, missing: missing.filter(m => !isNo(m.d)), noLect };
 }
+// --- Vector PDF (jsPDF, vendored) — one A4 landscape page, identical on every browser ---
+const TCOL = { VO: "#2563eb", UE: "#059669", "ZÜ": "#d97706", TUT: "#db2777", PR: "#7c3aed", SE: "#0891b2" };
+function hsl2rgb(h, s, l) { s /= 100; l /= 100; const k = n => (n + h / 30) % 12, a = s * Math.min(l, 1 - l), f = n => Math.round(255 * (l - a * Math.max(-1, Math.min(k(n) - 3, 9 - k(n), 1)))); return [f(0), f(8), f(4)]; }
+function hex2rgb(x) { return [1, 3, 5].map(i => parseInt(x.slice(i, i + 2), 16)); }
+const pdfTxt = s => String(s || "").normalize("NFC").replace(/[\u2018\u2019]/g, "'").replace(/[\u201C\u201D\u201E]/g, '"').replace(/[^\x20-\x7E\u00A0-\u00FF\u2013\u2014\u2022\u2026\u20AC]/g, c => c.normalize("NFKD").replace(/[^\x20-\x7E]/g, "") || "?");
+let jspdfP;
+function loadJsPDF() { return jspdfP || (jspdfP = new Promise((ok, no) => { if (window.jspdf) return ok(window.jspdf); const s = document.createElement("script"); s.src = "vendor/jspdf.umd.min.js?v=" + APPV; s.onload = () => window.jspdf ? ok(window.jspdf) : no(new Error("jsPDF missing")); s.onerror = () => { jspdfP = null; no(new Error("jsPDF failed to load")); }; document.head.appendChild(s); })); }
+function fitLine(doc, s, w) { s = pdfTxt(s); if (doc.getTextWidth(s) <= w) return s; while (s.length > 1 && doc.getTextWidth(s + "…") > w) s = s.slice(0, -1); return s.trimEnd() + "…"; }
+function wrapLines(doc, s, w, max) { const ls = doc.splitTextToSize(pdfTxt(s), w); if (ls.length <= max) return ls; const o = ls.slice(0, max); o[max - 1] = fitLine(doc, ls.slice(max - 1).join(" "), w); return o; }
+function buildPdf(J, M, loc, items) {
+  const doc = new J.jsPDF({ orientation: "landscape", unit: "mm", format: "a4", compress: true });
+  const PW = 297, PH = 210, m = 10, X0 = m, X1 = PW - m;
+  const D = o => dlabel(o, { day: "numeric", month: "short", year: "numeric" });
+  doc.setProperties({ title: "Semester timetable", creator: "TUM Schedule" });
+  doc.setFont("helvetica", "bold"); doc.setFontSize(15); doc.setTextColor(17); doc.text("Semester timetable", X0, m + 5);
+  doc.setFont("helvetica", "normal"); doc.setFontSize(8.5); doc.setTextColor(90); doc.text(pdfTxt(`${D(M.first)} – ${D(M.last)} · typical week · TUM Schedule`), X1, m + 5, { align: "right" });
+  // exceptions: choose font size + columns so everything fits under a grid of >= 112 mm
+  const gTop = m + 9, legH = 7, minGrid = 112;
+  let ex = null;
+  if (items.length) {
+    const avail = PH - m - gTop - minGrid - legH;
+    for (const fs of [7, 6.5, 6, 5.5, 5, 4.6, 4.2, 3.8]) {
+      let ok = null; const lh = fs * 0.42;
+      for (let nc = 1; nc <= 5; nc++) { const rows = Math.ceil(items.length / nc), h = 5 + rows * lh; if (h <= avail) { ok = { fs, lh, nc, rows, h }; break; } }
+      if (ok) { ex = ok; break; }
+    }
+    if (!ex) { const fs = 3.8, lh = fs * 0.42, nc = 5, rows = Math.floor((PH - m - gTop - minGrid - legH - 5) / lh); ex = { fs, lh, nc, rows, h: 5 + rows * lh, cut: items.length - rows * nc }; }
+  }
+  const gBot = PH - m - (ex ? ex.h + 1 : 0) - legH;
+  const cols = [1, 2, 3, 4, 5]; if (M.slots.some(s => s.e.start.getDay() === 6)) cols.push(6); if (M.slots.some(s => s.e.start.getDay() === 0)) cols.push(0);
+  let h0 = Math.max(MIN_H, Math.min(...M.slots.map(s => s.e.start.getHours()), 10)), h1 = Math.min(MAX_H, Math.max(...M.slots.map(s => Math.ceil(hm(s.e.end) / 60)), 16));
+  const ax = 9, dh = 5, bodyT = gTop + dh, bodyH = gBot - bodyT, cw = (X1 - X0 - ax) / cols.length;
+  const Y = min => bodyT + Math.min(1, Math.max(0, (min / 60 - h0) / (h1 - h0))) * bodyH;
+  doc.setDrawColor(215); doc.setLineWidth(0.2); doc.setFillColor(246, 247, 249); doc.rect(X0, gTop, X1 - X0, dh, "F");
+  doc.setFontSize(6.5); doc.setTextColor(110);
+  for (let h = h0; h <= h1; h++) { const y = Y(h * 60); doc.setDrawColor(228); doc.line(X0 + ax, y, X1, y); doc.text(`${h}:00`, X0 + ax - 1, y + (h === h0 ? 2.2 : 1), { align: "right" }); }
+  cols.forEach((wd, i) => {
+    const x = X0 + ax + i * cw; doc.setDrawColor(205); doc.line(x, gTop, x, gBot);
+    doc.setFont("helvetica", "bold"); doc.setFontSize(8); doc.setTextColor(40); doc.text(DOW[(wd + 6) % 7], x + cw / 2, gTop + 3.6, { align: "center" });
+    const ss = M.slots.filter(s => s.e.start.getDay() === wd).sort((a, b) => hm(a.e.start) - hm(b.e.start));
+    const fake = ss.map(s => ({ start: new Date(2000, 0, 3, 0, hm(s.e.start)), end: new Date(2000, 0, 3, 0, hm(s.e.end)), s }));
+    const { lanes } = layout(fake), lw = cw / lanes;
+    for (const f of fake) {
+      const s = f.s, t = evType(s.e.title), hh = hue(s.e.title), bx = x + f.lane * lw + 0.4, bw = lw - 0.8, by = Y(hm(s.e.start)) + 0.3, bh = Math.max(Y(hm(s.e.end)) - by - 0.3, 3);
+      doc.setFillColor(...hsl2rgb(hh, t.k === "VO" ? 70 : 75, t.k === "VO" ? 78 : 86)); doc.setDrawColor(...hsl2rgb(hh, 62, 50)); doc.setLineWidth(0.25);
+      doc.roundedRect(bx, by, bw, bh, 0.8, 0.8, "FD"); doc.setFillColor(...hsl2rgb(hh, 62, 50)); doc.rect(bx, by, 1.1, bh, "F");
+      const tx = bx + 1.9, tw = bw - 2.6; let pillW = 0;
+      if (t.k) { doc.setFont("helvetica", "bold"); doc.setFontSize(5.2); pillW = doc.getTextWidth(pdfTxt(t.k)) + 1.6; if (bw > 14) { doc.setFillColor(...hex2rgb(TCOL[t.k])); doc.roundedRect(bx + bw - pillW - 0.7, by + 0.7, pillW, 2.6, 0.6, 0.6, "F"); doc.setTextColor(255); doc.text(pdfTxt(t.k), bx + bw - pillW / 2 - 0.7, by + 2.5, { align: "center" }); } else { doc.setFillColor(...hex2rgb(TCOL[t.k])); doc.circle(bx + bw - 1.3, by + 1.3, 0.7, "F"); pillW = 1.6; } }
+      const fs = bw < 22 ? 5.6 : 6.6, lh = fs * 0.4; doc.setFont("helvetica", "bold"); doc.setFontSize(fs); doc.setTextColor(17);
+      const nm = bw < 30 ? shortName(s.e.title) : baseName(s.e.title);
+      const cad = s.step === 1 ? "weekly" : s.step === 2 ? "biweekly" : `every ${s.step} wks`;
+      const sub = [loc(s.room), `${fmt(s.e.start)}–${fmt(s.e.end)} · ${cad} · ${s.from.getDate()}.${s.from.getMonth() + 1}.–${s.to.getDate()}.${s.to.getMonth() + 1}.`];
+      const cap = Math.max(1, Math.floor((bh - 1.2) / lh)); const nl = Math.max(1, Math.min(3, cap - (cap >= 3 ? 2 : cap >= 2 ? 1 : 0)));
+      const first = doc.splitTextToSize(pdfTxt(nm), tw - pillW - 0.6)[0] || ""; const rest = pdfTxt(nm).slice(first.length).trim();
+      const names = [first]; if (rest && nl > 1) names.push(...wrapLines(doc, rest, tw, nl - 1)); else if (rest) names[0] = fitLine(doc, nm, tw - pillW - 0.6);
+      let y = by + 0.6 + lh; for (const l of names) { doc.text(l, tx, y); y += lh; }
+      doc.setFont("helvetica", "normal"); doc.setFontSize(fs - 0.8); doc.setTextColor(50);
+      for (const l of sub) { if (y > by + bh - 0.4) break; doc.text(fitLine(doc, l, tw), tx, y); y += lh * 0.92; }
+    }
+  });
+  doc.setDrawColor(205); doc.setLineWidth(0.25); doc.rect(X0, gTop, X1 - X0, gBot - gTop);
+  // legend
+  let lx = X0, ly = gBot + 4.3; const seen = new Map(); for (const s of M.slots) { const t = evType(s.e.title); if (!seen.has(t.k)) seen.set(t.k, t.name); }
+  for (const [k, name] of seen) {
+    doc.setFont("helvetica", "bold"); doc.setFontSize(6); const pw = k ? doc.getTextWidth(pdfTxt(k)) + 2 : 5;
+    if (k) { doc.setFillColor(...hex2rgb(TCOL[k])); doc.roundedRect(lx, ly - 2.4, pw, 3.2, 0.7, 0.7, "F"); doc.setTextColor(255); doc.text(pdfTxt(k), lx + 1, ly); } else { doc.setDrawColor(120); doc.rect(lx, ly - 2.2, pw, 2.8); }
+    doc.setFont("helvetica", "normal"); doc.setFontSize(7); doc.setTextColor(60); doc.text(pdfTxt(name), lx + pw + 1.2, ly); lx += pw + doc.getTextWidth(pdfTxt(name)) + 6;
+  }
+  // exceptions in columns
+  if (ex) {
+    const ey = gBot + legH + 1; doc.setFont("helvetica", "bold"); doc.setFontSize(8); doc.setTextColor(20); doc.text("Exceptions & extra dates", X0, ey + 2.6);
+    const colW = (X1 - X0) / ex.nc; doc.setFontSize(ex.fs);
+    items.slice(0, ex.rows * ex.nc).forEach(([, b, r], i) => {
+      const c = Math.floor(i / ex.rows), row = i % ex.rows, x = X0 + c * colW, y = ey + 5 + (row + 0.8) * ex.lh;
+      doc.setFont("helvetica", "bold"); doc.setTextColor(20); const bt = pdfTxt(b); doc.text(bt, x, y); const bw = doc.getTextWidth(bt + " ");
+      doc.setFont("helvetica", "normal"); doc.setTextColor(55); doc.text(fitLine(doc, r, colW - bw - 2), x + bw, y);
+    });
+    if (ex.cut > 0) { doc.setFont("helvetica", "italic"); doc.text(`+ ${ex.cut} more`, X1, ey + 2.6, { align: "right" }); }
+  }
+  return doc;
+}
+async function deliverPdf(doc) {
+  const name = "semester-timetable.pdf", blob = doc.output("blob");
+  const file = typeof File === "function" ? new File([blob], name, { type: "application/pdf" }) : null;
+  const touch = matchMedia("(pointer:coarse)").matches;
+  if (touch && file && navigator.canShare && navigator.canShare({ files: [file] })) {
+    try { await navigator.share({ files: [file], title: "Semester timetable" }); return; } catch (e) { if (e && e.name === "AbortError") return; }
+  }
+  const url = URL.createObjectURL(blob), a = document.createElement("a"); a.href = url; a.download = name; a.rel = "noopener";
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 60000);
+  window.__lastPdf = blob;
+}
+function pdfItems(M, loc) {
+  const items = [];
+  for (const d of M.noLect) items.push([d, dShort(d), "– no lectures"]);
+  const byDay = new Map(); for (const m of M.missing) { const k = m.d.getTime(); (byDay.get(k) || byDay.set(k, []).get(k)).push(m); }
+  for (const [k, ms] of byDay) { const d = new Date(k); items.push([d, dShort(d), ms.map(m => `${shortName(m.s.e.title)} ${evType(m.s.e.title).k} ${fmt(m.s.e.start)}${m.why ? " (cancelled)" : ""}`).join(", ") + ` – ${ms.length > 1 ? "do" : "does"} not take place`]); }
+  for (const r of M.roomChanges) items.push([r.e.start, dShort(r.e.start), `${baseName(r.e.title)} ${fmt(r.e.start)} – room change: ${loc(r.e.location)}`]);
+  for (const e of M.oneOffs) items.push([e.start, dShort(e.start), `${fmt(e.start)}–${fmt(e.end)} ${baseName(e.title)} ${evType(e.title).k} · ${loc(e.location)} (extra)`]);
+  return items.sort((a, b) => a[0] - b[0]);
+}
 async function exportPdf() {
   const M = semesterModel(); if (!M) return showError("PDF", new Error("No events loaded."));
   const btn = $("print"); btn.disabled = true; btn.textContent = "Preparing…";
   const locs = new Set([...M.slots.map(s => s.room), ...M.oneOffs.map(e => e.location), ...M.roomChanges.map(r => r.e.location)]);
+  const jp = loadJsPDF().catch(e => e);
   const rooms = new Map(await Promise.all([...locs].map(async l => [l, await resolveRoom(l)])));
-  btn.disabled = false; btn.textContent = "Save semester PDF";
   const loc = l => { const r = rooms.get(l); return r ? [r.short, r.building].filter(Boolean).join(" · ") : (l || "–"); };
+  try { const J = await jp; if (J instanceof Error) throw J; await deliverPdf(buildPdf(J, M, loc, pdfItems(M, loc))); btn.disabled = false; btn.textContent = "Save semester PDF"; return; }
+  catch (e) { console.warn("PDF file failed, using print fallback", e); }
+  btn.disabled = false; btn.textContent = "Save semester PDF";
   const out = $("printout"); out.innerHTML = "";
   const pg = el("div", "ppage"), fit = el("div", "pfit"); pg.appendChild(fit);
   const D = o => dlabel(o, { day: "numeric", month: "short", year: "numeric" });
@@ -357,9 +462,6 @@ async function exportPdf() {
   if (items.length) { const ex = el("div", "pex", `<h3>Exceptions &amp; extra dates</h3>`); const ul = el("ul"); for (const [, h] of items) ul.appendChild(el("li", "", h)); ex.appendChild(ul); fit.appendChild(ex); }
   out.appendChild(pg);
   // scale to guarantee a single page (A4 landscape minus 10mm margins ≈ 1046×718 CSS px)
-  out.classList.add("measure"); fit.style.zoom = 1;
-  const W = 1040, H = 660, z = Math.min(1, W / fit.scrollWidth, H / fit.scrollHeight); fit.style.zoom = z.toFixed(3);
-  out.classList.remove("measure");
   setTimeout(() => window.print(), 50);
 }
 
