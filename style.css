@@ -151,3 +151,6 @@ footer{text-align:center;padding:28px 16px}
 .exgap{font-size:11px;color:#667;margin:3px 0 3px 2.6em;padding-left:10px;border-left:2px dashed #ccd}.exgap.tight{color:#c8323a}
 [data-theme=dark] .exi{background:hsl(var(--h) 30% 20%)}[data-theme=dark] .exd{color:hsl(var(--h) 70% 72%)}
 @media print{.exams,#examPdf{display:none!important}}
+.exi.plan{background:transparent;border:1px dashed hsl(var(--h) 55% 55%)}
+.exbadge{font-style:normal;font-size:.68em;font-weight:700;background:#fff3cd;color:#926000;border-radius:99px;padding:1px 7px;white-space:nowrap;vertical-align:middle}
+.exsrc{font-size:.78em;margin-top:.6em}

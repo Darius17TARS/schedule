@@ -281,7 +281,7 @@ function setMode(m) { mode = m; $("vDay").classList.toggle("on", m === "day"); $
 
 // --- Semester PDF: ONE A4 landscape page with a typical week + exceptions ---
 function isCancelled(e) { return /cancel|storn|abgesagt|entf(ä|ae)llt|f(ä|ae)llt aus/i.test((e.status || "").trim()) || /\b(abgesagt|entfällt|storniert|cancell?ed)\b/i.test(e.title || ""); }
-const APPV = 17;
+const APPV = 18;
 const hm = d => d.getHours() * 60 + d.getMinutes();
 const dShort = d => `${DOW[(d.getDay() + 6) % 7]} ${d.getDate()}.${d.getMonth() + 1}.`;
 function semesterModel() {
@@ -415,9 +415,36 @@ const EXAM_RE = /(^|[\s:(\[–-])(wiederholungs|end|haupt|modul|semestral)?(pr(�
 const EXAM_NOT = /einsicht|anmeldung|vorbereitung|repetitorium|review|prep|probe|mock|exkursion/i;
 function isExam(e) { const s = `${e.title} ${e.status || ""}`; return EXAM_RE.test(s) && !EXAM_NOT.test(s); } // "PR" alone = Praktikum, never an exam
 function examCourse(t) { return (t || "").replace(/\((schriftlich|mündlich|written|oral)[^)]*\)/gi, "").replace(/\b(schriftliche|mündliche|written|oral)\b/gi, "").replace(/\b(wiederholungs)?(pr(ü|ue)fung|klausur)(stermin)?\b|\b(final |re-?)?exam(ination)?\b|\b(endterm|midterm|retake)\b/gi, "").replace(/\(\s*\)/g, "").replace(/^[\s:–-]+|[\s:–-]+$/g, "").replace(/\s{2,}/g, " ").trim() || t; }
-function examList() { return events.filter(isExam).sort((a, b) => a.start - b.start).map(e => ({ e, course: examCourse(e.title), h: hue(examCourse(e.title)), min: Math.round((e.end - e.start) / 6e4) })); }
+function examReg() { return events.filter(isExam).sort((a, b) => a.start - b.start).map(e => ({ e, course: examCourse(e.title), h: hue(examCourse(e.title)), min: Math.round((e.end - e.start) / 6e4) })); }
+// --- Planned exams: public TUMonline exam list (no personal data), baked into data/ and matched locally by course name or module number ---
+let PLAN = null, planP = null;
+function loadPlan() { return planP || (planP = fetch("data/exams-ws2026.json?v=" + APPV, { credentials: "omit" }).then(r => r.ok ? r.json() : null).catch(() => null).then(j => { PLAN = j; if (events.length) renderExams(); return j; })); }
+const normE = t => examCourse(t || "").replace(/\s+[-–:]\s+(klausur|exam|prüfung)\b.*$/i, "").toLowerCase().normalize("NFC").replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+const normC = t => examCourse(baseName(t || "")).replace(/\s+[-–:]\s+(klausur|exam|prüfung)\b.*$/i, "").toLowerCase().normalize("NFC").replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+const MODNR = /\b([A-Z]{2,4}\d{3,6}(?:-\d+)?)\b/;
+function plannedExams(reg) {
+  if (!PLAN || !PLAN.exams) return [];
+  const today = startOfDay(new Date()), byName = new Map(), byCode = new Map();
+  for (const x of PLAN.exams) { const d = new Date(x.d + "T" + x.s + ":00"); if (d < today) continue; const k = normE(x.t); (byName.get(k) || byName.set(k, []).get(k)).push(x); (byCode.get(x.c) || byCode.set(x.c, []).get(x.c)).push(x); }
+  const regN = new Set(reg.map(r => normC(r.course))), regT = reg.map(r => r.e.title).join(" "), seen = new Set(), out = [];
+  const courses = new Map(); for (const e of events) if (!isExam(e) && !EXAM_NOT.test(e.title)) { const k = normC(e.title); if (k && !courses.has(k)) courses.set(k, e.title); }
+  for (const [k, title] of courses) {
+    const code = (title.match(MODNR) || [])[1], k2 = normC(title.split(/\s+[–-]\s+/)[0]); let c = code && byCode.get(code);
+    if (!c) c = byName.get(k) || byName.get(k2);
+    if (!c || !c.length || regN.has(k) || regN.has(k2) || (code && regT.includes(code))) continue;
+    c = [...c].sort((a, b) => (a.d + a.s).localeCompare(b.d + b.s)); const f = c[0], key = f.t + f.d;
+    if (seen.has(key)) continue; seen.add(key);
+    const alt = c.filter(x => x.d === f.d && x.s === f.s), rooms = [...new Set(alt.map(x => x.r).filter(Boolean))];
+    const start = new Date(f.d + "T" + f.s + ":00"), end = f.e ? new Date(f.d + "T" + f.e + ":00") : new Date(+start + 9e5 * 6), course = baseName(title).split(/\s+[–-]\s+/)[0];
+    out.push({ planned: true, code: alt.map(x => x.c).join(" / "), e: { title: course, start, end, location: rooms.length === 1 ? rooms[0] : rooms.length ? "Room depends on degree programme: " + rooms.join(" | ") : "Room not published yet" }, course, h: hue(course), min: Math.round((end - start) / 6e4), noRoom: !rooms.length });
+  }
+  return out;
+}
+function examList() { const R = examReg(); return [...R, ...plannedExams(R)].sort((a, b) => a.e.start - b.e.start); }
+const planNote = () => PLAN ? `Planned = not registered yet. Date/room from the public TUMonline exam list (${PLAN.source.replace(/^https?:\/\//, "").replace(/\?.*$/, "")}), as of ${PLAN.updated}; matched to your courses by name/module number on this device. Binding info only in TUMonline after you register (WiSe 26/27 registration 16.11.2026–15.01.2027).` : "";
 const dayDiff = (a, b) => Math.round((startOfDay(b) - startOfDay(a)) / 864e5);
-function studyDays(a, b) { let n = 0; for (let d = addDays(startOfDay(a), 1); d < startOfDay(b); d = addDays(d, 1)) if (d.getDay() % 6) n++; return n; }
+function studyDays(a, b) { // every calendar day without an exam between the two exam days (weekends included)
+  let n = 0; for (let d = addDays(startOfDay(a), 1); d < startOfDay(b); d = addDays(d, 1)) n++; return n; }
 const durTxt = m => m >= 60 && m % 60 === 0 ? `${m / 60} h` : `${m} min`;
 const EXAM_NONE = "No exams found in your TUMonline calendar. Exams only appear here after you register for them in TUMonline (the token's Kalender permission is enough — TUMonline offers no separate exam webservice).";
 function examSummary(X) {
@@ -435,7 +462,7 @@ function buildExamPdf(J, X, loc) {
   if (!X.length) { doc.setFontSize(10); doc.setTextColor(60); doc.text(doc.splitTextToSize(pdfTxt(EXAM_NONE), W), X0, m + 20); return doc; }
   // summary chips
   let cx = X0, cy = m + 12;
-  for (const [k, v] of [["Exams", String(S.n)], ["Total span", `${S.span} days`], ["Shortest gap", S.min == null ? "–" : `${S.min} day${S.min === 1 ? "" : "s"}`]]) {
+  for (const [k, v] of [["Exams", String(S.n)], ["Total span", `${S.span} days`], ["Fewest study days between exams", S.min == null ? "–" : String(Math.max(0, S.min - 1))]]) {
     doc.setFont("helvetica", "bold"); doc.setFontSize(11); const vw = doc.getTextWidth(v); doc.setFont("helvetica", "normal"); doc.setFontSize(7); const kw = doc.getTextWidth(k);
     const w = Math.max(vw, kw) + 8; doc.setFillColor(244, 245, 247); doc.roundedRect(cx, cy, w, 11, 1.5, 1.5, "F");
     doc.setTextColor(110); doc.text(k, cx + 4, cy + 4); doc.setFont("helvetica", "bold"); doc.setFontSize(11); doc.setTextColor(20); doc.text(v, cx + 4, cy + 9); cx += w + 3;
@@ -450,45 +477,49 @@ function buildExamPdf(J, X, loc) {
     lvl = px - lastX < 24 ? (lvl + 1) % 4 : 0; lastX = px; const ly = [ty - 3.6, ty + 8.2, ty - 7, ty + 11.4][lvl]; doc.setFont("helvetica", "bold"); doc.setFontSize(6.2); doc.setTextColor(40);
     const lab = fitLine(doc, shortName(x.course), 26); doc.text(lab, px, ly, { align: "center" }); });
   // list
-  const top = ty + 18, gapH = 6.5, n = X.length, rowH = Math.min(22, Math.max(11, (PH - m - 6 - top - (n - 1) * gapH) / n)), big = rowH >= 16;
+  const top = ty + 18, gapH = 6.5, n = X.length, rowH = Math.min(22, Math.max(11, (PH - m - (X.some(x => x.planned) ? 12 : 6) - top - (n - 1) * gapH) / n)), big = rowH >= 16;
   let y = top;
   X.forEach((x, i) => {
     if (i) { const g = dayDiff(X[i - 1].e.start, x.e.start), sd = studyDays(X[i - 1].e.start, x.e.start), tight = g <= 2;
-      const txt = g === 0 ? "same day" : `${g} day${g > 1 ? "s" : ""} gap${sd ? ` · ${sd} study day${sd > 1 ? "s" : ""} in between` : ""}`;
+      const txt = g === 0 ? "same day · 0 study days" : `${sd} study day${sd === 1 ? "" : "s"} in between · next exam ${g} day${g > 1 ? "s" : ""} later`;
       doc.setDrawColor(215); doc.setLineWidth(0.3); doc.setLineDashPattern([0.8, 0.8], 0); doc.line(X0 + 11, y + 0.5, X0 + 11, y + gapH - 0.5); doc.setLineDashPattern([], 0);
       doc.setFont("helvetica", "bold"); doc.setFontSize(7); const w = doc.getTextWidth(pdfTxt(txt)) + 5;
       doc.setFillColor(...(tight ? [253, 236, 236] : [241, 243, 245])); doc.roundedRect(X0 + 15, y + gapH / 2 - 2.2, w, 4.4, 2.2, 2.2, "F");
       doc.setTextColor(...(tight ? [200, 50, 55] : [90, 98, 110])); doc.text(pdfTxt(txt), X0 + 17.5, y + gapH / 2 + 0.9); y += gapH; }
     const c = hsl2rgb(x.h, 62, 50), d = x.e.start;
-    doc.setFillColor(...hsl2rgb(x.h, 70, 96)); doc.roundedRect(X0, y, W, rowH, 1.6, 1.6, "F"); doc.setFillColor(...c); doc.rect(X0, y, 1.4, rowH, "F");
+    if (x.planned) { doc.setFillColor(255); doc.setDrawColor(...c); doc.setLineWidth(0.35); doc.setLineDashPattern([1.2, 0.9], 0); doc.roundedRect(X0, y, W, rowH, 1.6, 1.6, "FD"); doc.setLineDashPattern([], 0); }
+    else { doc.setFillColor(...hsl2rgb(x.h, 70, 96)); doc.roundedRect(X0, y, W, rowH, 1.6, 1.6, "F"); doc.setFillColor(...c); doc.rect(X0, y, 1.4, rowH, "F"); }
     doc.setFont("helvetica", "bold"); doc.setFontSize(big ? 15 : 12); doc.setTextColor(...c); doc.text(String(d.getDate()), X0 + 11, y + rowH / 2 + (big ? 0.5 : 0.8), { align: "center" });
     doc.setFontSize(6.5); doc.setTextColor(90); doc.text(pdfTxt(dlabel(d, { weekday: "short" }) + " " + dlabel(d, { month: "short" })), X0 + 11, y + rowH / 2 + (big ? 4.6 : 4), { align: "center" });
     const tx2 = X0 + 22, tw = W - 26; doc.setFont("helvetica", "bold"); doc.setFontSize(big ? 10.5 : 9); doc.setTextColor(17);
-    const nm = wrapLines(doc, x.course, tw - 28, big ? 2 : 1); let yy = y + (big ? 6 : 4.6); nm.forEach(l => { doc.text(l, tx2, yy); yy += big ? 4.4 : 3.8; });
+    const bw = x.planned ? 40 : 0, nm = wrapLines(doc, x.course, tw - 28 - bw, big ? 2 : 1); let yy = y + (big ? 6 : 4.6); nm.forEach(l => { doc.text(l, tx2, yy); yy += big ? 4.4 : 3.8; });
+    if (x.planned) { doc.setFont("helvetica", "bold"); doc.setFontSize(5.6); const bt = pdfTxt(`PLANNED · NOT REGISTERED · ${x.code}`), w = Math.min(doc.getTextWidth(bt) + 3, bw + 18); doc.setFillColor(255, 243, 205); doc.roundedRect(X1 - 3 - 26 - w, y + (big ? 3.3 : 2.2), w, 3.6, 1.8, 1.8, "F"); doc.setTextColor(146, 96, 0); doc.text(fitLine(doc, bt, w - 3), X1 - 3 - 26 - w + 1.5, y + (big ? 5.9 : 4.8)); doc.setFont("helvetica", "bold"); doc.setFontSize(big ? 10.5 : 9); }
     doc.setFont("helvetica", "bold"); doc.setFontSize(big ? 9 : 8); doc.setTextColor(40); doc.text(pdfTxt(`${fmt(x.e.start)}–${fmt(x.e.end)}`), X1 - 3, y + (big ? 6 : 4.6), { align: "right" });
     doc.setFont("helvetica", "normal"); doc.setFontSize(7); doc.setTextColor(110); doc.text(durTxt(x.min), X1 - 3, y + (big ? 10.4 : 8.4), { align: "right" });
     doc.setFontSize(big ? 7.8 : 7); doc.setTextColor(85); doc.text(fitLine(doc, loc(x.e.location), tw - 18), tx2, Math.min(yy + 0.2, y + rowH - 2.2));
     y += rowH;
   });
+  if (X.some(x => x.planned)) { doc.setFont("helvetica", "normal"); doc.setFontSize(6.3); doc.setTextColor(120); doc.text(doc.splitTextToSize(pdfTxt(planNote()), W), X0, PH - m + 2); }
   return doc;
 }
 function renderExams() {
-  const box = $("exams"); if (!box) return; const X = examList(); box.hidden = false; box.innerHTML = "";
+  const box = $("exams"); if (!box) return; if (!PLAN) loadPlan(); const X = examList(), nP = X.filter(x => x.planned).length; box.hidden = false; box.innerHTML = "";
   box.appendChild(el("h3", "", `Exams <small class="muted">${X.length || ""}</small>`));
   if (!X.length) { box.appendChild(el("p", "muted", esc(EXAM_NONE))); return; }
-  const S = examSummary(X); box.appendChild(el("p", "muted", `${S.n} exam${S.n > 1 ? "s" : ""} · span ${S.span} days${S.min != null ? ` · shortest gap ${S.min} day${S.min === 1 ? "" : "s"}` : ""}`));
+  const S = examSummary(X); box.appendChild(el("p", "muted", `${S.n} exam${S.n > 1 ? "s" : ""}${nP ? ` (${S.n - nP} registered, ${nP} planned)` : ""} · span ${S.span} days${S.min != null ? ` · fewest study days between exams: ${Math.max(0, S.min - 1)}` : ""}`));
   const ol = el("ol", "exl");
   X.forEach((x, i) => {
-    if (i) { const g = dayDiff(X[i - 1].e.start, x.e.start); ol.appendChild(el("li", "exgap" + (g <= 2 ? " tight" : ""), g ? `Δ ${g} day${g > 1 ? "s" : ""}` : "same day")); }
-    const li = el("li", "exi", `<b class="exd">${esc(dShort(x.e.start))}</b><span class="exn">${esc(x.course)}</span><span class="muted">${fmt(x.e.start)}–${fmt(x.e.end)} · ${durTxt(x.min)} · ${esc(x.e.location || "–")}</span>`);
+    if (i) { const g = dayDiff(X[i - 1].e.start, x.e.start); ol.appendChild(el("li", "exgap" + (g <= 2 ? " tight" : ""), g ? `${g - 1} study day${g === 2 ? "" : "s"} · Δ ${g} day${g > 1 ? "s" : ""}` : "same day · 0 study days")); }
+    const li = el("li", "exi" + (x.planned ? " plan" : ""), `<b class="exd">${esc(dShort(x.e.start))}</b><span class="exn">${esc(x.course)}${x.planned ? ` <i class="exbadge">planned · not registered</i> <small class="muted">${esc(x.code)}</small>` : ""}</span><span class="muted">${fmt(x.e.start)}–${fmt(x.e.end)} · ${durTxt(x.min)} · ${esc(x.e.location || "–")}</span>`);
     li.style.setProperty("--h", x.h); ol.appendChild(li);
   });
   box.appendChild(ol);
+  if (nP) box.appendChild(el("p", "muted exsrc", esc(planNote())));
 }
 async function exportExams() {
-  const X = examList(), btn = $("examPdf"); btn.disabled = true; btn.textContent = "Preparing…";
+  await loadPlan(); const X = examList(), btn = $("examPdf"); btn.disabled = true; btn.textContent = "Preparing…";
   const jp = loadJsPDF().catch(e => e);
-  const rooms = new Map(await Promise.all([...new Set(X.map(x => x.e.location))].map(async l => [l, await resolveRoom(l)])));
+  const rooms = new Map(await Promise.all([...new Set(X.filter(x => !x.planned).map(x => x.e.location))].map(async l => [l, await resolveRoom(l)])));
   const loc = l => { const r = rooms.get(l); return r ? [r.short, r.name, r.building].filter(Boolean).join(" · ") : (l || "–"); };
   try { const J = await jp; if (J instanceof Error) throw J; await deliverPdf(buildExamPdf(J, X, loc), "exam-calendar.pdf", "Exam calendar"); }
   catch (e) { showError("Exam PDF", e); }
