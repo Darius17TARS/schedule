@@ -1,8 +1,8 @@
 "use strict";
 const store = {
   get: () => sessionStorage.getItem("tok") || localStorage.getItem("tumSchedTok"),
-  set: (t) => { store.set(t); if (document.getElementById("remember")?.checked) localStorage.setItem("tumSchedTok", t); else localStorage.removeItem("tumSchedTok"); },
-  clear: () => { store.clear(); $("remember").checked = false; localStorage.removeItem("tumSchedTok"); }
+  set: (t) => { sessionStorage.setItem("tok", t); if (document.getElementById("remember")?.checked) localStorage.setItem("tumSchedTok", t); else localStorage.removeItem("tumSchedTok"); },
+  clear: () => { sessionStorage.removeItem("tok"); $("remember").checked = false; localStorage.removeItem("tumSchedTok"); }
 };
 function showError(where, err) {
   const box = document.getElementById("errbox"); if (!box) return;
