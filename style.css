@@ -132,3 +132,11 @@ footer{text-align:center;padding:28px 16px}
 .pop{position:absolute;z-index:50;width:260px;background:var(--card);color:var(--fg);border:1px solid var(--bd);border-radius:12px;box-shadow:var(--sh);padding:10px 12px;font-size:.85rem;display:flex;flex-direction:column;gap:4px}.pop[hidden]{display:none}
 @media print{.pop{display:none!important}}
 .week .wd{position:sticky;left:0;z-index:4;background:var(--card)}.week .wrow.today .wd{background:color-mix(in srgb,var(--today) 100%,var(--card))}
+
+/* v12: distinct type pills */
+.tb[data-t]{--t:#64748b;background:var(--t)!important;color:#fff!important;font-weight:800;border-radius:5px;box-shadow:0 0 0 1px rgb(0 0 0/.08);opacity:1}
+.tb[data-t=VO]{--t:#2563eb}.tb[data-t=UE]{--t:#059669}.tb[data-t="ZÜ"]{--t:#d97706}.tb[data-t=TUT]{--t:#db2777}.tb[data-t=PR]{--t:#7c3aed}.tb[data-t=SE]{--t:#0891b2}
+[data-theme=dark] .tb[data-t]{filter:brightness(1.12)}
+.ev.past .tb{filter:saturate(.7)}
+.legend .tb{position:static;font-size:10px;padding:1px 5px}
+@container (max-width:150px){.ev .tb[data-t],.pev .tb[data-t]{background:var(--t)!important;box-shadow:0 0 0 1.5px var(--card)}}

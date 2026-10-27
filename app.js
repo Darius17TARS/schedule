@@ -19,6 +19,7 @@ const MIN_H = 7, MAX_H = 21; let START_H = MIN_H, END_H = MAX_H;
 let zoom = +localStorage.getItem("tumSchedZoom") || 1, trim = localStorage.getItem("tumSchedTrim") === "1";
 let events = [], cancelled = [], day = startOfDay(new Date()), pollTimer = null;
 const roomCache = new Map();
+const FOPT = { referrerPolicy: "no-referrer", credentials: "omit" };
 
 function semesterMonths() { const n = new Date(), m = n.getMonth(); const ws = m >= 9 || m < 3; const startM = ws ? (m >= 9 ? m - 9 : m + 3) : m - 3; return { pMonateVor: startM + 1, pMonateNach: 6 - startM }; }
 function startOfDay(d) { const x = new Date(d); x.setHours(0, 0, 0, 0); return x; }
@@ -26,7 +27,7 @@ function show(id) { for (const s of ["login", "activate", "cal"]) $(s).hidden = 
 function esc(s) { return String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
 
 async function api(method, params) {
-  const r = await fetch(BASE + method + "?" + new URLSearchParams(params), { referrerPolicy: "no-referrer" });
+  const r = await fetch(BASE + method + "?" + new URLSearchParams(params), { referrerPolicy: "no-referrer", credentials: "omit", cache: "no-store" });
   const doc = new DOMParser().parseFromString(await r.text(), "text/xml");
   const err = doc.querySelector("error > message");
   if (err) throw new Error(err.textContent);
@@ -117,11 +118,11 @@ async function resolveRoom(loc) {
       let id = roomCode(loc);
       if (!id) {
         const q = loc.split(",")[0].trim();
-        const r = await (await fetch(NAV + "search?" + new URLSearchParams({ q }))).json();
+        const r = await (await fetch(NAV + "search?" + new URLSearchParams({ q }), FOPT)).json();
         id = r.sections?.find(s => s.facet === "rooms")?.entries?.[0]?.id;
         if (!id) return null;
       }
-      const d = await (await fetch(NAV + "locations/" + encodeURIComponent(id))).json();
+      const d = await (await fetch(NAV + "locations/" + encodeURIComponent(id), FOPT)).json();
       if (!d.id) return null;
       const short = (d.aliases || []).find(a => /^[A-Z]+\d/.test(a)) || d.aliases?.[0] || d.id;
       return { id: d.id, short, name: d.name, building: (d.parent_names || []).slice(-1)[0], campus: (d.parent_names || [])[1], map: "https://nav.tum.de/room/" + encodeURIComponent(d.id) };
@@ -188,7 +189,7 @@ function fillRoom(node, e) {
 function evBlock(e, compact) {
   const a = el("a", "ev" + (e.end < new Date() ? " past" : "") + (e.clash ? " clash" : "")); a.target = "_blank"; a.rel = "noopener";
   const t = decorate(a, e);
-  a.innerHTML = `${t.k ? `<i class="tb">${t.k}</i>` : ""}<span class="nm" lang="de"><span class="fn">${esc(baseName(e.title))}</span><span class="sn">${esc(shortName(e.title))}</span></span><span class="loc">${esc(locLine(e))}</span>` + (compact ? "" : `<span class="t">${fmt(e.start)}–${fmt(e.end)}</span>`);
+  a.innerHTML = `${t.k ? `<i class="tb" data-t="${t.k}">${t.k}</i>` : ""}<span class="nm" lang="de"><span class="fn">${esc(baseName(e.title))}</span><span class="sn">${esc(shortName(e.title))}</span></span><span class="loc">${esc(locLine(e))}</span>` + (compact ? "" : `<span class="t">${fmt(e.start)}–${fmt(e.end)}</span>`);
   a.title = details(e); fillRoom(a, e); return a;
 }
 function buildTrack(list, d, compact) {
@@ -207,7 +208,7 @@ function buildTrack(list, d, compact) {
 function legendFor(list) {
   const seen = new Map(); for (const e of list) { const t = evType(e.title); if (!seen.has(t.k)) seen.set(t.k, t.name); }
   const lg = el("div", "legend");
-  for (const [k, name] of seen) { const s = el("span", "lg", `<i class="sw" data-type="${k || "X"}"></i>${esc(name)}`); lg.appendChild(s); }
+  for (const [k, name] of seen) { const s = el("span", "lg", `${k ? `<i class="tb" data-t="${k}">${k}</i>` : `<i class="sw" data-type="X"></i>`}${esc(name)}`); lg.appendChild(s); }
   if (list.some(e => e.clash)) lg.appendChild(el("span", "lg", `<i class="sw clashsw"></i>Overlap`));
   return lg;
 }
@@ -229,7 +230,7 @@ function renderDay(v) {
   const cards = el("div", "cards"); const now = new Date();
   for (const e of list) {
     const c = el("div", "card" + (e.start <= now && e.end > now ? " live" : "") + (e.clash ? " clash" : "")); const t = decorate(c, e);
-    c.innerHTML = `<div class="row1"><span class="t">${fmt(e.start)}–${fmt(e.end)}</span>${t.k ? `<i class="tb">${esc(t.name)}</i>` : ""}${e.clash ? '<i class="cb">overlap</i>' : ""}</div>
+    c.innerHTML = `<div class="row1"><span class="t">${fmt(e.start)}–${fmt(e.end)}</span>${t.k ? `<i class="tb" data-t="${t.k}">${esc(t.name)}</i>` : ""}${e.clash ? '<i class="cb">overlap</i>' : ""}</div>
       <div class="nm">${esc(baseName(e.title))}</div><div class="loc">${esc(locLine(e))}</div><div class="full muted">${esc(e.location || "")}</div><a class="map" target="_blank" rel="noopener" hidden>Open map →</a>`;
     c.title = details(e); fillRoom(c, e); cards.appendChild(c);
   }
@@ -340,7 +341,7 @@ async function exportPdf() {
       b.style.top = P(s.e.start) + "%"; b.style.height = Math.max(P(s.e.end) - P(s.e.start), 3) + "%";
       b.style.left = (f.lane / lanes * 100) + "%"; b.style.width = (100 / lanes) + "%";
       const cad = s.step === 1 ? "weekly" : s.step === 2 ? "biweekly" : `every ${s.step} wks`;
-      b.title = s.e.title; b.innerHTML = `${t.k ? `<i class="tb">${t.k}</i>` : ""}<b lang="de"><span class="fn">${esc(baseName(s.e.title))}</span><span class="sn">${esc(shortName(s.e.title))}</span></b><span>${esc(loc(s.room))}</span><small>${fmt(s.e.start)}–${fmt(s.e.end)} · ${cad} · ${s.from.getDate()}.${s.from.getMonth() + 1}.–${s.to.getDate()}.${s.to.getMonth() + 1}.</small>`;
+      b.title = s.e.title; b.innerHTML = `${t.k ? `<i class="tb" data-t="${t.k}">${t.k}</i>` : ""}<b lang="de"><span class="fn">${esc(baseName(s.e.title))}</span><span class="sn">${esc(shortName(s.e.title))}</span></b><span>${esc(loc(s.room))}</span><small>${fmt(s.e.start)}–${fmt(s.e.end)} · ${cad} · ${s.from.getDate()}.${s.from.getMonth() + 1}.–${s.to.getDate()}.${s.to.getMonth() + 1}.</small>`;
       cb.appendChild(b);
     }
     col.appendChild(cb); grid.appendChild(col);
