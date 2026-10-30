@@ -4,16 +4,24 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://campus.tum.de https://nav.tum.de; style-src 'self'; script-src 'self'; img-src 'self' data:; font-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'; worker-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="color-scheme" content="light dark">
-<title>TUM Schedule – rooms at a glance</title><link rel="stylesheet" href="style.css?v=19">
+<title>TUM Schedule – rooms at a glance</title><link rel="stylesheet" href="style.css?v=20">
 </head><body>
 <header class="top">
   <div class="brand"><span class="logo">S</span><div><b>TUM Schedule</b><small>Your classes &amp; rooms at a glance</small></div></div>
   <div class="actions">
+    <button id="mensaBtn" class="ghost" aria-expanded="false" title="Mensa Ottobrunn menu">🍽 Mensa</button>
     <button id="theme" class="ghost" aria-label="Toggle dark mode" title="Light / dark">◐</button>
     <button id="logout" class="ghost" hidden>Log out</button>
   </div>
 </header>
 <main>
+<section id="mensa" class="mensa" hidden>
+  <div class="mhead"><div><h2>Mensa Ottobrunn</h2><p class="muted">Willy-Messerschmitt-Str. 5, Taufkirchen · <a id="mSrc" target="_blank" rel="noopener noreferrer">Studierendenwerk</a> · <a href="https://www.studierendenwerk-muenchen-oberbayern.de/gastronomie/preise-und-bezahlung/" target="_blank" rel="noopener noreferrer">Prices</a></p></div>
+  <button id="mClose" class="ghost" aria-label="Close">✕</button></div>
+  <div id="mDays" class="mdays" role="tablist"></div>
+  <ul id="mList" class="mlist"></ul>
+  <p id="mInfo" class="muted"></p>
+</section>
 <section id="login" class="panel">
   <h1>Your timetable, with rooms.</h1>
   <p class="lead">Enter your TUM ID. We request a read-only TUMonline token for your calendar – no password, ever.</p>
@@ -70,5 +78,6 @@
 <section id="printout" aria-hidden="true"></section>
 </main>
 <footer class="muted">Unofficial · not affiliated with TUM · Data: TUMonline &amp; <a href="https://nav.tum.de" target="_blank" rel="noopener">NavigaTUM</a> · No server, no tracking · <a href="https://github.com/Darius17TARS/schedule" target="_blank" rel="noopener">Source</a></footer>
-<script src="app.js?v=19"></script>
+<script src="app.js?v=20"></script>
+<script src="mensa.js?v=20"></script>
 </body></html>

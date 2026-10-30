@@ -1,0 +1,15 @@
+name: Update Mensa menu
+on:
+  schedule: [{cron: "17 4 * * 1-5"}]
+  workflow_dispatch:
+permissions: {contents: write}
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 scripts/mensa.py
+      - run: |
+          git config user.name "menu-bot"; git config user.email "actions@users.noreply.github.com"
+          git add data/mensa-ottobrunn.json
+          git diff --cached --quiet || (git commit -m "Mensa menu update" && git push)

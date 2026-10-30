@@ -1,0 +1,612 @@
+{
+ "canteen": "Mensa Ottobrunn",
+ "address": "Willy-Messerschmitt-Str. 5, Taufkirchen",
+ "source": "https://www.studierendenwerk-muenchen-oberbayern.de/mensa/speiseplan/speiseplan_433_-de.html",
+ "fetched": "2026-10-30T11:17+00:00",
+ "days": [
+  {
+   "date": "2026-10-30",
+   "dishes": [
+    {
+     "type": "Studitopf",
+     "name": "Grüner Erbseneintopf",
+     "diet": "vegan",
+     "allergens": [
+      "Sl"
+     ],
+     "additives": []
+    },
+    {
+     "type": "Fisch",
+     "name": "Gegrilltes Zanderfilet (1 Stück) mit Weißweinsauce",
+     "diet": "meat",
+     "allergens": [
+      "Fi",
+      "Mi",
+      "Sw"
+     ],
+     "additives": [
+      "5",
+      "Kn",
+      "99"
+     ]
+    },
+    {
+     "type": "Süßspeise",
+     "name": "Kaiserschmarrn mit Apfelmus",
+     "diet": "vegetarian",
+     "allergens": [
+      "Ei",
+      "Gl",
+      "GlW",
+      "Mi"
+     ],
+     "additives": [
+      "3"
+     ]
+    }
+   ]
+  },
+  {
+   "date": "2026-11-02",
+   "dishes": [
+    {
+     "type": "Grill",
+     "name": "Käsekrainer (1 Stück)",
+     "diet": "meat",
+     "allergens": [
+      "Mi",
+      "Sf"
+     ],
+     "additives": [
+      "2",
+      "3",
+      "8"
+     ]
+    },
+    {
+     "type": "Wok",
+     "name": "Gemüsecurry aus Blumenkohl und Broccoli",
+     "diet": "vegan",
+     "allergens": [],
+     "additives": [
+      "Kn"
+     ]
+    },
+    {
+     "type": "Studitopf",
+     "name": "Graupen-Gemüse-Eintopf",
+     "diet": "vegan",
+     "allergens": [
+      "Gl",
+      "GlG",
+      "Sl"
+     ],
+     "additives": []
+    },
+    {
+     "type": "Vegetarisch/fleischlos",
+     "name": "Gefüllte Paprikaschote",
+     "diet": "vegetarian",
+     "allergens": [
+      "Gl",
+      "GlD",
+      "Mi"
+     ],
+     "additives": [
+      "2",
+      "Kn"
+     ]
+    },
+    {
+     "type": "Dessert (Glas)",
+     "name": "Quark mit Mango",
+     "diet": "vegetarian",
+     "allergens": [
+      "Mi"
+     ],
+     "additives": []
+    }
+   ]
+  },
+  {
+   "date": "2026-11-03",
+   "dishes": [
+    {
+     "type": "Pasta",
+     "name": "Schweizer Knöpflepfanne mit feinem Gemüse und Käse",
+     "diet": "vegetarian",
+     "allergens": [
+      "Ei",
+      "Gl",
+      "GlW",
+      "Mi",
+      "Sl"
+     ],
+     "additives": []
+    },
+    {
+     "type": "Studitopf",
+     "name": "Veganer Eintopf mit Kraut, Kartoffeln und Roter Beete",
+     "diet": "vegan",
+     "allergens": [
+      "Sw"
+     ],
+     "additives": [
+      "1",
+      "3",
+      "5",
+      "9"
+     ]
+    },
+    {
+     "type": "Vegetarisch/fleischlos",
+     "name": "Tomate-Mozzarella-Strudel mit Tomatenragout",
+     "diet": "vegetarian",
+     "allergens": [
+      "Gl",
+      "GlG",
+      "GlR",
+      "GlW",
+      "Mi",
+      "Sf"
+     ],
+     "additives": [
+      "Kn"
+     ]
+    },
+    {
+     "type": "Fleisch",
+     "name": "Schweineschnitzel Wiener Art (1 Stück)",
+     "diet": "meat",
+     "allergens": [
+      "Gl",
+      "GlW"
+     ],
+     "additives": []
+    },
+    {
+     "type": "Dessert (Glas)",
+     "name": "Kokos-Panna-Cotta mit Himbeersauce",
+     "diet": "meat",
+     "allergens": [
+      "Mi"
+     ],
+     "additives": [
+      "14"
+     ]
+    }
+   ]
+  },
+  {
+   "date": "2026-11-04",
+   "dishes": [
+    {
+     "type": "Pasta",
+     "name": "Pasta mit Gemüsebolognese",
+     "diet": "vegan",
+     "allergens": [
+      "Gl",
+      "GlW",
+      "Sl"
+     ],
+     "additives": []
+    },
+    {
+     "type": "Studitopf",
+     "name": "Zartweizen mit Tomaten, Zucchini und Auberginen",
+     "diet": "vegan",
+     "allergens": [
+      "Gl",
+      "GlW"
+     ],
+     "additives": []
+    },
+    {
+     "type": "Fleisch",
+     "name": "Rinderbraten (1 Scheibe) mit Rotweinsauce",
+     "diet": "meat",
+     "allergens": [
+      "Gl",
+      "GlW",
+      "Sl",
+      "Sw"
+     ],
+     "additives": [
+      "5",
+      "99"
+     ]
+    },
+    {
+     "type": "Vegan",
+     "name": "Yufkateigschnecke mit Spinatfüllung mit Sojajoghurtdip",
+     "diet": "vegan",
+     "allergens": [
+      "Gl",
+      "GlW",
+      "Sl",
+      "So",
+      "Sw"
+     ],
+     "additives": [
+      "2",
+      "3",
+      "4"
+     ]
+    },
+    {
+     "type": "Dessert (Glas)",
+     "name": "Schokoladen-Seidentofu-Creme mit Agavendicksaft",
+     "diet": "vegan",
+     "allergens": [
+      "So"
+     ],
+     "additives": []
+    }
+   ]
+  },
+  {
+   "date": "2026-11-05",
+   "dishes": [
+    {
+     "type": "Pasta",
+     "name": "Tortellini mit Kürbis-Tomatensauce",
+     "diet": "vegan",
+     "allergens": [
+      "Gl",
+      "GlW",
+      "Sl"
+     ],
+     "additives": [
+      "Kn"
+     ]
+    },
+    {
+     "type": "Grill",
+     "name": "Truthahnschnitzel (1 Stück) mit Paprikasauce",
+     "diet": "meat",
+     "allergens": [
+      "Gl",
+      "GlW"
+     ],
+     "additives": []
+    },
+    {
+     "type": "Wok",
+     "name": "Veganer Gulaschtopf mit Kartoffeln, Wurzelgemüse und Schwarzbier",
+     "diet": "vegan",
+     "allergens": [
+      "Gl",
+      "GlG",
+      "GlW",
+      "Sl",
+      "So"
+     ],
+     "additives": [
+      "99"
+     ]
+    },
+    {
+     "type": "Studitopf",
+     "name": "Bulgur mit roten Linsen, Bohnen und Tomaten",
+     "diet": "vegan",
+     "allergens": [
+      "Gl",
+      "GlW"
+     ],
+     "additives": []
+    },
+    {
+     "type": "Dessert (Glas)",
+     "name": "Bayerisch Creme mit Waldbeeren",
+     "diet": "vegetarian",
+     "allergens": [
+      "Mi"
+     ],
+     "additives": [
+      "14"
+     ]
+    }
+   ]
+  },
+  {
+   "date": "2026-11-06",
+   "dishes": [
+    {
+     "type": "Studitopf",
+     "name": "Kartoffeleintopf mit Majoran",
+     "diet": "vegan",
+     "allergens": [
+      "Sl"
+     ],
+     "additives": []
+    },
+    {
+     "type": "Vegetarisch/fleischlos",
+     "name": "Gnocchi Alfredo mit Gemüse",
+     "diet": "vegetarian",
+     "allergens": [
+      "Mi"
+     ],
+     "additives": []
+    },
+    {
+     "type": "Fisch",
+     "name": "Mariniertes Zanderfilet (1 Stück) mit Zitrone, Chilli und Koriander",
+     "diet": "meat",
+     "allergens": [
+      "Fi",
+      "Gl",
+      "GlW"
+     ],
+     "additives": []
+    },
+    {
+     "type": "Süßspeise",
+     "name": "Topfenstrudel mit Birnen und Vanillesauce (ohne Rosinen)",
+     "diet": "vegetarian",
+     "allergens": [
+      "Ei",
+      "Gl",
+      "GlW",
+      "Mi"
+     ],
+     "additives": []
+    },
+    {
+     "type": "Dessert (Glas)",
+     "name": "Latte Macchiato Creme - koffeinhaltig",
+     "diet": "meat",
+     "allergens": [
+      "Mi"
+     ],
+     "additives": [
+      "14"
+     ]
+    }
+   ]
+  },
+  {
+   "date": "2026-11-09",
+   "dishes": [
+    {
+     "type": "Pasta",
+     "name": "Teigtaschen gefüllt mit Steinpilzen und Frischkäse in Kräutersauce",
+     "diet": "vegetarian",
+     "allergens": [
+      "Ei",
+      "Gl",
+      "GlW",
+      "Mi"
+     ],
+     "additives": [
+      "Kn"
+     ]
+    },
+    {
+     "type": "Grill",
+     "name": "Currywurst mit Honig-Ingwer-Ketchup (1 Stück)",
+     "diet": "meat",
+     "allergens": [
+      "Sf",
+      "Sl"
+     ],
+     "additives": [
+      "8",
+      "11"
+     ]
+    },
+    {
+     "type": "Studitopf",
+     "name": "Pikantes Kartoffelchili",
+     "diet": "vegan",
+     "allergens": [],
+     "additives": []
+    },
+    {
+     "type": "Vegetarisch/fleischlos",
+     "name": "Gegrillte Süßkartoffeln mit Gemüse",
+     "diet": "vegan",
+     "allergens": [],
+     "additives": [
+      "Kn"
+     ]
+    },
+    {
+     "type": "Dessert (Glas)",
+     "name": "Kirsch-Mascarpone-Creme",
+     "diet": "vegetarian",
+     "allergens": [
+      "Mi",
+      "Sc",
+      "ScM"
+     ],
+     "additives": []
+    }
+   ]
+  },
+  {
+   "date": "2026-11-10",
+   "dishes": [
+    {
+     "type": "Pasta",
+     "name": "Pasta mit Sojabolognese",
+     "diet": "vegan",
+     "allergens": [
+      "Gl",
+      "GlW",
+      "Sl",
+      "So"
+     ],
+     "additives": []
+    },
+    {
+     "type": "Grill",
+     "name": "Gegrillte Hähnchenbrust (1 Stück) mit Thaipesto",
+     "diet": "meat",
+     "allergens": [
+      "En",
+      "Se"
+     ],
+     "additives": []
+    },
+    {
+     "type": "Studitopf",
+     "name": "Gersteneintopf",
+     "diet": "vegan",
+     "allergens": [
+      "Gl",
+      "GlG",
+      "Sl"
+     ],
+     "additives": []
+    },
+    {
+     "type": "Vegetarisch/fleischlos",
+     "name": "Gekräutertes Pilzragout (Champignons, Egerlingen und Austernpilzen)",
+     "diet": "vegan",
+     "allergens": [
+      "Mi"
+     ],
+     "additives": []
+    },
+    {
+     "type": "Dessert (Glas)",
+     "name": "Topfencreme mit Zwetschgenröster",
+     "diet": "vegetarian",
+     "allergens": [
+      "Mi"
+     ],
+     "additives": []
+    }
+   ]
+  },
+  {
+   "date": "2026-11-11",
+   "dishes": [
+    {
+     "type": "Pasta",
+     "name": "Dim Sum: Asian Dumplings mit Asiagemüse",
+     "diet": "vegan",
+     "allergens": [
+      "Gl",
+      "GlW",
+      "Se",
+      "So"
+     ],
+     "additives": [
+      "Kn"
+     ]
+    },
+    {
+     "type": "Grill",
+     "name": "Gegrillte Zucchini mit Tomaten-Paprika-Ragout",
+     "diet": "vegan",
+     "allergens": [],
+     "additives": []
+    },
+    {
+     "type": "Studitopf",
+     "name": "Eintopf mit Reis, Bohnen und Gemüse",
+     "diet": "vegan",
+     "allergens": [
+      "Sl"
+     ],
+     "additives": []
+    },
+    {
+     "type": "Fleisch",
+     "name": "Entenkeule (1 Stück) mit Bratenssauce",
+     "diet": "meat",
+     "allergens": [
+      "Gl",
+      "GlW"
+     ],
+     "additives": []
+    },
+    {
+     "type": "Dessert (Glas)",
+     "name": "Veganer Sojacreme-Joghurt mit Brombeeren und Minze",
+     "diet": "vegan",
+     "allergens": [
+      "So"
+     ],
+     "additives": [
+      "3"
+     ]
+    },
+    {
+     "type": "",
+     "name": "Faschingskrapfen mit Vierfruchtfüllung",
+     "diet": "vegetarian",
+     "allergens": [
+      "Ei",
+      "Gl",
+      "GlW",
+      "Mi"
+     ],
+     "additives": []
+    }
+   ]
+  },
+  {
+   "date": "2026-11-12",
+   "dishes": [
+    {
+     "type": "Pasta",
+     "name": "Tortellini (Käsefüllung) mit Kräutersauce",
+     "diet": "vegetarian",
+     "allergens": [
+      "Ei",
+      "Gl",
+      "GlW",
+      "Mi"
+     ],
+     "additives": [
+      "Kn"
+     ]
+    },
+    {
+     "type": "Grill",
+     "name": "Putensteak (1 Stück) mit Chimichuri aus Koriander, Tomate und Petersilie",
+     "diet": "meat",
+     "allergens": [],
+     "additives": []
+    },
+    {
+     "type": "Studitopf",
+     "name": "Pikante Hirse mit schwarzen Bohnen und Gemüse",
+     "diet": "vegan",
+     "allergens": [
+      "Sl"
+     ],
+     "additives": [
+      "2"
+     ]
+    },
+    {
+     "type": "Vegan",
+     "name": "Falafel mit Hummus",
+     "diet": "vegan",
+     "allergens": [
+      "Gl",
+      "GlW",
+      "Se"
+     ],
+     "additives": [
+      "Kn"
+     ]
+    },
+    {
+     "type": "Dessert (Glas)",
+     "name": "Schokopudding mit Sahne",
+     "diet": "vegetarian",
+     "allergens": [
+      "Mi"
+     ],
+     "additives": []
+    }
+   ]
+  }
+ ]
+}
