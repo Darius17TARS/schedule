@@ -158,16 +158,16 @@ footer{text-align:center;padding:28px 16px}
 .excred{margin:.4em 0 .8em}.excred .check{font-size:.9em}.credline{margin:.35em 0 0;font-size:.95em}.credline.err{color:#b3261e}
 .mensa{scroll-margin-top:70px;max-width:760px;margin:0 auto 20px;background:var(--card);border:1px solid var(--bd);border-radius:18px;padding:20px;box-shadow:var(--sh)}
 .mhead{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}.mhead h2{margin:0;font-size:1.35rem;letter-spacing:-.02em}.mhead p{margin:2px 0 0}
-.mdays{display:flex;gap:6px;overflow-x:auto;padding:12px 0 6px;-webkit-overflow-scrolling:touch}
-.mdays button{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;line-height:1.15;padding:7px 12px}.mdays small{font-size:.75rem}
-.mdays button.on{background:var(--ac);border-color:var(--ac);color:#fff}
-.mlist{list-style:none;margin:8px 0;padding:0;display:grid;gap:8px}
-.dish{--h:215;padding:11px 14px;border-radius:12px;border-left:5px solid hsl(var(--h) 65% 45%);background:hsl(var(--h) 70% 96%)}
-.d-vegan{--h:140}.d-vegetarian{--h:85}.d-meat{--h:10}
-[data-theme=dark] .dish{background:hsl(var(--h) 30% 16%)}
-@media(prefers-color-scheme:dark){:root:not([data-theme=light]) .dish{background:hsl(var(--h) 30% 16%)}}
-.dtop{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
-.dtype{font-size:.75rem;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:var(--fg)}
-.diet{font-size:.72rem;font-weight:700;padding:1px 8px;border-radius:99px;background:hsl(var(--h) 65% 38%);color:#fff}
-.dname{font-weight:650;margin-top:2px}.dall{font-size:.78rem;opacity:.85;margin-top:2px}.mempty{padding:14px;color:var(--mu)}
+.mdays{display:flex;gap:6px;overflow-x:auto;padding:14px 0 8px;-webkit-overflow-scrolling:touch;scrollbar-width:none}.mdays::-webkit-scrollbar{display:none}
+.mdays button{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;line-height:1.15;padding:7px 13px;background:transparent;border-color:var(--bd)}.mdays b{font-weight:650;font-size:.88rem}.mdays small{font-size:.74rem;color:var(--fg);opacity:.75}
+.mdays button.on{background:var(--fg);border-color:var(--fg);color:var(--card)}.mdays button.on small{color:var(--card);opacity:.85}
+.mlist{list-style:none;margin:10px 0;padding:0;display:grid;gap:10px;transition:opacity .18s,transform .18s;touch-action:pan-y}.mlist.fade{opacity:0;transform:translateX(var(--dx,0))}
+.dish{--pb:#eef1f5;--pf:#334155;--dot:#94a3b8;padding:14px 16px;border-radius:14px;background:var(--card);border:1px solid var(--bd)}
+.d-vegan{--pb:#e6f2ea;--pf:#2f5d3f;--dot:#6fa982}.d-vegetarian{--pb:#f1f2df;--pf:#55571f;--dot:#a9ab5c}.d-meat{--pb:#f6e9e4;--pf:#7a3b2a;--dot:#c48a77}
+[data-theme=dark] .dish{--pb:#222833;--pf:#cbd5e1}[data-theme=dark] .d-vegan{--pb:#1d2b22;--pf:#a9d3b5}[data-theme=dark] .d-vegetarian{--pb:#29291b;--pf:#d6d79f}[data-theme=dark] .d-meat{--pb:#2f221e;--pf:#e6b8a8}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]) .dish{--pb:#222833;--pf:#cbd5e1}:root:not([data-theme=light]) .d-vegan{--pb:#1d2b22;--pf:#a9d3b5}:root:not([data-theme=light]) .d-vegetarian{--pb:#29291b;--pf:#d6d79f}:root:not([data-theme=light]) .d-meat{--pb:#2f221e;--pf:#e6b8a8}}
+.dtop{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+.dtype{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--fg);opacity:.8}
+.diet{display:inline-flex;align-items:center;gap:6px;font-size:.74rem;font-weight:600;padding:2px 10px;border-radius:99px;background:var(--pb);color:var(--pf)}.diet::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--dot)}
+.dname{font-weight:600;font-size:1.02rem;line-height:1.35;margin-top:6px;letter-spacing:-.005em}.dall{font-size:.78rem;color:var(--fg);opacity:.78;margin-top:6px}.mempty{padding:14px;color:var(--fg);opacity:.8}
 @media(max-width:560px){.brand small{display:none}#mensaBtn{padding:8px 10px}}
