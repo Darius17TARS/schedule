@@ -2,51 +2,8 @@
  "canteen": "Mensa Ottobrunn",
  "address": "Willy-Messerschmitt-Str. 5, Taufkirchen",
  "source": "https://www.studierendenwerk-muenchen-oberbayern.de/mensa/speiseplan/speiseplan_433_-de.html",
- "fetched": "2026-10-30T11:21+00:00",
+ "fetched": "2026-11-02T12:31+00:00",
  "days": [
-  {
-   "date": "2026-10-30",
-   "dishes": [
-    {
-     "type": "Studitopf",
-     "name": "Grüner Erbseneintopf",
-     "diet": "vegan",
-     "allergens": [
-      "Sl"
-     ],
-     "additives": []
-    },
-    {
-     "type": "Fisch",
-     "name": "Gegrilltes Zanderfilet (1 Stück) mit Weißweinsauce",
-     "diet": "meat",
-     "allergens": [
-      "Fi",
-      "Mi",
-      "Sw"
-     ],
-     "additives": [
-      "5",
-      "Kn",
-      "99"
-     ]
-    },
-    {
-     "type": "Süßspeise",
-     "name": "Kaiserschmarrn mit Apfelmus",
-     "diet": "vegetarian",
-     "allergens": [
-      "Ei",
-      "Gl",
-      "GlW",
-      "Mi"
-     ],
-     "additives": [
-      "3"
-     ]
-    }
-   ]
-  },
   {
    "date": "2026-11-02",
    "dishes": [
@@ -100,12 +57,14 @@
     },
     {
      "type": "Dessert (Glas)",
-     "name": "Quark mit Mango",
-     "diet": "vegetarian",
+     "name": "Mousse Heidelbeer-Geschmack",
+     "diet": "meat",
      "allergens": [
       "Mi"
      ],
-     "additives": []
+     "additives": [
+      "14"
+     ]
     }
    ]
   },
@@ -600,6 +559,67 @@
     {
      "type": "Dessert (Glas)",
      "name": "Schokopudding mit Sahne",
+     "diet": "vegetarian",
+     "allergens": [
+      "Mi"
+     ],
+     "additives": []
+    }
+   ]
+  },
+  {
+   "date": "2026-11-13",
+   "dishes": [
+    {
+     "type": "Pasta",
+     "name": "Pasta mit Käsesauce",
+     "diet": "vegetarian",
+     "allergens": [
+      "Gl",
+      "GlW",
+      "Mi"
+     ],
+     "additives": []
+    },
+    {
+     "type": "Studitopf",
+     "name": "Bauerneintopf",
+     "diet": "vegan",
+     "allergens": [
+      "Sl"
+     ],
+     "additives": []
+    },
+    {
+     "type": "Fisch",
+     "name": "Panierter Seelachs (1 Stück) mit Remouladensuce",
+     "diet": "meat",
+     "allergens": [
+      "Ei",
+      "Fi",
+      "Gl",
+      "GlW",
+      "Mi",
+      "Sf"
+     ],
+     "additives": [
+      "9"
+     ]
+    },
+    {
+     "type": "Süßspeise",
+     "name": "Apfelstrudel mit Vanillesauce",
+     "diet": "vegetarian",
+     "allergens": [
+      "Gl",
+      "GlW",
+      "Mi"
+     ],
+     "additives": []
+    },
+    {
+     "type": "Dessert (Glas)",
+     "name": "Vanillecreme",
      "diet": "vegetarian",
      "allergens": [
       "Mi"
