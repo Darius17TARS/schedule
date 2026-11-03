@@ -2,72 +2,8 @@
  "canteen": "Mensa Ottobrunn",
  "address": "Willy-Messerschmitt-Str. 5, Taufkirchen",
  "source": "https://www.studierendenwerk-muenchen-oberbayern.de/mensa/speiseplan/speiseplan_433_-de.html",
- "fetched": "2026-11-02T12:31+00:00",
+ "fetched": "2026-11-03T11:59+00:00",
  "days": [
-  {
-   "date": "2026-11-02",
-   "dishes": [
-    {
-     "type": "Grill",
-     "name": "Käsekrainer (1 Stück)",
-     "diet": "meat",
-     "allergens": [
-      "Mi",
-      "Sf"
-     ],
-     "additives": [
-      "2",
-      "3",
-      "8"
-     ]
-    },
-    {
-     "type": "Wok",
-     "name": "Gemüsecurry aus Blumenkohl und Broccoli",
-     "diet": "vegan",
-     "allergens": [],
-     "additives": [
-      "Kn"
-     ]
-    },
-    {
-     "type": "Studitopf",
-     "name": "Graupen-Gemüse-Eintopf",
-     "diet": "vegan",
-     "allergens": [
-      "Gl",
-      "GlG",
-      "Sl"
-     ],
-     "additives": []
-    },
-    {
-     "type": "Vegetarisch/fleischlos",
-     "name": "Gefüllte Paprikaschote",
-     "diet": "vegetarian",
-     "allergens": [
-      "Gl",
-      "GlD",
-      "Mi"
-     ],
-     "additives": [
-      "2",
-      "Kn"
-     ]
-    },
-    {
-     "type": "Dessert (Glas)",
-     "name": "Mousse Heidelbeer-Geschmack",
-     "diet": "meat",
-     "allergens": [
-      "Mi"
-     ],
-     "additives": [
-      "14"
-     ]
-    }
-   ]
-  },
   {
    "date": "2026-11-03",
    "dishes": [
@@ -100,15 +36,28 @@
     },
     {
      "type": "Vegetarisch/fleischlos",
-     "name": "Tomate-Mozzarella-Strudel mit Tomatenragout",
+     "name": "Gefüllte Paprikaschote",
+     "diet": "vegetarian",
+     "allergens": [
+      "Gl",
+      "GlD",
+      "Mi"
+     ],
+     "additives": [
+      "2",
+      "Kn"
+     ]
+    },
+    {
+     "type": "Vegetarisch/fleischlos",
+     "name": "Tomate-Mozzarella-Strudel mit Tomatensauce",
      "diet": "vegetarian",
      "allergens": [
       "Gl",
       "GlG",
       "GlR",
       "GlW",
-      "Mi",
-      "Sf"
+      "Mi"
      ],
      "additives": [
       "Kn"
@@ -125,8 +74,18 @@
      "additives": []
     },
     {
+     "type": "",
+     "name": "Paniertes Hähnchenschnitzel (1 Stück)",
+     "diet": "meat",
+     "allergens": [
+      "Gl",
+      "GlW"
+     ],
+     "additives": []
+    },
+    {
      "type": "Dessert (Glas)",
-     "name": "Kokos-Panna-Cotta mit Himbeersauce",
+     "name": "Panna Cotta mit Waldbeeren",
      "diet": "meat",
      "allergens": [
       "Mi"
@@ -569,57 +528,71 @@
   },
   {
    "date": "2026-11-13",
+   "dishes": []
+  },
+  {
+   "date": "2026-11-16",
    "dishes": [
     {
      "type": "Pasta",
-     "name": "Pasta mit Käsesauce",
+     "name": "Kürbis-Teigtaschen mit Käsesauce, Kirschtomaten und Basilikum",
      "diet": "vegetarian",
      "allergens": [
+      "Ei",
       "Gl",
       "GlW",
       "Mi"
      ],
-     "additives": []
+     "additives": [
+      "Kn"
+     ]
+    },
+    {
+     "type": "Wok",
+     "name": "Asia-Reisbällchen mit veganem Currydip",
+     "diet": "vegan",
+     "allergens": [
+      "Gl",
+      "GlG",
+      "Sf",
+      "Sl",
+      "So"
+     ],
+     "additives": [
+      "1",
+      "3"
+     ]
     },
     {
      "type": "Studitopf",
-     "name": "Bauerneintopf",
+     "name": "Bulgur mit Gemüse",
      "diet": "vegan",
      "allergens": [
+      "Gl",
+      "GlW",
       "Sl"
      ],
      "additives": []
     },
     {
-     "type": "Fisch",
-     "name": "Panierter Seelachs (1 Stück) mit Remouladensuce",
+     "type": "Fleisch",
+     "name": "Hähnchenschnitzel (1 Stück) mit Mango-Chili-Dip",
      "diet": "meat",
      "allergens": [
       "Ei",
-      "Fi",
       "Gl",
       "GlW",
       "Mi",
       "Sf"
      ],
      "additives": [
+      "Kn",
       "9"
      ]
     },
     {
-     "type": "Süßspeise",
-     "name": "Apfelstrudel mit Vanillesauce",
-     "diet": "vegetarian",
-     "allergens": [
-      "Gl",
-      "GlW",
-      "Mi"
-     ],
-     "additives": []
-    },
-    {
      "type": "Dessert (Glas)",
-     "name": "Vanillecreme",
+     "name": "Topfencreme mit Himbeeren",
      "diet": "vegetarian",
      "allergens": [
       "Mi"
