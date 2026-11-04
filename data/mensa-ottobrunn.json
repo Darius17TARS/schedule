@@ -2,11 +2,22 @@
  "canteen": "Mensa Ottobrunn",
  "address": "Willy-Messerschmitt-Str. 5, Taufkirchen",
  "source": "https://www.studierendenwerk-muenchen-oberbayern.de/mensa/speiseplan/speiseplan_433_-de.html",
- "fetched": "2026-11-03T11:59+00:00",
+ "fetched": "2026-11-04T12:13+00:00",
  "days": [
   {
-   "date": "2026-11-03",
+   "date": "2026-11-04",
    "dishes": [
+    {
+     "type": "Pasta",
+     "name": "Pasta mit Gemüsebolognese",
+     "diet": "vegan",
+     "allergens": [
+      "Gl",
+      "GlW",
+      "Sl"
+     ],
+     "additives": []
+    },
     {
      "type": "Pasta",
      "name": "Schweizer Knöpflepfanne mit feinem Gemüse und Käse",
@@ -35,82 +46,6 @@
      ]
     },
     {
-     "type": "Vegetarisch/fleischlos",
-     "name": "Gefüllte Paprikaschote",
-     "diet": "vegetarian",
-     "allergens": [
-      "Gl",
-      "GlD",
-      "Mi"
-     ],
-     "additives": [
-      "2",
-      "Kn"
-     ]
-    },
-    {
-     "type": "Vegetarisch/fleischlos",
-     "name": "Tomate-Mozzarella-Strudel mit Tomatensauce",
-     "diet": "vegetarian",
-     "allergens": [
-      "Gl",
-      "GlG",
-      "GlR",
-      "GlW",
-      "Mi"
-     ],
-     "additives": [
-      "Kn"
-     ]
-    },
-    {
-     "type": "Fleisch",
-     "name": "Schweineschnitzel Wiener Art (1 Stück)",
-     "diet": "meat",
-     "allergens": [
-      "Gl",
-      "GlW"
-     ],
-     "additives": []
-    },
-    {
-     "type": "",
-     "name": "Paniertes Hähnchenschnitzel (1 Stück)",
-     "diet": "meat",
-     "allergens": [
-      "Gl",
-      "GlW"
-     ],
-     "additives": []
-    },
-    {
-     "type": "Dessert (Glas)",
-     "name": "Panna Cotta mit Waldbeeren",
-     "diet": "meat",
-     "allergens": [
-      "Mi"
-     ],
-     "additives": [
-      "14"
-     ]
-    }
-   ]
-  },
-  {
-   "date": "2026-11-04",
-   "dishes": [
-    {
-     "type": "Pasta",
-     "name": "Pasta mit Gemüsebolognese",
-     "diet": "vegan",
-     "allergens": [
-      "Gl",
-      "GlW",
-      "Sl"
-     ],
-     "additives": []
-    },
-    {
      "type": "Studitopf",
      "name": "Zartweizen mit Tomaten, Zucchini und Auberginen",
      "diet": "vegan",
@@ -121,12 +56,45 @@
      "additives": []
     },
     {
+     "type": "Vegetarisch/fleischlos",
+     "name": "Tomate-Mozzarella-Strudel mit Soja-Dip",
+     "diet": "vegetarian",
+     "allergens": [
+      "Gl",
+      "GlG",
+      "GlR",
+      "GlW",
+      "Mi",
+      "So"
+     ],
+     "additives": [
+      "Kn",
+      "3"
+     ]
+    },
+    {
+     "type": "Fleisch",
+     "name": "Fleischpflanzerl (1 Stück) mit Rotweinsauce",
+     "diet": "meat",
+     "allergens": [
+      "Ei",
+      "Gl",
+      "GlW",
+      "Sf",
+      "Sl",
+      "Sw"
+     ],
+     "additives": [
+      "5",
+      "Kn",
+      "99"
+     ]
+    },
+    {
      "type": "Fleisch",
      "name": "Rinderbraten (1 Scheibe) mit Rotweinsauce",
      "diet": "meat",
      "allergens": [
-      "Gl",
-      "GlW",
       "Sl",
       "Sw"
      ],
@@ -137,7 +105,7 @@
     },
     {
      "type": "Vegan",
-     "name": "Yufkateigschnecke mit Spinatfüllung mit Sojajoghurtdip",
+     "name": "Yufkateigschnecke mit Spinatfüllung mit Soja-Dip",
      "diet": "vegan",
      "allergens": [
       "Gl",
@@ -154,12 +122,21 @@
     },
     {
      "type": "Dessert (Glas)",
-     "name": "Schokoladen-Seidentofu-Creme mit Agavendicksaft",
+     "name": "Veganer Chiapudding mit Kokosmilch und Mandarinen",
      "diet": "vegan",
-     "allergens": [
-      "So"
-     ],
+     "allergens": [],
      "additives": []
+    },
+    {
+     "type": "Dessert (Glas)",
+     "name": "Panna Cotta mit Waldbeeren",
+     "diet": "meat",
+     "allergens": [
+      "Mi"
+     ],
+     "additives": [
+      "14"
+     ]
     }
    ]
   },
@@ -597,6 +574,61 @@
      "allergens": [
       "Mi"
      ],
+     "additives": []
+    }
+   ]
+  },
+  {
+   "date": "2026-11-17",
+   "dishes": [
+    {
+     "type": "Pasta",
+     "name": "Pasta all'arrabiata",
+     "diet": "vegan",
+     "allergens": [
+      "Gl",
+      "GlW"
+     ],
+     "additives": []
+    },
+    {
+     "type": "Grill",
+     "name": "Tandoori Chicken (1 Stück) in Joghurtmarinade und Gurken-Minz-Dip",
+     "diet": "meat",
+     "allergens": [
+      "Mi",
+      "Sf"
+     ],
+     "additives": [
+      "Kn"
+     ]
+    },
+    {
+     "type": "Wok",
+     "name": "Rotes Linsendahl mit Lauch und Koriander",
+     "diet": "vegan",
+     "allergens": [
+      "Sf",
+      "Sl"
+     ],
+     "additives": []
+    },
+    {
+     "type": "Studitopf",
+     "name": "Zartweizen mit Erbsen, Karotten und Mais",
+     "diet": "vegan",
+     "allergens": [
+      "Gl",
+      "GlW",
+      "Sl"
+     ],
+     "additives": []
+    },
+    {
+     "type": "Dessert (Glas)",
+     "name": "Veganer Chiapudding mit Kokosmilch und Mangospiegel",
+     "diet": "vegan",
+     "allergens": [],
      "additives": []
     }
    ]
