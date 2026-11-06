@@ -2,47 +2,11 @@
  "canteen": "Mensa Ottobrunn",
  "address": "Willy-Messerschmitt-Str. 5, Taufkirchen",
  "source": "https://www.studierendenwerk-muenchen-oberbayern.de/mensa/speiseplan/speiseplan_433_-de.html",
- "fetched": "2026-11-05T12:27+00:00",
+ "fetched": "2026-11-06T12:11+00:00",
  "days": [
   {
-   "date": "2026-11-05",
+   "date": "2026-11-06",
    "dishes": [
-    {
-     "type": "Pasta",
-     "name": "Tortellini mit Kürbis-Tomatensauce",
-     "diet": "vegan",
-     "allergens": [
-      "Gl",
-      "GlW",
-      "Sl"
-     ],
-     "additives": [
-      "Kn"
-     ]
-    },
-    {
-     "type": "",
-     "name": "Pasta mit Kürbis-Tomatensauce",
-     "diet": "vegan",
-     "allergens": [
-      "Gl",
-      "GlW"
-     ],
-     "additives": []
-    },
-    {
-     "type": "Grill",
-     "name": "Hirschgulasch in Preiselbeersauce",
-     "diet": "meat",
-     "allergens": [
-      "Sl",
-      "Sw"
-     ],
-     "additives": [
-      "5",
-      "99"
-     ]
-    },
     {
      "type": "Grill",
      "name": "Hähnchenspieß (1 Stück) mit Paprikasauce",
@@ -64,28 +28,6 @@
      "additives": []
     },
     {
-     "type": "Wok",
-     "name": "Veganer Gulaschtopf mit Wurzelgemüse",
-     "diet": "vegan",
-     "allergens": [
-      "Sl",
-      "So"
-     ],
-     "additives": []
-    },
-    {
-     "type": "",
-     "name": "Kürbis-Falafel mit Tomatensauce",
-     "diet": "vegan",
-     "allergens": [
-      "Gl",
-      "GlW"
-     ],
-     "additives": [
-      "Kn"
-     ]
-    },
-    {
      "type": "Studitopf",
      "name": "Bulgur mit Gemüse und Tomaten",
      "diet": "vegan",
@@ -97,39 +39,6 @@
      "additives": []
     },
     {
-     "type": "Vegetarisch/fleischlos",
-     "name": "Spinatknödel mit Bergkäsesauce",
-     "diet": "meat",
-     "allergens": [
-      "Ei",
-      "Gl",
-      "GlW",
-      "Mi",
-      "Sw"
-     ],
-     "additives": [
-      "5",
-      "15",
-      "99"
-     ]
-    },
-    {
-     "type": "Dessert (Glas)",
-     "name": "Mousse Bourbon-Vanille",
-     "diet": "meat",
-     "allergens": [
-      "Mi"
-     ],
-     "additives": [
-      "14"
-     ]
-    }
-   ]
-  },
-  {
-   "date": "2026-11-06",
-   "dishes": [
-    {
      "type": "Studitopf",
      "name": "Kartoffeleintopf mit Majoran",
      "diet": "vegan",
@@ -139,22 +48,14 @@
      "additives": []
     },
     {
-     "type": "Vegetarisch/fleischlos",
-     "name": "Gnocchi Alfredo mit Gemüse",
-     "diet": "vegetarian",
-     "allergens": [
-      "Mi"
-     ],
-     "additives": []
-    },
-    {
      "type": "Fisch",
-     "name": "Mariniertes Zanderfilet (1 Stück) mit Zitrone, Chilli und Koriander",
+     "name": "Panierter Seelachs (1 Stück) mit Dillrahmsauce",
      "diet": "meat",
      "allergens": [
       "Fi",
       "Gl",
-      "GlW"
+      "GlW",
+      "Mi"
      ],
      "additives": []
     },
@@ -172,7 +73,7 @@
     },
     {
      "type": "Dessert (Glas)",
-     "name": "Latte Macchiato Creme - koffeinhaltig",
+     "name": "Mousse Bourbon-Vanille",
      "diet": "meat",
      "allergens": [
       "Mi"
@@ -591,8 +492,8 @@
       "So"
      ],
      "additives": [
-      "Kn",
-      "1"
+      "1",
+      "Kn"
      ]
     },
     {
@@ -604,10 +505,10 @@
       "Sw"
      ],
      "additives": [
+      "Kn",
       "1",
       "3",
-      "5",
-      "Kn"
+      "5"
      ]
     },
     {
@@ -620,6 +521,72 @@
       "Mi"
      ],
      "additives": []
+    }
+   ]
+  },
+  {
+   "date": "2026-11-19",
+   "dishes": [
+    {
+     "type": "Grill",
+     "name": "Schweinesteak (1 Stück) vom Grill (S vom Strohschwein) mit Champignonsauce",
+     "diet": "meat",
+     "allergens": [
+      "Mi"
+     ],
+     "additives": []
+    },
+    {
+     "type": "Wok",
+     "name": "Thailändische Frühlingsrolle mit Sweet-Chilisauce",
+     "diet": "vegan",
+     "allergens": [
+      "Gl",
+      "GlW",
+      "Sl"
+     ],
+     "additives": [
+      "Kn",
+      "11"
+     ]
+    },
+    {
+     "type": "Wok",
+     "name": "Curry-Mie-Nudeln mit Asiagemüse",
+     "diet": "vegan",
+     "allergens": [
+      "Gl",
+      "GlW",
+      "Se",
+      "Sf",
+      "So"
+     ],
+     "additives": [
+      "2"
+     ]
+    },
+    {
+     "type": "Studitopf",
+     "name": "Kürbis-Reistopf mit Tomaten",
+     "diet": "vegan",
+     "allergens": [],
+     "additives": []
+    },
+    {
+     "type": "Dessert (Glas)",
+     "name": "Panna Cotta mit Amarettini",
+     "diet": "meat",
+     "allergens": [
+      "Ei",
+      "Gl",
+      "GlW",
+      "Mi",
+      "Sw"
+     ],
+     "additives": [
+      "5",
+      "14"
+     ]
     }
    ]
   }
