@@ -2,20 +2,21 @@
  "canteen": "Mensa Ottobrunn",
  "address": "Willy-Messerschmitt-Str. 5, Taufkirchen",
  "source": "https://www.studierendenwerk-muenchen-oberbayern.de/mensa/speiseplan/speiseplan_433_-de.html",
- "fetched": "2026-11-10T12:43+00:00",
+ "fetched": "2026-11-11T10:35+00:00",
  "days": [
   {
-   "date": "2026-11-10",
+   "date": "2026-11-11",
    "dishes": [
     {
      "type": "Pasta",
-     "name": "Teigtaschen gefüllt mit Kürbis und Frischkäse in Kräutersauce",
-     "diet": "vegetarian",
+     "name": "Dim Sum: Asian Dumplings mit Asiagemüse",
+     "diet": "vegan",
      "allergens": [
-      "Ei",
       "Gl",
       "GlW",
-      "Mi"
+      "Se",
+      "Sf",
+      "So"
      ],
      "additives": [
       "Kn"
@@ -34,75 +35,8 @@
      "additives": []
     },
     {
-     "type": "Grill",
-     "name": "Weiße Bratwurst (1 Stück)",
-     "diet": "meat",
-     "allergens": [],
-     "additives": [
-      "8"
-     ]
-    },
-    {
-     "type": "Grill",
-     "name": "Paniertes Hähnchenschnitzel mit Rahmschwammerl (1 Stück)",
-     "diet": "meat",
-     "allergens": [
-      "Gl",
-      "GlW",
-      "Mi"
-     ],
-     "additives": []
-    },
-    {
-     "type": "Grill",
-     "name": "Gegrillte Hähnchenbrust (1 Stück) mit Rahmschwammerl",
-     "diet": "meat",
-     "allergens": [
-      "Mi"
-     ],
-     "additives": [
-      "Kn"
-     ]
-    },
-    {
-     "type": "Studitopf",
-     "name": "Pikantes Kartoffelchili",
-     "diet": "vegan",
-     "allergens": [],
-     "additives": []
-    },
-    {
-     "type": "Studitopf",
-     "name": "Gersteneintopf",
-     "diet": "vegan",
-     "allergens": [
-      "Gl",
-      "GlG",
-      "Sl"
-     ],
-     "additives": []
-    },
-    {
-     "type": "Vegetarisch/fleischlos",
-     "name": "Gegrillte Süßkartoffeln mit Gemüse",
-     "diet": "vegan",
-     "allergens": [],
-     "additives": [
-      "Kn"
-     ]
-    },
-    {
-     "type": "Vegetarisch/fleischlos",
-     "name": "Gekräutertes Pilzragout (Champignons, Egerlingen und Austernpilzen)",
-     "diet": "vegan",
-     "allergens": [
-      "Mi"
-     ],
-     "additives": []
-    },
-    {
-     "type": "Dessert (Glas)",
-     "name": "Grießbrei mit Kirschragout",
+     "type": "Pasta",
+     "name": "Pasta mit Tomaten-Sahnesauce",
      "diet": "vegetarian",
      "allergens": [
       "Gl",
@@ -111,43 +45,15 @@
      ],
      "additives": []
     },
-    {
-     "type": "Dessert (Glas)",
-     "name": "Kirsch-Mascarpone-Creme",
-     "diet": "vegetarian",
-     "allergens": [
-      "Mi",
-      "Sw"
-     ],
-     "additives": [
-      "5",
-      "99"
-     ]
-    }
-   ]
-  },
-  {
-   "date": "2026-11-11",
-   "dishes": [
     {
      "type": "Pasta",
-     "name": "Dim Sum: Asian Dumplings mit Asiagemüse",
-     "diet": "vegan",
+     "name": "Pasta mit Rahmpilzen",
+     "diet": "vegetarian",
      "allergens": [
       "Gl",
       "GlW",
-      "Se",
-      "So"
+      "Mi"
      ],
-     "additives": [
-      "Kn"
-     ]
-    },
-    {
-     "type": "Grill",
-     "name": "Gegrillte Zucchini mit Tomaten-Paprika-Ragout",
-     "diet": "vegan",
-     "allergens": [],
      "additives": []
     },
     {
@@ -161,27 +67,24 @@
     },
     {
      "type": "Fleisch",
-     "name": "Entenkeule (1 Stück) mit Bratenssauce",
+     "name": "Entenkeule (1 Stück) mit Orangensauce",
      "diet": "meat",
-     "allergens": [
-      "Gl",
-      "GlW"
-     ],
-     "additives": []
-    },
-    {
-     "type": "Dessert (Glas)",
-     "name": "Veganer Sojacreme-Joghurt mit Brombeeren und Minze",
-     "diet": "vegan",
-     "allergens": [
-      "So"
-     ],
+     "allergens": [],
      "additives": [
-      "3"
+      "Kn"
      ]
     },
     {
      "type": "",
+     "name": "Gegrillte Entenbrust (1 Stück) mit Orangensauce",
+     "diet": "meat",
+     "allergens": [],
+     "additives": [
+      "Kn"
+     ]
+    },
+    {
+     "type": "Dessert (Glas)",
      "name": "Faschingskrapfen mit Vierfruchtfüllung",
      "diet": "vegetarian",
      "allergens": [
@@ -191,6 +94,23 @@
       "Mi"
      ],
      "additives": []
+    },
+    {
+     "type": "Dessert (Glas)",
+     "name": "Creme Tiramisu",
+     "diet": "vegetarian",
+     "allergens": [
+      "Ei",
+      "Gl",
+      "GlW",
+      "Mi",
+      "Sw"
+     ],
+     "additives": [
+      "5",
+      "14",
+      "99"
+     ]
     }
    ]
   },
@@ -321,8 +241,8 @@
       "Sf"
      ],
      "additives": [
-      "9",
-      "Kn"
+      "Kn",
+      "9"
      ]
     },
     {
@@ -441,8 +361,8 @@
      ],
      "additives": [
       "1",
-      "3",
       "Kn",
+      "3",
       "5"
      ]
     },
@@ -538,8 +458,8 @@
       "So"
      ],
      "additives": [
-      "2",
-      "Kn"
+      "Kn",
+      "2"
      ]
     },
     {
@@ -624,8 +544,8 @@
       "So"
      ],
      "additives": [
-      "Kn",
-      "2"
+      "2",
+      "Kn"
      ]
     },
     {
@@ -656,6 +576,67 @@
      "allergens": [
       "Gl",
       "GlW",
+      "Mi"
+     ],
+     "additives": []
+    }
+   ]
+  },
+  {
+   "date": "2026-11-24",
+   "dishes": [
+    {
+     "type": "Pasta",
+     "name": "Pasta Verdura",
+     "diet": "vegan",
+     "allergens": [
+      "Gl",
+      "GlW"
+     ],
+     "additives": []
+    },
+    {
+     "type": "Studitopf",
+     "name": "Couscous arabische Art mit Karotten und Kichererbsen",
+     "diet": "vegan",
+     "allergens": [
+      "Gl",
+      "GlW"
+     ],
+     "additives": [
+      "2"
+     ]
+    },
+    {
+     "type": "Fleisch",
+     "name": "Spanferkelrollbraten (1 Scheibe) mit Biersauce",
+     "diet": "meat",
+     "allergens": [
+      "Gl",
+      "GlG",
+      "GlW"
+     ],
+     "additives": [
+      "99"
+     ]
+    },
+    {
+     "type": "Süßspeise",
+     "name": "Mini-Germknödel mit Kirschfüllung, dazu Vanillesauce",
+     "diet": "vegetarian",
+     "allergens": [
+      "Ei",
+      "Gl",
+      "GlW",
+      "Mi"
+     ],
+     "additives": []
+    },
+    {
+     "type": "Dessert (Glas)",
+     "name": "Mousse au chocolat mit glasierten Kirschen",
+     "diet": "vegetarian",
+     "allergens": [
       "Mi"
      ],
      "additives": []
