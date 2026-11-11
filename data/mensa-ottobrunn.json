@@ -2,7 +2,7 @@
  "canteen": "Mensa Ottobrunn",
  "address": "Willy-Messerschmitt-Str. 5, Taufkirchen",
  "source": "https://www.studierendenwerk-muenchen-oberbayern.de/mensa/speiseplan/speiseplan_433_-de.html",
- "fetched": "2026-11-11T10:35+00:00",
+ "fetched": "2026-11-11T11:55+00:00",
  "days": [
   {
    "date": "2026-11-11",
@@ -24,6 +24,17 @@
     },
     {
      "type": "Pasta",
+     "name": "Pasta mit Rahmpilzen",
+     "diet": "vegetarian",
+     "allergens": [
+      "Gl",
+      "GlW",
+      "Mi"
+     ],
+     "additives": []
+    },
+    {
+     "type": "Pasta",
      "name": "Pasta mit Sojabolognese",
      "diet": "vegan",
      "allergens": [
@@ -37,17 +48,6 @@
     {
      "type": "Pasta",
      "name": "Pasta mit Tomaten-Sahnesauce",
-     "diet": "vegetarian",
-     "allergens": [
-      "Gl",
-      "GlW",
-      "Mi"
-     ],
-     "additives": []
-    },
-    {
-     "type": "Pasta",
-     "name": "Pasta mit Rahmpilzen",
      "diet": "vegetarian",
      "allergens": [
       "Gl",
@@ -347,8 +347,8 @@
       "So"
      ],
      "additives": [
-      "Kn",
-      "1"
+      "1",
+      "Kn"
      ]
     },
     {
@@ -361,8 +361,8 @@
      ],
      "additives": [
       "1",
-      "Kn",
       "3",
+      "Kn",
       "5"
      ]
     },
@@ -416,8 +416,8 @@
       "Sl"
      ],
      "additives": [
-      "Kn",
-      "11"
+      "11",
+      "Kn"
      ]
     },
     {
