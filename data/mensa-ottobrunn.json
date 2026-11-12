@@ -2,118 +2,8 @@
  "canteen": "Mensa Ottobrunn",
  "address": "Willy-Messerschmitt-Str. 5, Taufkirchen",
  "source": "https://www.studierendenwerk-muenchen-oberbayern.de/mensa/speiseplan/speiseplan_433_-de.html",
- "fetched": "2026-11-11T11:55+00:00",
+ "fetched": "2026-11-12T12:49+00:00",
  "days": [
-  {
-   "date": "2026-11-11",
-   "dishes": [
-    {
-     "type": "Pasta",
-     "name": "Dim Sum: Asian Dumplings mit Asiagemüse",
-     "diet": "vegan",
-     "allergens": [
-      "Gl",
-      "GlW",
-      "Se",
-      "Sf",
-      "So"
-     ],
-     "additives": [
-      "Kn"
-     ]
-    },
-    {
-     "type": "Pasta",
-     "name": "Pasta mit Rahmpilzen",
-     "diet": "vegetarian",
-     "allergens": [
-      "Gl",
-      "GlW",
-      "Mi"
-     ],
-     "additives": []
-    },
-    {
-     "type": "Pasta",
-     "name": "Pasta mit Sojabolognese",
-     "diet": "vegan",
-     "allergens": [
-      "Gl",
-      "GlW",
-      "Sl",
-      "So"
-     ],
-     "additives": []
-    },
-    {
-     "type": "Pasta",
-     "name": "Pasta mit Tomaten-Sahnesauce",
-     "diet": "vegetarian",
-     "allergens": [
-      "Gl",
-      "GlW",
-      "Mi"
-     ],
-     "additives": []
-    },
-    {
-     "type": "Studitopf",
-     "name": "Eintopf mit Reis, Bohnen und Gemüse",
-     "diet": "vegan",
-     "allergens": [
-      "Sl"
-     ],
-     "additives": []
-    },
-    {
-     "type": "Fleisch",
-     "name": "Entenkeule (1 Stück) mit Orangensauce",
-     "diet": "meat",
-     "allergens": [],
-     "additives": [
-      "Kn"
-     ]
-    },
-    {
-     "type": "",
-     "name": "Gegrillte Entenbrust (1 Stück) mit Orangensauce",
-     "diet": "meat",
-     "allergens": [],
-     "additives": [
-      "Kn"
-     ]
-    },
-    {
-     "type": "Dessert (Glas)",
-     "name": "Faschingskrapfen mit Vierfruchtfüllung",
-     "diet": "vegetarian",
-     "allergens": [
-      "Ei",
-      "Gl",
-      "GlW",
-      "Mi"
-     ],
-     "additives": []
-    },
-    {
-     "type": "Dessert (Glas)",
-     "name": "Creme Tiramisu",
-     "diet": "vegetarian",
-     "allergens": [
-      "Ei",
-      "Gl",
-      "GlW",
-      "Mi",
-      "Sw"
-     ],
-     "additives": [
-      "5",
-      "14",
-      "99"
-     ]
-    }
-   ]
-  },
   {
    "date": "2026-11-12",
    "dishes": [
@@ -132,21 +22,46 @@
      ]
     },
     {
-     "type": "Grill",
-     "name": "Putensteak (1 Stück) mit Chimichuri aus Koriander, Tomate und Petersilie",
-     "diet": "meat",
-     "allergens": [],
+     "type": "",
+     "name": "Gnocchi mit Kräutersauce",
+     "diet": "vegetarian",
+     "allergens": [
+      "Gl",
+      "GlW",
+      "Mi"
+     ],
      "additives": []
     },
     {
-     "type": "Studitopf",
-     "name": "Pikante Hirse mit schwarzen Bohnen und Gemüse",
-     "diet": "vegan",
+     "type": "Grill",
+     "name": "Putensteak (1 Stück) mit Salsa",
+     "diet": "meat",
      "allergens": [
       "Sl"
      ],
      "additives": [
-      "2"
+      "11"
+     ]
+    },
+    {
+     "type": "Studitopf",
+     "name": "Couscous mit mediterranem Gemüse",
+     "diet": "vegan",
+     "allergens": [
+      "Gl",
+      "GlW"
+     ],
+     "additives": [
+      "Kn"
+     ]
+    },
+    {
+     "type": "Fleisch",
+     "name": "Gegrillte Entenbrust (1 Stück) mit Orangensauce",
+     "diet": "meat",
+     "allergens": [],
+     "additives": [
+      "Kn"
      ]
     },
     {
@@ -156,15 +71,16 @@
      "allergens": [
       "Gl",
       "GlW",
-      "Se"
+      "So"
      ],
      "additives": [
-      "Kn"
+      "Kn",
+      "3"
      ]
     },
     {
      "type": "Dessert (Glas)",
-     "name": "Schokopudding mit Sahne",
+     "name": "Mousse au chocolat",
      "diet": "vegetarian",
      "allergens": [
       "Mi"
@@ -241,8 +157,8 @@
       "Sf"
      ],
      "additives": [
-      "Kn",
-      "9"
+      "9",
+      "Kn"
      ]
     },
     {
@@ -360,9 +276,9 @@
       "Sw"
      ],
      "additives": [
+      "Kn",
       "1",
       "3",
-      "Kn",
       "5"
      ]
     },
@@ -544,8 +460,8 @@
       "So"
      ],
      "additives": [
-      "2",
-      "Kn"
+      "Kn",
+      "2"
      ]
     },
     {
@@ -640,6 +556,77 @@
       "Mi"
      ],
      "additives": []
+    }
+   ]
+  },
+  {
+   "date": "2026-11-25",
+   "dishes": [
+    {
+     "type": "Pasta",
+     "name": "Spätzlepfanne mit Gemüse",
+     "diet": "vegetarian",
+     "allergens": [
+      "Ei",
+      "Gl",
+      "GlW",
+      "Mi"
+     ],
+     "additives": []
+    },
+    {
+     "type": "Wok",
+     "name": "Brasilianisches Brathähnchen (1 Stück)- Frango a Passarinho mit Mango-Chili-Dip",
+     "diet": "meat",
+     "allergens": [
+      "Ei",
+      "Gl",
+      "GlG",
+      "GlW",
+      "Mi",
+      "Sf",
+      "Sl",
+      "Sw"
+     ],
+     "additives": [
+      "1",
+      "2",
+      "5",
+      "9",
+      "99",
+      "Kn"
+     ]
+    },
+    {
+     "type": "Studitopf",
+     "name": "Reistopf mit Kidneybohnen, Paprika und Mais",
+     "diet": "vegan",
+     "allergens": [],
+     "additives": []
+    },
+    {
+     "type": "Vegan",
+     "name": "Orientalischer Gemüse-Couscous mit Kichererbsen",
+     "diet": "vegan",
+     "allergens": [
+      "Gl",
+      "GlW",
+      "Se"
+     ],
+     "additives": [
+      "2"
+     ]
+    },
+    {
+     "type": "Dessert (Glas)",
+     "name": "Mousse Bourbon-Vanille",
+     "diet": "meat",
+     "allergens": [
+      "Mi"
+     ],
+     "additives": [
+      "14"
+     ]
     }
    ]
   }
