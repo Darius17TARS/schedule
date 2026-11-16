@@ -2,20 +2,8 @@
  "canteen": "Mensa Ottobrunn",
  "address": "Willy-Messerschmitt-Str. 5, Taufkirchen",
  "source": "https://www.studierendenwerk-muenchen-oberbayern.de/mensa/speiseplan/speiseplan_433_-de.html",
- "fetched": "2026-11-13T12:17+00:00",
+ "fetched": "2026-11-16T12:50+00:00",
  "days": [
-  {
-   "date": "2026-11-13",
-   "dishes": [
-    {
-     "type": "Studitopf",
-     "name": "TUM-Veranstaltung - keine reguläre Mittagsverpflegung!",
-     "diet": "meat",
-     "allergens": [],
-     "additives": []
-    }
-   ]
-  },
   {
    "date": "2026-11-16",
    "dishes": [
@@ -34,24 +22,29 @@
      ]
     },
     {
-     "type": "Wok",
-     "name": "Asia-Reisbällchen mit veganem Currydip",
-     "diet": "vegan",
+     "type": "",
+     "name": "Trüffel Teigtaschen mit Käsesauce, Kirschtomaten und Basilikum",
+     "diet": "vegetarian",
      "allergens": [
+      "Ei",
       "Gl",
-      "GlG",
-      "Sf",
-      "Sl",
-      "So"
+      "GlW",
+      "Mi"
      ],
+     "additives": []
+    },
+    {
+     "type": "Wok",
+     "name": "Asia-Reisbällchen mit Sweet Chili Sauce",
+     "diet": "vegetarian",
+     "allergens": [],
      "additives": [
-      "1",
-      "3"
+      "Kn"
      ]
     },
     {
      "type": "Studitopf",
-     "name": "Bulgur mit Gemüse",
+     "name": "Zartweizen mit Gemüse",
      "diet": "vegan",
      "allergens": [
       "Gl",
@@ -62,28 +55,28 @@
     },
     {
      "type": "Fleisch",
-     "name": "Hähnchenschnitzel (1 Stück) mit Mango-Chili-Dip",
+     "name": "Hähnchenschnitzel (1 Stück) mit Curry-Chili-Dip",
      "diet": "meat",
      "allergens": [
       "Ei",
       "Gl",
       "GlW",
-      "Mi",
       "Sf"
      ],
      "additives": [
-      "Kn",
       "9"
      ]
     },
     {
      "type": "Dessert (Glas)",
-     "name": "Topfencreme mit Himbeeren",
-     "diet": "vegetarian",
+     "name": "Panna Cotta",
+     "diet": "meat",
      "allergens": [
       "Mi"
      ],
-     "additives": []
+     "additives": [
+      "14"
+     ]
     }
    ]
   },
@@ -178,8 +171,8 @@
       "So"
      ],
      "additives": [
-      "Kn",
-      "1"
+      "1",
+      "Kn"
      ]
     },
     {
@@ -191,10 +184,10 @@
       "Sw"
      ],
      "additives": [
-      "1",
       "3",
-      "5",
-      "Kn"
+      "Kn",
+      "1",
+      "5"
      ]
     },
     {
@@ -375,8 +368,8 @@
       "So"
      ],
      "additives": [
-      "2",
-      "Kn"
+      "Kn",
+      "2"
      ]
     },
     {
@@ -504,8 +497,8 @@
       "Sw"
      ],
      "additives": [
-      "1",
       "Kn",
+      "1",
       "2",
       "5",
       "9",
@@ -606,6 +599,68 @@
     {
      "type": "Dessert (Glas)",
      "name": "Schokopudding mit Sahne",
+     "diet": "vegetarian",
+     "allergens": [
+      "Mi"
+     ],
+     "additives": []
+    }
+   ]
+  },
+  {
+   "date": "2026-11-27",
+   "dishes": [
+    {
+     "type": "Pasta",
+     "name": "Pasta mit Tomaten-Frischkäse-Sauce",
+     "diet": "vegetarian",
+     "allergens": [
+      "Gl",
+      "GlW",
+      "Mi"
+     ],
+     "additives": []
+    },
+    {
+     "type": "Studitopf",
+     "name": "Kartoffelgulasch mit Paprika",
+     "diet": "vegan",
+     "allergens": [],
+     "additives": []
+    },
+    {
+     "type": "Fisch",
+     "name": "Seelachsfilet Lemon Koriander (1 Stück)",
+     "diet": "meat",
+     "allergens": [
+      "Ei",
+      "Fi",
+      "Gl",
+      "GlG",
+      "GlW",
+      "Mi",
+      "Sf",
+      "Sl"
+     ],
+     "additives": [
+      "1"
+     ]
+    },
+    {
+     "type": "Süßspeise",
+     "name": "Pfannkuchen mit Heidelbeerfüllung und Vanillesauce",
+     "diet": "vegetarian",
+     "allergens": [
+      "Ei",
+      "Gl",
+      "GlW",
+      "Mi"
+     ],
+     "additives": []
+    },
+    {
+     "type": "Dessert (Glas)",
+     "name": "Vanille-Zimtcreme mit Blaubeeren",
      "diet": "vegetarian",
      "allergens": [
       "Mi"
