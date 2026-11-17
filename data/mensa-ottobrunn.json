@@ -2,94 +2,21 @@
  "canteen": "Mensa Ottobrunn",
  "address": "Willy-Messerschmitt-Str. 5, Taufkirchen",
  "source": "https://www.studierendenwerk-muenchen-oberbayern.de/mensa/speiseplan/speiseplan_433_-de.html",
- "fetched": "2026-11-16T12:50+00:00",
+ "fetched": "2026-11-17T13:31+00:00",
  "days": [
-  {
-   "date": "2026-11-16",
-   "dishes": [
-    {
-     "type": "Pasta",
-     "name": "Kürbis-Teigtaschen mit Käsesauce, Kirschtomaten und Basilikum",
-     "diet": "vegetarian",
-     "allergens": [
-      "Ei",
-      "Gl",
-      "GlW",
-      "Mi"
-     ],
-     "additives": [
-      "Kn"
-     ]
-    },
-    {
-     "type": "",
-     "name": "Trüffel Teigtaschen mit Käsesauce, Kirschtomaten und Basilikum",
-     "diet": "vegetarian",
-     "allergens": [
-      "Ei",
-      "Gl",
-      "GlW",
-      "Mi"
-     ],
-     "additives": []
-    },
-    {
-     "type": "Wok",
-     "name": "Asia-Reisbällchen mit Sweet Chili Sauce",
-     "diet": "vegetarian",
-     "allergens": [],
-     "additives": [
-      "Kn"
-     ]
-    },
-    {
-     "type": "Studitopf",
-     "name": "Zartweizen mit Gemüse",
-     "diet": "vegan",
-     "allergens": [
-      "Gl",
-      "GlW",
-      "Sl"
-     ],
-     "additives": []
-    },
-    {
-     "type": "Fleisch",
-     "name": "Hähnchenschnitzel (1 Stück) mit Curry-Chili-Dip",
-     "diet": "meat",
-     "allergens": [
-      "Ei",
-      "Gl",
-      "GlW",
-      "Sf"
-     ],
-     "additives": [
-      "9"
-     ]
-    },
-    {
-     "type": "Dessert (Glas)",
-     "name": "Panna Cotta",
-     "diet": "meat",
-     "allergens": [
-      "Mi"
-     ],
-     "additives": [
-      "14"
-     ]
-    }
-   ]
-  },
   {
    "date": "2026-11-17",
    "dishes": [
     {
      "type": "Pasta",
-     "name": "Pasta all'arrabiata",
-     "diet": "vegan",
+     "name": "Allgäuer Käsespätzle mit Röstzwiebeln",
+     "diet": "vegetarian",
      "allergens": [
+      "Ei",
       "Gl",
-      "GlW"
+      "GlD",
+      "GlW",
+      "Mi"
      ],
      "additives": []
     },
@@ -99,11 +26,38 @@
      "diet": "meat",
      "allergens": [
       "Mi",
-      "Sf"
+      "Sf",
+      "So"
      ],
      "additives": [
+      "Kn",
+      "3"
+     ]
+    },
+    {
+     "type": "Grill",
+     "name": "Paniertes Hähnchenschnitzel (1 Stück) mit Gurken-Joghurtdip",
+     "diet": "meat",
+     "allergens": [
+      "Gl",
+      "GlW",
+      "Mi",
+      "So"
+     ],
+     "additives": [
+      "3",
       "Kn"
      ]
+    },
+    {
+     "type": "",
+     "name": "Schweineschnitzel Wiener Art (1 Stück)",
+     "diet": "meat",
+     "allergens": [
+      "Gl",
+      "GlW"
+     ],
+     "additives": []
     },
     {
      "type": "Wok",
@@ -117,21 +71,25 @@
     },
     {
      "type": "Studitopf",
-     "name": "Zartweizen mit Erbsen, Karotten und Mais",
+     "name": "Graupen mit Erbsen, Karotten und Mais",
      "diet": "vegan",
      "allergens": [
       "Gl",
-      "GlW",
+      "GlG",
       "Sl"
      ],
      "additives": []
     },
     {
      "type": "Dessert (Glas)",
-     "name": "Veganer Chiapudding mit Kokosmilch und Mangospiegel",
-     "diet": "vegan",
-     "allergens": [],
-     "additives": []
+     "name": "Cappuccinocreme",
+     "diet": "vegetarian",
+     "allergens": [
+      "Mi"
+     ],
+     "additives": [
+      "14"
+     ]
     }
    ]
   },
@@ -140,13 +98,11 @@
    "dishes": [
     {
      "type": "Pasta",
-     "name": "Allgäuer Käsespätzle mit Röstzwiebeln",
-     "diet": "vegetarian",
+     "name": "Pasta all'arrabiata",
+     "diet": "vegan",
      "allergens": [
-      "Ei",
       "Gl",
-      "GlW",
-      "Mi"
+      "GlW"
      ],
      "additives": []
     },
@@ -184,9 +140,9 @@
       "Sw"
      ],
      "additives": [
-      "3",
       "Kn",
       "1",
+      "3",
       "5"
      ]
     },
@@ -217,6 +173,20 @@
     },
     {
      "type": "Wok",
+     "name": "Thailändische Frühlingsrolle mit Sweet-Chilisauce",
+     "diet": "vegan",
+     "allergens": [
+      "Gl",
+      "GlW",
+      "Sl"
+     ],
+     "additives": [
+      "Kn",
+      "11"
+     ]
+    },
+    {
+     "type": "Wok",
      "name": "Curry-Mie-Nudeln mit Asiagemüse",
      "diet": "vegan",
      "allergens": [
@@ -228,20 +198,6 @@
      ],
      "additives": [
       "2"
-     ]
-    },
-    {
-     "type": "Wok",
-     "name": "Thailändische Frühlingsrolle mit Sweet-Chilisauce",
-     "diet": "vegan",
-     "allergens": [
-      "Gl",
-      "GlW",
-      "Sl"
-     ],
-     "additives": [
-      "Kn",
-      "11"
      ]
     },
     {
@@ -497,10 +453,10 @@
       "Sw"
      ],
      "additives": [
-      "Kn",
       "1",
-      "2",
       "5",
+      "Kn",
+      "2",
       "9",
       "99"
      ]
@@ -666,6 +622,73 @@
       "Mi"
      ],
      "additives": []
+    }
+   ]
+  },
+  {
+   "date": "2026-11-30",
+   "dishes": [
+    {
+     "type": "Pasta",
+     "name": "Ravioli mit Tomate-Basilikumfüllung , dazu Tomatensauce",
+     "diet": "vegetarian",
+     "allergens": [
+      "Ei",
+      "Gl",
+      "GlW",
+      "Mi"
+     ],
+     "additives": []
+    },
+    {
+     "type": "Studitopf",
+     "name": "Polenta mit Wurzelgemüse",
+     "diet": "vegan",
+     "allergens": [
+      "Sl"
+     ],
+     "additives": []
+    },
+    {
+     "type": "Vegetarisch/fleischlos",
+     "name": "Kartoffeltaschen mit Kräuterfrischkäse und Sauerrahmdip",
+     "diet": "vegetarian",
+     "allergens": [
+      "Gl",
+      "GlG",
+      "Mi",
+      "Sf",
+      "Sl"
+     ],
+     "additives": [
+      "1"
+     ]
+    },
+    {
+     "type": "Fleisch",
+     "name": "Cordon bleu vom Schwein (1 Stück) (mit Formfleisch Kochschinken)",
+     "diet": "meat",
+     "allergens": [
+      "Gl",
+      "GlW",
+      "Mi"
+     ],
+     "additives": [
+      "2",
+      "3",
+      "8"
+     ]
+    },
+    {
+     "type": "Dessert (Glas)",
+     "name": "Bayerisch Creme mit Himbeermark",
+     "diet": "meat",
+     "allergens": [
+      "Mi"
+     ],
+     "additives": [
+      "14"
+     ]
     }
    ]
   }
