@@ -2,97 +2,8 @@
  "canteen": "Mensa Ottobrunn",
  "address": "Willy-Messerschmitt-Str. 5, Taufkirchen",
  "source": "https://www.studierendenwerk-muenchen-oberbayern.de/mensa/speiseplan/speiseplan_433_-de.html",
- "fetched": "2026-11-17T13:31+00:00",
+ "fetched": "2026-11-18T13:08+00:00",
  "days": [
-  {
-   "date": "2026-11-17",
-   "dishes": [
-    {
-     "type": "Pasta",
-     "name": "Allgäuer Käsespätzle mit Röstzwiebeln",
-     "diet": "vegetarian",
-     "allergens": [
-      "Ei",
-      "Gl",
-      "GlD",
-      "GlW",
-      "Mi"
-     ],
-     "additives": []
-    },
-    {
-     "type": "Grill",
-     "name": "Tandoori Chicken (1 Stück) in Joghurtmarinade und Gurken-Minz-Dip",
-     "diet": "meat",
-     "allergens": [
-      "Mi",
-      "Sf",
-      "So"
-     ],
-     "additives": [
-      "Kn",
-      "3"
-     ]
-    },
-    {
-     "type": "Grill",
-     "name": "Paniertes Hähnchenschnitzel (1 Stück) mit Gurken-Joghurtdip",
-     "diet": "meat",
-     "allergens": [
-      "Gl",
-      "GlW",
-      "Mi",
-      "So"
-     ],
-     "additives": [
-      "3",
-      "Kn"
-     ]
-    },
-    {
-     "type": "",
-     "name": "Schweineschnitzel Wiener Art (1 Stück)",
-     "diet": "meat",
-     "allergens": [
-      "Gl",
-      "GlW"
-     ],
-     "additives": []
-    },
-    {
-     "type": "Wok",
-     "name": "Rotes Linsendahl mit Lauch und Koriander",
-     "diet": "vegan",
-     "allergens": [
-      "Sf",
-      "Sl"
-     ],
-     "additives": []
-    },
-    {
-     "type": "Studitopf",
-     "name": "Graupen mit Erbsen, Karotten und Mais",
-     "diet": "vegan",
-     "allergens": [
-      "Gl",
-      "GlG",
-      "Sl"
-     ],
-     "additives": []
-    },
-    {
-     "type": "Dessert (Glas)",
-     "name": "Cappuccinocreme",
-     "diet": "vegetarian",
-     "allergens": [
-      "Mi"
-     ],
-     "additives": [
-      "14"
-     ]
-    }
-   ]
-  },
   {
    "date": "2026-11-18",
    "dishes": [
@@ -107,6 +18,29 @@
      "additives": []
     },
     {
+     "type": "",
+     "name": "Pasta mit Sojabolognese",
+     "diet": "vegan",
+     "allergens": [
+      "Gl",
+      "GlW",
+      "Sl",
+      "So"
+     ],
+     "additives": []
+    },
+    {
+     "type": "",
+     "name": "Pasta mit Pilzrahmsauce",
+     "diet": "vegetarian",
+     "allergens": [
+      "Gl",
+      "GlW",
+      "Mi"
+     ],
+     "additives": []
+    },
+    {
      "type": "Studitopf",
      "name": "Pikanter Pilztopf mit Kartoffeln und Kraut",
      "diet": "vegan",
@@ -115,7 +49,7 @@
     },
     {
      "type": "Vegetarisch/fleischlos",
-     "name": "Quinoa-Grünkern-Strudel mit Sauerrahm-Dip",
+     "name": "Quinoa-Grünkern-Strudel mit Dip",
      "diet": "vegetarian",
      "allergens": [
       "Gl",
@@ -127,8 +61,21 @@
       "So"
      ],
      "additives": [
-      "1",
-      "Kn"
+      "Kn",
+      "1"
+     ]
+    },
+    {
+     "type": "Fleisch",
+     "name": "Hirschgulasch in Preiselbeersauce",
+     "diet": "meat",
+     "allergens": [
+      "Sl",
+      "Sw"
+     ],
+     "additives": [
+      "5",
+      "99"
      ]
     },
     {
@@ -137,24 +84,21 @@
      "diet": "meat",
      "allergens": [
       "Mi",
+      "So",
       "Sw"
      ],
      "additives": [
-      "Kn",
       "1",
+      "Kn",
       "3",
       "5"
      ]
     },
     {
      "type": "Dessert (Glas)",
-     "name": "Grießbrei mit Zimtzucker",
-     "diet": "vegetarian",
-     "allergens": [
-      "Gl",
-      "GlW",
-      "Mi"
-     ],
+     "name": "Veganer Chiapudding mit Himbeer-Kokos",
+     "diet": "vegan",
+     "allergens": [],
      "additives": []
     }
    ]
@@ -454,11 +398,11 @@
      ],
      "additives": [
       "1",
-      "5",
-      "Kn",
       "2",
+      "5",
       "9",
-      "99"
+      "99",
+      "Kn"
      ]
     },
     {
@@ -689,6 +633,63 @@
      "additives": [
       "14"
      ]
+    }
+   ]
+  },
+  {
+   "date": "2026-12-01",
+   "dishes": [
+    {
+     "type": "Pasta",
+     "name": "Pasta mit mediterraner Tomatensauce",
+     "diet": "vegan",
+     "allergens": [
+      "Gl",
+      "GlW"
+     ],
+     "additives": []
+    },
+    {
+     "type": "Studitopf",
+     "name": "Gersteneintopf",
+     "diet": "vegan",
+     "allergens": [
+      "Gl",
+      "GlG",
+      "Sl"
+     ],
+     "additives": []
+    },
+    {
+     "type": "Vegetarisch/fleischlos",
+     "name": "Frische Rahmschwammerl",
+     "diet": "vegetarian",
+     "allergens": [
+      "Gl",
+      "GlW",
+      "Mi"
+     ],
+     "additives": []
+    },
+    {
+     "type": "Fleisch",
+     "name": "Münchner Biergulasch vom Rind",
+     "diet": "meat",
+     "allergens": [
+      "Gl",
+      "GlG",
+      "GlW"
+     ],
+     "additives": [
+      "99"
+     ]
+    },
+    {
+     "type": "Dessert (Glas)",
+     "name": "Tagesdessert",
+     "diet": "meat",
+     "allergens": [],
+     "additives": []
     }
    ]
   }
