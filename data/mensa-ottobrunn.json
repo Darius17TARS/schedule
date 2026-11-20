@@ -2,76 +2,13 @@
  "canteen": "Mensa Ottobrunn",
  "address": "Willy-Messerschmitt-Str. 5, Taufkirchen",
  "source": "https://www.studierendenwerk-muenchen-oberbayern.de/mensa/speiseplan/speiseplan_433_-de.html",
- "fetched": "2026-11-19T13:19+00:00",
+ "fetched": "2026-11-20T12:59+00:00",
  "days": [
   {
-   "date": "2026-11-19",
+   "date": "2026-11-20",
    "dishes": [
     {
-     "type": "Grill",
-     "name": "Schweinesteak (1 Stück) vom Grill (S vom Strohschwein) mit Champignonsauce",
-     "diet": "meat",
-     "allergens": [
-      "Mi",
-      "Sl",
-      "Sw"
-     ],
-     "additives": [
-      "5",
-      "99"
-     ]
-    },
-    {
-     "type": "Wok",
-     "name": "Thailändische Frühlingsrolle mit Sweet-Chilisauce",
-     "diet": "vegan",
-     "allergens": [
-      "Gl",
-      "GlW",
-      "Sl"
-     ],
-     "additives": [
-      "11",
-      "Kn"
-     ]
-    },
-    {
-     "type": "Wok",
-     "name": "Curry-Mie-Nudeln mit Asiagemüse",
-     "diet": "vegan",
-     "allergens": [
-      "Gl",
-      "GlW",
-      "Se",
-      "Sf",
-      "So",
-      "Sw"
-     ],
-     "additives": [
-      "2",
-      "Kn",
-      "5"
-     ]
-    },
-    {
      "type": "Studitopf",
-     "name": "Pikanter Pilztopf mit Kartoffeln und Kraut",
-     "diet": "vegan",
-     "allergens": [],
-     "additives": []
-    },
-    {
-     "type": "Studitopf",
-     "name": "Linseneintopf mit Kürbis",
-     "diet": "vegan",
-     "allergens": [
-      "Sf",
-      "Sl"
-     ],
-     "additives": []
-    },
-    {
-     "type": "",
      "name": "Couscous mit Tomaten und Paprika",
      "diet": "vegan",
      "allergens": [
@@ -79,19 +16,6 @@
       "GlW"
      ],
      "additives": []
-    },
-    {
-     "type": "Vegetarisch/fleischlos",
-     "name": "Quinoa-Grünkern-Strudel mit Sweet-Chili Sauce (V)",
-     "diet": "meat",
-     "allergens": [
-      "Gl",
-      "GlW",
-      "So"
-     ],
-     "additives": [
-      "Kn"
-     ]
     },
     {
      "type": "Fleisch",
@@ -103,34 +27,6 @@
      ],
      "additives": [
       "11"
-     ]
-    },
-    {
-     "type": "Dessert (Glas)",
-     "name": "Pudding Vanillegeschmack mit Himbeersauce",
-     "diet": "vegetarian",
-     "allergens": [
-      "Mi"
-     ],
-     "additives": []
-    }
-   ]
-  },
-  {
-   "date": "2026-11-20",
-   "dishes": [
-    {
-     "type": "Wok",
-     "name": "Gemüsecurry",
-     "diet": "vegan",
-     "allergens": [
-      "Gl",
-      "GlW",
-      "So"
-     ],
-     "additives": [
-      "2",
-      "Kn"
      ]
     },
     {
@@ -163,8 +59,25 @@
      ]
     },
     {
+     "type": "",
+     "name": "Gefüllte Paprikaschotenhälfte mit Tomatensauce",
+     "diet": "vegetarian",
+     "allergens": [
+      "Gl",
+      "GlD",
+      "Mi",
+      "Sf",
+      "Sl"
+     ],
+     "additives": [
+      "2",
+      "11",
+      "Kn"
+     ]
+    },
+    {
      "type": "Dessert (Glas)",
-     "name": "Joghurt mit Kirschen",
+     "name": "Pudding Vanillegeschmack mit Beerenragout",
      "diet": "vegetarian",
      "allergens": [
       "Mi"
@@ -203,8 +116,8 @@
       "So"
      ],
      "additives": [
-      "2",
-      "Kn"
+      "Kn",
+      "2"
      ]
     },
     {
@@ -332,12 +245,12 @@
       "Sw"
      ],
      "additives": [
-      "2",
-      "Kn",
       "1",
+      "2",
       "5",
       "9",
-      "99"
+      "99",
+      "Kn"
      ]
     },
     {
@@ -678,6 +591,59 @@
       "5",
       "99"
      ]
+    },
+    {
+     "type": "Dessert (Glas)",
+     "name": "Tagesdessert",
+     "diet": "meat",
+     "allergens": [],
+     "additives": []
+    }
+   ]
+  },
+  {
+   "date": "2026-12-03",
+   "dishes": [
+    {
+     "type": "Pasta",
+     "name": "Spinatspätzlepfanne mit Bergkäse und abgeschmelzten Zwiebeln",
+     "diet": "meat",
+     "allergens": [
+      "Ei",
+      "Gl",
+      "GlW",
+      "Mi"
+     ],
+     "additives": [
+      "15"
+     ]
+    },
+    {
+     "type": "Studitopf",
+     "name": "Eintopf mit roten Linsen, Möhren und Blumenkohl",
+     "diet": "meat",
+     "allergens": [],
+     "additives": []
+    },
+    {
+     "type": "Fleisch",
+     "name": "Schweinegeschnetzeltes (S vom Strohschwein) in Rahmsauce",
+     "diet": "meat",
+     "allergens": [
+      "Gl",
+      "GlW",
+      "Mi"
+     ],
+     "additives": []
+    },
+    {
+     "type": "Vegan",
+     "name": "Kürbisfalafel mit Zucchini-Hummus",
+     "diet": "vegan",
+     "allergens": [
+      "Se"
+     ],
+     "additives": []
     },
     {
      "type": "Dessert (Glas)",
