@@ -299,7 +299,7 @@ function setMode(m) { mode = m; $("vDay").classList.toggle("on", m === "day"); $
 
 // --- Semester PDF: ONE A4 landscape page with a typical week + exceptions ---
 function isCancelled(e) { const st = (e.status || "").trim(); if (/^(cancel|cancelled|fa|fg|fv|wa|wg)$/i.test(st)) return true; return /cancel|storn|abgesagt|entf(ä|ae)llt|f(ä|ae)llt aus/i.test(st) || /\b(abgesagt|entfällt|storniert|cancell?ed)\b/i.test(e.title || ""); }
-const APPV = 24;
+const APPV = 25;
 const hm = d => d.getHours() * 60 + d.getMinutes();
 const dShort = d => `${DOW[(d.getDay() + 6) % 7]} ${d.getDate()}.${d.getMonth() + 1}.`;
 function semesterModel() {
@@ -611,6 +611,7 @@ function renderExams() {
   const box = $("exams"); if (!box) return; if (!PLAN) loadPlan(); const X = examList(), nP = X.filter(x => x.planned).length; box.hidden = false; box.innerHTML = "";
   box.appendChild(el("h3", "", `Exams <small class="muted">${X.length || ""}</small>`));
   if (!X.length) { box.appendChild(el("p", "muted", esc(EXAM_NONE))); return; }
+  const pb = el("button", "planbtn", "Grade planner"); pb.id = "planBtn"; pb.type = "button"; pb.onclick = () => window.togglePlanner && togglePlanner(); box.querySelector("h3").appendChild(pb);
   const S = examSummary(X); box.appendChild(el("p", "muted", `${S.n} exam${S.n > 1 ? "s" : ""}${nP ? ` (${S.n - nP} registered, ${nP} planned)` : ""} · span ${S.span} days${S.min != null ? ` · fewest study days between exams: ${Math.max(0, S.min - 1)}` : ""}${S.ects ? ` · <b>${ectsTxt(S.ects)} ECTS</b> at stake${S.noE ? ` (${S.noE} without ECTS data)` : ""}` : ""}`));
   const cr = el("div", "excred"); cr.innerHTML = `<label class="check"><input type="checkbox" id="credChk"${credOn ? " checked" : ""}> <span>Also show my credits <small class="muted">(needs “Noten” permission; read once, kept in memory only)</small></span></label>`;
   if (credOn) { const p = el("p", "credline", ""); if (credBusy || !CRED) p.textContent = "Loading credits…"; else if (CRED.err) { p.className = "credline err"; p.textContent = CRED.err; } else p.innerHTML = `<b>${ectsTxt(CRED.sum)} ECTS earned</b> · ${ectsTxt(CRED.sum)} + ${ectsTxt(S.ects)} = <b>${ectsTxt(CRED.sum + S.ects)} ECTS</b> after this exam period <small class="muted">(${CRED.n} passed module${CRED.n === 1 ? "" : "s"}${CRED.unk ? `, ${CRED.unk} without ECTS data counted as 0` : ""})</small>`; cr.appendChild(p); }
@@ -623,6 +624,7 @@ function renderExams() {
   });
   box.appendChild(ol);
   if (nP) box.appendChild(el("p", "muted exsrc", esc(planNote())));
+  if (window.renderPlanner) renderPlanner();
 }
 async function exportExams() {
   await loadPlan(); const X = examList(), btn = $("examPdf"); btn.disabled = true; btn.textContent = "Preparing…";
@@ -695,7 +697,7 @@ async function exportPdf() {
   setTimeout(() => window.print(), 50);
 }
 
-function logout() { clearInterval(pollTimer); store.clear(); CRED = null; credOn = false; $("remember").checked = false; events = []; cancelled = []; localStorage.removeItem("tumSchedZoom"); localStorage.removeItem("tumSchedTrim"); roomCache.clear(); $("tumid").value = $("tokenIn").value = ""; $("msg").textContent = ""; $("msg2").textContent = "Waiting for activation – checking every 5 s…"; $("printout").innerHTML = ""; show("login"); }
+function logout() { clearInterval(pollTimer); store.clear(); if (window.plannerReset) plannerReset(); CRED = null; credOn = false; $("remember").checked = false; events = []; cancelled = []; localStorage.removeItem("tumSchedZoom"); localStorage.removeItem("tumSchedTrim"); roomCache.clear(); $("tumid").value = $("tokenIn").value = ""; $("msg").textContent = ""; $("msg2").textContent = "Waiting for activation – checking every 5 s…"; $("printout").innerHTML = ""; show("login"); }
 function shift(n) { day = addDays(day, n * (mode === "week" ? 7 : 1)); render(n); }
 
 $("req").onclick = requestToken;

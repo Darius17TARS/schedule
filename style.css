@@ -249,3 +249,44 @@ input:focus,select:focus,button:focus-visible{outline:2px solid color-mix(in srg
 footer{color:var(--mu)}
 @media print{.exams{display:none!important}}
 .exsrc{overflow-wrap:anywhere}
+
+/* ===== v25: grade planner ===== */
+.exams h3{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.exams h3 .planbtn{margin-left:auto;font-size:.85rem;font-weight:600;padding:6px 12px}
+.planner{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:18px;max-width:760px;margin:12px 0 8px;scroll-margin-top:70px}
+.planner.closed{display:none}
+.phead{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.phead h3{margin:0;font-size:1.15rem;letter-spacing:-.01em}.phead p{margin:2px 0 0;font-size:13px}
+.pprogs{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0 2px}.pprogs button{padding:6px 12px;font-size:.85rem;background:transparent}.pprogs button.on{background:var(--fg);border-color:var(--fg);color:var(--card)}
+.pload{margin:12px 0;padding:12px 14px;border:1px solid var(--bd);border-radius:12px;background:var(--bg);font-size:13px}.pload .muted{font-size:12.5px}
+.perr{margin:10px 0 0;padding:8px 10px;border-radius:10px;background:var(--warnb);color:var(--warnf)}.perr a{color:inherit;font-weight:600}
+.pman{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin-top:10px}.pman label,.ptarget label{display:inline-flex;align-items:center;gap:6px;font-weight:600;font-size:13px}
+.pman input,.ptarget input{width:84px;padding:6px 8px}
+.pstats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0 10px}
+.pstat{display:flex;flex-direction:column;gap:2px;padding:10px 12px;border:1px solid var(--bd);border-radius:12px;background:var(--card)}
+.pstat span{font-size:12px;font-weight:600;color:var(--mu)}.pstat b{font-size:1.6rem;line-height:1.1;letter-spacing:-.02em;font-variant-numeric:tabular-nums}.pstat small{font-size:12px;color:var(--mu)}
+.pstat.proj{background:var(--chip);border-color:transparent}
+.pstat em{font-style:normal;font-weight:700;padding:0 6px;border-radius:99px}.pstat em.up{background:var(--ue-b);color:var(--ue-f)}.pstat em.down{background:var(--warnb);color:var(--warnf)}
+.ptarget{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;font-size:13px;margin:4px 0 10px}.ptarget b{color:var(--fg)}
+.pbar{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12.5px;margin:6px 0}.pbar select{padding:4px 8px;font-size:12.5px}
+.plist{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.pex{--c:hsl(var(--h,210) 38% 54%);display:grid;grid-template-columns:1fr auto auto;grid-template-areas:"t e g" "s s s";gap:8px 10px;align-items:center;padding:10px 12px;border:1px solid var(--bd);border-left:3px solid var(--c);border-radius:12px;background:var(--card)}
+.pex .pt{grid-area:t;min-width:0;display:flex;flex-direction:column}.pex .pt b{font-size:14px;line-height:1.25}.pex .pt small{font-size:12px}
+.pex .pects{grid-area:e;display:inline-flex;align-items:baseline;gap:3px;font-size:13px;font-weight:600;font-variant-numeric:tabular-nums}.pex .pects small{font-size:11px;color:var(--mu);font-weight:500}.pex .pects input{width:46px;padding:4px 6px;text-align:center}
+.pex .gsel{grid-area:g;padding:6px 8px;min-width:92px;font-weight:600}
+.pex.picked .gsel{background:var(--chip);border-color:color-mix(in srgb,var(--fg) 25%,var(--bd))}
+.pex .pswitch{grid-area:s;display:inline-flex;align-items:center;gap:8px;font-size:12.5px;color:var(--fg);cursor:pointer;width:max-content}
+.pex .psel{grid-column:1/-1;justify-self:start;padding:4px 8px;font-size:12.5px}
+.pswitch input{position:absolute;opacity:0;width:1px;height:1px}
+.sw2{position:relative;width:32px;height:18px;border-radius:99px;background:var(--chip);border:1px solid var(--bd);transition:background .15s;flex:none}
+.sw2::after{content:"";position:absolute;top:2px;left:2px;width:12px;height:12px;border-radius:50%;background:var(--mu);transition:transform .15s,background .15s}
+.pswitch input:checked+.sw2{background:var(--warnb);border-color:color-mix(in srgb,var(--warnf) 40%,var(--bd))}.pswitch input:checked+.sw2::after{transform:translateX(14px);background:var(--warnf)}
+.pswitch input:focus-visible+.sw2{outline:2px solid color-mix(in srgb,var(--ac) 70%,transparent);outline-offset:1px}
+.pex.pfail{background:repeating-linear-gradient(135deg,transparent 0 8px,color-mix(in srgb,var(--warnb) 45%,transparent) 8px 9px),var(--card);border-left-style:dashed}
+.pex.pfail .pt b{text-decoration:line-through;text-decoration-color:color-mix(in srgb,var(--warnf) 60%,transparent)}.pex.pfail .stxt{color:var(--warnf);font-weight:600}.pex.pfail .gsel{opacity:.5}
+.pother{font-size:12.5px;padding:4px 2px}
+.ppast{margin:12px 0 4px;font-size:13px}.ppast summary{color:var(--fg);font-weight:600}.ppast ul{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:4px}
+.ppast li{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;padding:6px 10px;border:1px solid var(--bd);border-radius:10px}.ppast li.nf{opacity:.75}
+.ppast .pg{font-weight:700;font-variant-numeric:tabular-nums}.ppast .pe{font-size:12px;color:var(--mu)}.ppast .pe input{width:46px;padding:3px 6px;text-align:center}
+.pnote{font-size:12px;line-height:1.45;margin:12px 0 0}
+button.link{background:none;border:0;padding:0;color:var(--ac);text-decoration:underline;font-size:inherit;cursor:pointer}
+@media(max-width:560px){.pstats{grid-template-columns:1fr 1fr}.pstats .pstat:last-child{grid-column:1/-1}.pstat b{font-size:1.4rem}.pex{grid-template-columns:1fr auto;grid-template-areas:"t t" "e g" "s s"}.exams h3 .planbtn{margin-left:0}}
+@media print{.planner{display:none!important}}

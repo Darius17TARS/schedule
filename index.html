@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://campus.tum.de https://nav.tum.de; style-src 'self'; script-src 'self'; img-src 'self' data:; font-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'; worker-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="color-scheme" content="light dark">
-<title>TUM Schedule – rooms at a glance</title><link rel="stylesheet" href="style.css?v=24">
+<title>TUM Schedule – rooms at a glance</title><link rel="stylesheet" href="style.css?v=25">
 </head><body>
 <header class="top">
   <div class="brand"><span class="logo">S</span><div><b>TUM Schedule</b><small>Your classes &amp; rooms at a glance</small></div></div>
@@ -30,7 +30,7 @@
   <div class="hint">
     <ul>
       <li>No server, nothing saved by the site; data goes only between your browser and TUM (TUMonline, nav.tum.de).</li>
-      <li>Enable <b>“Kalender”</b>. <b>“Noten”</b> is optional — only used, if you tick “show my credits”, to add up your ECTS (grades are never shown or stored).</li>
+      <li>Enable <b>“Kalender”</b>. <b>“Noten”</b> is optional — only for your credits and the grade planner; grades are read into this browser’s memory, never stored or sent anywhere else.</li>
       <li>“Remember me” keeps the token in this browser only — don’t tick on shared devices.</li>
       <li>Revoke anytime.</li>
     </ul>
@@ -48,12 +48,12 @@
   <h1>Activate your token</h1>
   <ol class="steps">
     <li>Open the TUMonline email, or the token settings below.</li>
-    <li>Activate <b>“TUM Schedule”</b> with <b>“Kalender”</b> enabled (<b>“Noten”</b> optional, only for the credit count).</li>
+    <li>Activate <b>“TUM Schedule”</b> with <b>“Kalender”</b> enabled (<b>“Noten”</b> optional, for credits and the grade planner).</li>
   </ol>
   <div class="hint">
     <ul>
       <li>No server, nothing saved by the site; data goes only between your browser and TUM (TUMonline, nav.tum.de).</li>
-      <li>Enable <b>“Kalender”</b>. <b>“Noten”</b> is optional — only used, if you tick “show my credits”, to add up your ECTS (grades are never shown or stored).</li>
+      <li>Enable <b>“Kalender”</b>. <b>“Noten”</b> is optional — only for your credits and the grade planner; grades are read into this browser’s memory, never stored or sent anywhere else.</li>
       <li>“Remember me” keeps the token in this browser only — don’t tick on shared devices.</li>
       <li>Revoke anytime.</li>
     </ul>
@@ -73,11 +73,13 @@
   <h2 id="dayLabel" class="daylabel"></h2>
   <div id="view" class="view"></div>
   <section id="exams" class="exams" hidden></section>
+  <section id="planner" class="planner" hidden></section>
 </section>
 <div id="errbox" class="errbox" hidden><b>Something went wrong</b><p class="muted">Details (contain no token):</p><pre></pre></div>
 <section id="printout" aria-hidden="true"></section>
 </main>
 <footer class="muted">Unofficial · not affiliated with TUM · Data: TUMonline &amp; <a href="https://nav.tum.de" target="_blank" rel="noopener">NavigaTUM</a> · No server, no tracking · <a href="https://github.com/Darius17TARS/schedule" target="_blank" rel="noopener">Source</a></footer>
-<script src="app.js?v=24"></script>
-<script src="mensa.js?v=24"></script>
+<script src="app.js?v=25"></script>
+<script src="mensa.js?v=25"></script>
+<script src="planner.js?v=25"></script>
 </body></html>
