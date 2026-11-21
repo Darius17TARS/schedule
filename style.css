@@ -290,3 +290,28 @@ footer{color:var(--mu)}
 button.link{background:none;border:0;padding:0;color:var(--ac);text-decoration:underline;font-size:inherit;cursor:pointer}
 @media(max-width:560px){.pstats{grid-template-columns:1fr 1fr}.pstats .pstat:last-child{grid-column:1/-1}.pstat b{font-size:1.4rem}.pex{grid-template-columns:1fr auto;grid-template-areas:"t t" "e g" "s s"}.exams h3 .planbtn{margin-left:0}}
 @media print{.planner{display:none!important}}
+
+/* ===== v26: one calm colour family per event TYPE (blocks, cards, pills, legend, PDF all match) =====
+   VO lecture = blue · UE exercise = green · ZÜ central exercise = teal · TUT tutorial = olive · PR practical = amber · SE seminar = violet · other = neutral */
+:root{--vo-a:#4a73b5;--vo-b:#e5ecf7;--vo-f:#233f6b;--ue-a:#3e8c62;--ue-b:#e2f1e8;--ue-f:#1f5137;--zu-a:#2f8a8c;--zu-b:#dff0ef;--zu-f:#1c5153;--tut-a:#7a9440;--tut-b:#edf2df;--tut-f:#3f4f1c;--pr-a:#c07a2c;--pr-b:#f8ecdc;--pr-f:#6a3f0f;--se-a:#8065b3;--se-b:#ece6f6;--se-f:#43306b;--x-a:#8a8f98;--x-b:#eeeeec;--x-f:#3b3e45}
+:root[data-theme=dark]{--vo-a:#7d9fd8;--vo-b:#1a2335;--vo-f:#c3d3f0;--ue-a:#6fb88f;--ue-b:#16271e;--ue-f:#b4dcc5;--zu-a:#5fb5b5;--zu-b:#142a2a;--zu-f:#ace0de;--tut-a:#a3bd6c;--tut-b:#20261a;--tut-f:#d3e3b0;--pr-a:#d9a060;--pr-b:#2c2216;--pr-f:#ecd0a8;--se-a:#a68fd6;--se-b:#231e33;--se-f:#d4c8f0;--x-a:#8f8f95;--x-b:#1f1f21;--x-f:#d4d3cf}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--vo-a:#7d9fd8;--vo-b:#1a2335;--vo-f:#c3d3f0;--ue-a:#6fb88f;--ue-b:#16271e;--ue-f:#b4dcc5;--zu-a:#5fb5b5;--zu-b:#142a2a;--zu-f:#ace0de;--tut-a:#a3bd6c;--tut-b:#20261a;--tut-f:#d3e3b0;--pr-a:#d9a060;--pr-b:#2c2216;--pr-f:#ecd0a8;--se-a:#a68fd6;--se-b:#231e33;--se-f:#d4c8f0;--x-a:#8f8f95;--x-b:#1f1f21;--x-f:#d4d3cf}}
+[data-type],[data-t]{--ta:var(--x-a);--tb:var(--x-b);--tf:var(--x-f)}
+[data-type=VO],[data-t=VO]{--ta:var(--vo-a);--tb:var(--vo-b);--tf:var(--vo-f)}
+[data-type=UE],[data-t=UE]{--ta:var(--ue-a);--tb:var(--ue-b);--tf:var(--ue-f)}
+[data-type="ZÜ"],[data-t="ZÜ"]{--ta:var(--zu-a);--tb:var(--zu-b);--tf:var(--zu-f)}
+[data-type=TUT],[data-t=TUT]{--ta:var(--tut-a);--tb:var(--tut-b);--tf:var(--tut-f)}
+[data-type=PR],[data-t=PR]{--ta:var(--pr-a);--tb:var(--pr-b);--tf:var(--pr-f)}
+[data-type=SE],[data-t=SE]{--ta:var(--se-a);--tb:var(--se-b);--tf:var(--se-f)}
+.ev[data-type],.card[data-type]{background:var(--tb)!important;border:1px solid color-mix(in srgb,var(--ta) 32%,var(--bd));border-left:3px solid var(--ta);border-style:solid;color:var(--tf)}
+.ev[data-type]:hover{border-color:color-mix(in srgb,var(--ta) 60%,var(--bd));border-left-color:var(--ta)}
+.ev[data-type] .nm,.card[data-type] .nm,.card[data-type] .room{color:var(--tf)}
+.ev[data-type] .loc,.ev[data-type] .t,.ev[data-type] .b,.card[data-type] .t,.card[data-type] .b{color:color-mix(in srgb,var(--tf) 82%,var(--mu))}
+.card[data-type] .loc{color:var(--tf)}
+.tb[data-t]{--tb2:color-mix(in srgb,var(--ta) 24%,var(--tb));background:var(--tb2)!important;color:var(--tf)!important;box-shadow:none}
+@container (max-width:150px){.ev .tb[data-t]{background:var(--ta)!important;box-shadow:0 0 0 1.5px var(--tb)}}
+.legend{gap:6px 16px}.legend .lg{opacity:1;color:var(--fg)}
+.lgsw{display:inline-grid;place-items:center;min-width:30px;height:18px;padding:0 6px 0 8px;font-style:normal;font-size:10px;font-weight:700;letter-spacing:.03em;border-radius:5px;background:var(--tb);color:var(--tf);border:1px solid color-mix(in srgb,var(--ta) 32%,var(--bd));border-left:3px solid var(--ta)}
+.ev.past{opacity:.62}
+/* print fallback (always light) */
+.pev[data-type]{background:#eeeeec;color:#111}.pev[data-type=VO]{background:#e5ecf7;border-color:#4a73b5}.pev[data-type=UE]{background:#e2f1e8;border-color:#3e8c62}.pev[data-type="ZÜ"]{background:#dff0ef;border-color:#2f8a8c}.pev[data-type=TUT]{background:#edf2df;border-color:#7a9440}.pev[data-type=PR]{background:#f8ecdc;border-color:#c07a2c}.pev[data-type=SE]{background:#ece6f6;border-color:#8065b3}

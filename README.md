@@ -1,4 +1,4 @@
-# TUM Schedule
+# TUM tool for Studis
 
 Static page that shows your TUM timetable with rooms on a daily left-to-right timeline.
 

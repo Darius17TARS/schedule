@@ -226,7 +226,7 @@ function buildTrack(list, d, compact) {
 function legendFor(list) {
   const seen = new Map(); for (const e of list) { const t = evType(e.title); if (!seen.has(t.k)) seen.set(t.k, t.name); }
   const lg = el("div", "legend");
-  for (const [k, name] of seen) { const s = el("span", "lg", `${k ? `<i class="tb" data-t="${k}">${k}</i>` : `<i class="sw" data-type="X"></i>`}${esc(name)}`); lg.appendChild(s); }
+  for (const [k, name] of [...seen].sort((a, b) => TORDER.indexOf(a[0]) - TORDER.indexOf(b[0]))) lg.appendChild(el("span", "lg", `<i class="lgsw" data-type="${k || "X"}">${k || "–"}</i>${esc(name)}`));
   if (list.some(e => e.clash)) lg.appendChild(el("span", "lg", `<i class="sw clashsw"></i>Overlap`));
   return lg;
 }
@@ -299,7 +299,7 @@ function setMode(m) { mode = m; $("vDay").classList.toggle("on", m === "day"); $
 
 // --- Semester PDF: ONE A4 landscape page with a typical week + exceptions ---
 function isCancelled(e) { const st = (e.status || "").trim(); if (/^(cancel|cancelled|fa|fg|fv|wa|wg)$/i.test(st)) return true; return /cancel|storn|abgesagt|entf(ä|ae)llt|f(ä|ae)llt aus/i.test(st) || /\b(abgesagt|entfällt|storniert|cancell?ed)\b/i.test(e.title || ""); }
-const APPV = 25;
+const APPV = 26;
 const hm = d => d.getHours() * 60 + d.getMinutes();
 const dShort = d => `${DOW[(d.getDay() + 6) % 7]} ${d.getDate()}.${d.getMonth() + 1}.`;
 function semesterModel() {
@@ -331,9 +331,13 @@ function semesterModel() {
   return { first, last, slots, oneOffs, roomChanges, missing: missing.filter(m => !isNo(m.d)), noLect };
 }
 // --- Vector PDF (jsPDF, vendored) — one A4 landscape page, identical on every browser ---
-const TCOL = { VO: ["#dfe6f3", "#2b4675"], UE: ["#dcede3", "#2c5a41"], "ZÜ": ["#f3e6d1", "#714712"], TUT: ["#f3e0e7", "#78304a"], PR: ["#e7e2f3", "#4b3a7a"], SE: ["#d9ecef", "#265862"] }; // soft pastel pill, dark text (matches the app)
+// One colour family per event TYPE (same values as style.css): [pastel background, dark ink, accent]
+const TCOL = { VO: ["#e5ecf7", "#233f6b", "#4a73b5"], UE: ["#e2f1e8", "#1f5137", "#3e8c62"], "ZÜ": ["#dff0ef", "#1c5153", "#2f8a8c"], TUT: ["#edf2df", "#3f4f1c", "#7a9440"], PR: ["#f8ecdc", "#6a3f0f", "#c07a2c"], SE: ["#ece6f6", "#43306b", "#8065b3"], "": ["#eeeeec", "#3b3e45", "#8a8f98"] };
+const TORDER = ["VO", "UE", "ZÜ", "TUT", "PR", "SE", ""];
+const tcol = k => TCOL[k] || TCOL[""];
+const mixHex = (a, b, t) => { const A = hex2rgb(a), B = hex2rgb(b); return A.map((v, i) => Math.round(v * t + B[i] * (1 - t))); };
 function pageNums(doc, PW, PH) { const n = doc.getNumberOfPages(); if (n < 2) return; for (let i = 1; i <= n; i++) { doc.setPage(i); doc.setFont("helvetica", "normal"); doc.setFontSize(7); doc.setTextColor(120); doc.text(`Page ${i}/${n}`, PW / 2, PH - 4.5, { align: "center" }); } }
-function tPill(doc, k, x, y, w, h, r) { const [b, f] = TCOL[k]; doc.setFillColor(...hex2rgb(b)); doc.setDrawColor(...hex2rgb(f)); doc.setLineWidth(0.1); doc.roundedRect(x, y, w, h, r, r, "FD"); doc.setTextColor(...hex2rgb(f)); }
+function tPill(doc, k, x, y, w, h, r) { const [b, f, a] = tcol(k); doc.setFillColor(...mixHex(a, b, 0.24)); doc.roundedRect(x, y, w, h, r, r, "F"); doc.setTextColor(...hex2rgb(f)); }
 function hsl2rgb(h, s, l) { s /= 100; l /= 100; const k = n => (n + h / 30) % 12, a = s * Math.min(l, 1 - l), f = n => Math.round(255 * (l - a * Math.max(-1, Math.min(k(n) - 3, 9 - k(n), 1)))); return [f(0), f(8), f(4)]; }
 function hex2rgb(x) { return [1, 3, 5].map(i => parseInt(x.slice(i, i + 2), 16)); }
 const pdfTxt = s => String(s || "").normalize("NFC").replace(/[\u2018\u2019]/g, "'").replace(/[\u201C\u201D\u201E]/g, '"').replace(/[^\x20-\x7E\u00A0-\u00FF\u2013\u2014\u2022\u2026\u20AC]/g, c => c.normalize("NFKD").replace(/[^\x20-\x7E]/g, "") || "?");
@@ -345,9 +349,9 @@ function buildPdf(J, M, loc, items) {
   const doc = new J.jsPDF({ orientation: "landscape", unit: "mm", format: "a4", compress: true });
   const PW = 297, PH = 210, m = 10, X0 = m, X1 = PW - m;
   const D = o => dlabel(o, { day: "numeric", month: "short", year: "numeric" });
-  doc.setProperties({ title: "Semester timetable", creator: "TUM Schedule" });
+  doc.setProperties({ title: "Semester timetable", creator: "TUM tool for Studis" });
   doc.setFont("helvetica", "bold"); doc.setFontSize(15); doc.setTextColor(17); doc.text("Semester timetable", X0, m + 5);
-  doc.setFont("helvetica", "normal"); doc.setFontSize(8.5); doc.setTextColor(90); doc.text(pdfTxt(`${D(M.first)} – ${D(M.last)} · typical week · TUM Schedule`), X1, m + 5, { align: "right" });
+  doc.setFont("helvetica", "normal"); doc.setFontSize(8.5); doc.setTextColor(90); doc.text(pdfTxt(`${D(M.first)} – ${D(M.last)} · typical week · TUM tool for Studis`), X1, m + 5, { align: "right" });
   // exceptions: 3 columns flowing top-to-bottom, lines wrap inside the column (no truncation)
   const gTop = m + 9, legH = 7, minGrid = 105;
   let ex = null, more = false;
@@ -382,11 +386,11 @@ function buildPdf(J, M, loc, items) {
     const { lanes } = layout(fake), lw = cw / lanes;
     for (const f of fake) {
       const s = f.s, t = evType(s.e.title), hh = hue(s.e.title), bx = x + f.lane * lw + 0.4, bw = lw - 0.8, by = Y(hm(s.e.start)) + 0.3, bh = Math.max(Y(hm(s.e.end)) - by - 0.3, 3);
-      doc.setFillColor(...hsl2rgb(hh, t.k === "VO" ? 48 : 44, t.k === "VO" ? 84 : 91)); doc.setDrawColor(...hsl2rgb(hh, 38, 62)); doc.setLineWidth(0.2);
-      doc.roundedRect(bx, by, bw, bh, 0.8, 0.8, "FD"); doc.setFillColor(...hsl2rgb(hh, 38, 50)); doc.rect(bx, by, 1.1, bh, "F");
+      const [cb, cf, ca] = tcol(t.k); doc.setFillColor(...hex2rgb(cb)); doc.setDrawColor(...mixHex(ca, cb, 0.45)); doc.setLineWidth(0.2);
+      doc.roundedRect(bx, by, bw, bh, 0.8, 0.8, "FD"); doc.setFillColor(...hex2rgb(ca)); doc.rect(bx, by, 1.1, bh, "F");
       const tx = bx + 1.9, tw = bw - 2.6; let pillW = 0;
-      if (t.k) { doc.setFont("helvetica", "bold"); doc.setFontSize(5.2); pillW = doc.getTextWidth(pdfTxt(t.k)) + 1.6; if (bw > 14) { tPill(doc, t.k, bx + bw - pillW - 0.7, by + 0.7, pillW, 2.6, 0.6); doc.text(pdfTxt(t.k), bx + bw - pillW / 2 - 0.7, by + 2.5, { align: "center" }); } else { doc.setFillColor(...hex2rgb(TCOL[t.k][1])); doc.circle(bx + bw - 1.3, by + 1.3, 0.7, "F"); pillW = 1.6; } }
-      const fs = bw < 22 ? 5.6 : 6.6, lh = fs * 0.4; doc.setFont("helvetica", "bold"); doc.setFontSize(fs); doc.setTextColor(17);
+      if (t.k) { doc.setFont("helvetica", "bold"); doc.setFontSize(5.2); pillW = doc.getTextWidth(pdfTxt(t.k)) + 1.6; if (bw > 14) { tPill(doc, t.k, bx + bw - pillW - 0.7, by + 0.7, pillW, 2.6, 0.6); doc.text(pdfTxt(t.k), bx + bw - pillW / 2 - 0.7, by + 2.5, { align: "center" }); } else { doc.setFillColor(...hex2rgb(ca)); doc.circle(bx + bw - 1.3, by + 1.3, 0.7, "F"); pillW = 1.6; } }
+      const fs = bw < 22 ? 5.6 : 6.6, lh = fs * 0.4; doc.setFont("helvetica", "bold"); doc.setFontSize(fs); doc.setTextColor(...hex2rgb(cf));
       const nm = bw < 30 ? shortName(s.e.title) : baseName(s.e.title);
       const cad = s.step === 1 ? "weekly" : s.step === 2 ? "biweekly" : `every ${s.step} wks`;
       const sub = [loc(s.room), `${fmt(s.e.start)}–${fmt(s.e.end)} · ${cad} · ${s.from.getDate()}.${s.from.getMonth() + 1}.–${s.to.getDate()}.${s.to.getMonth() + 1}.`];
@@ -394,16 +398,17 @@ function buildPdf(J, M, loc, items) {
       const first = doc.splitTextToSize(pdfTxt(nm), tw - pillW - 0.6)[0] || ""; const rest = pdfTxt(nm).slice(first.length).trim();
       const names = [first]; if (rest && nl > 1) names.push(...wrapLines(doc, rest, tw, nl - 1)); else if (rest) names[0] = fitLine(doc, nm, tw - pillW - 0.6);
       let y = by + 0.6 + lh; for (const l of names) { doc.text(l, tx, y); y += lh; }
-      doc.setFont("helvetica", "normal"); doc.setFontSize(fs - 0.8); doc.setTextColor(50);
+      doc.setFont("helvetica", "normal"); doc.setFontSize(fs - 0.8); doc.setTextColor(...mixHex(cf, "#000000", 0.75));
       for (const l of sub) { if (y > by + bh - 0.4) break; doc.text(fitLine(doc, l, tw), tx, y); y += lh * 0.92; }
     }
   });
   doc.setDrawColor(205); doc.setLineWidth(0.25); doc.rect(X0, gTop, X1 - X0, gBot - gTop);
   // legend
   let lx = X0, ly = gBot + 4.3; const seen = new Map(); for (const s of M.slots) { const t = evType(s.e.title); if (!seen.has(t.k)) seen.set(t.k, t.name); }
-  for (const [k, name] of seen) {
-    doc.setFont("helvetica", "bold"); doc.setFontSize(6); const pw = k ? doc.getTextWidth(pdfTxt(k)) + 2 : 5;
-    if (k) { tPill(doc, k, lx, ly - 2.4, pw, 3.2, 0.7); doc.text(pdfTxt(k), lx + 1, ly); } else { doc.setDrawColor(120); doc.rect(lx, ly - 2.2, pw, 2.8); }
+  for (const [k, name] of [...seen].sort((a, b) => TORDER.indexOf(a[0]) - TORDER.indexOf(b[0]))) {
+    const [cb, cf, ca] = tcol(k); doc.setFont("helvetica", "bold"); doc.setFontSize(6); const lab = pdfTxt(k || "–"), pw = doc.getTextWidth(lab) + 3.2;
+    doc.setFillColor(...hex2rgb(cb)); doc.setDrawColor(...mixHex(ca, cb, 0.45)); doc.setLineWidth(0.15); doc.roundedRect(lx, ly - 2.5, pw, 3.4, 0.5, 0.5, "FD"); doc.setFillColor(...hex2rgb(ca)); doc.rect(lx, ly - 2.5, 0.8, 3.4, "F");
+    doc.setTextColor(...hex2rgb(cf)); doc.text(lab, lx + 1.7, ly);
     doc.setFont("helvetica", "normal"); doc.setFontSize(7); doc.setTextColor(60); doc.text(pdfTxt(name), lx + pw + 1.2, ly); lx += pw + doc.getTextWidth(pdfTxt(name)) + 6;
   }
   // exceptions in 3 columns
@@ -425,7 +430,7 @@ function buildPdf(J, M, loc, items) {
       if (used + it.lines.length > H) { c++; used = 0; }
       if (c >= 3) { doc.addPage("a4", "landscape"); c = 0; used = 0;
         doc.setFont("helvetica", "bold"); doc.setFontSize(13); doc.setTextColor(17); doc.text("Exceptions & extra dates", X0, m + 5);
-        doc.setFont("helvetica", "normal"); doc.setFontSize(8.5); doc.setTextColor(90); doc.text(pdfTxt(`Semester timetable · ${D(M.first)} – ${D(M.last)} · TUM Schedule`), X1, m + 5, { align: "right" });
+        doc.setFont("helvetica", "normal"); doc.setFontSize(8.5); doc.setTextColor(90); doc.text(pdfTxt(`Semester timetable · ${D(M.first)} – ${D(M.last)} · TUM tool for Studis`), X1, m + 5, { align: "right" });
         doc.setDrawColor(215); doc.setLineWidth(0.25); doc.line(X0, m + 8, X1, m + 8); doc.setFontSize(fs); }
       const x = X0 + c * (colW + gap); let y = top + (used + 0.8) * lh;
       doc.setFont("helvetica", "bold"); doc.setTextColor(20); doc.text(it.b, x, y); doc.setFont("helvetica", "normal"); doc.setTextColor(55);
@@ -550,11 +555,11 @@ function examSummary(X) {
 function buildExamPdf(J, X, loc) {
   const doc = new J.jsPDF({ orientation: "portrait", unit: "mm", format: "a4", compress: true });
   const PW = 210, PH = 297, m = 14, X0 = m, X1 = PW - m, W = X1 - X0, S = examSummary(X);
-  doc.setProperties({ title: "Exam calendar", creator: "TUM Schedule" });
+  doc.setProperties({ title: "Exam calendar", creator: "TUM tool for Studis" });
   doc.setFont("helvetica", "bold"); doc.setFontSize(18); doc.setTextColor(17); doc.text("Exam calendar", X0, m + 6);
   const DL = d => dlabel(d, { weekday: "short", day: "numeric", month: "short", year: "numeric" });
   doc.setFont("helvetica", "normal"); doc.setFontSize(8.5); doc.setTextColor(110);
-  doc.text(pdfTxt(X.length ? `${DL(X[0].e.start)} – ${DL(X[X.length - 1].e.start)} · TUM Schedule` : "TUM Schedule"), X1, m + 6, { align: "right" });
+  doc.text(pdfTxt(X.length ? `${DL(X[0].e.start)} – ${DL(X[X.length - 1].e.start)} · TUM tool for Studis` : "TUM tool for Studis"), X1, m + 6, { align: "right" });
   if (!X.length) { doc.setFontSize(10); doc.setTextColor(60); doc.text(doc.splitTextToSize(pdfTxt(EXAM_NONE), W), X0, m + 20); return doc; }
   // summary chips
   let cx = X0, cy = m + 12;
@@ -578,7 +583,7 @@ function buildExamPdf(J, X, loc) {
   const fitH = (PH - m - (hasP ? 12 : 6) - top - (n - 1) * gapH) / n, paged = fitH < 11; // too many for one page -> continue on extra pages
   const rowH = paged ? 14 : Math.min(22, fitH), big = rowH >= 16, yMax = PH - m - 4;
   const contHead = () => { doc.addPage("a4", "portrait"); doc.setFont("helvetica", "bold"); doc.setFontSize(12); doc.setTextColor(17); doc.text("Exam calendar (continued)", X0, m + 5);
-    doc.setFont("helvetica", "normal"); doc.setFontSize(8.5); doc.setTextColor(110); doc.text(pdfTxt(`${DL(X[0].e.start)} – ${DL(X[X.length - 1].e.start)} · TUM Schedule`), X1, m + 5, { align: "right" });
+    doc.setFont("helvetica", "normal"); doc.setFontSize(8.5); doc.setTextColor(110); doc.text(pdfTxt(`${DL(X[0].e.start)} – ${DL(X[X.length - 1].e.start)} · TUM tool for Studis`), X1, m + 5, { align: "right" });
     doc.setDrawColor(215); doc.setLineWidth(0.25); doc.line(X0, m + 8, X1, m + 8); return m + 12; };
   let y = top;
   X.forEach((x, i) => {
@@ -657,7 +662,7 @@ async function exportPdf() {
   const out = $("printout"); out.innerHTML = "";
   const pg = el("div", "ppage"), fit = el("div", "pfit"); pg.appendChild(fit);
   const D = o => dlabel(o, { day: "numeric", month: "short", year: "numeric" });
-  fit.appendChild(el("div", "ph", `<h1>Semester timetable</h1><span>${esc(D(M.first))} – ${esc(D(M.last))} · typical week · TUM Schedule</span>`));
+  fit.appendChild(el("div", "ph", `<h1>Semester timetable</h1><span>${esc(D(M.first))} – ${esc(D(M.last))} · typical week · TUM tool for Studis</span>`));
   const cols = [1, 2, 3, 4, 5]; if (M.slots.some(s => s.e.start.getDay() === 6)) cols.push(6); if (M.slots.some(s => s.e.start.getDay() === 0)) cols.push(0);
   let h0 = Math.min(...M.slots.map(s => s.e.start.getHours()), 10), h1 = Math.max(...M.slots.map(s => Math.ceil(hm(s.e.end) / 60)), 16);
   h0 = Math.max(MIN_H, h0); h1 = Math.min(MAX_H, h1);
