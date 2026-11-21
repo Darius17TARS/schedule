@@ -21,7 +21,14 @@ let events = [], cancelled = [], day = startOfDay(new Date()), pollTimer = null;
 const roomCache = new Map();
 const FOPT = { referrerPolicy: "no-referrer", credentials: "omit" };
 
-function semesterMonths() { const n = new Date(), m = n.getMonth(); const ws = m >= 9 || m < 3; const startM = ws ? (m >= 9 ? m - 9 : m + 3) : m - 3; return { pMonateVor: startM + 1, pMonateNach: 6 - startM }; }
+function semesterMonths() {
+  const n = new Date(), m = n.getMonth();
+  const winter = m >= 9 || m < 4; // Oct–Mar, including the winter exam period
+  const start = winter ? (m >= 9 ? 9 : -3) : 3;
+  const vor = ((m - start) % 12 + 12) % 12;
+  // Always look 8 months ahead so Feb–Apr exams are not cut off later in the semester.
+  return { pMonateVor: vor + 1, pMonateNach: 8 };
+}
 function startOfDay(d) { const x = new Date(d); x.setHours(0, 0, 0, 0); return x; }
 function show(id) { for (const s of ["login", "activate", "cal"]) $(s).hidden = s !== id; $("logout").hidden = id === "login"; }
 function esc(s) { return String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
@@ -76,10 +83,19 @@ async function loadCalendar(tok) {
     const pick = (el, ...names) => { for (const n of names) { const x = [...el.children].find(c => c.localName.toLowerCase() === n); if (x && x.textContent.trim()) return x.textContent.trim(); } return ""; };
     let nodes = [...doc.getElementsByTagName("event")];
     if (!nodes.length) nodes = [...doc.getElementsByTagName("row")];
-    events = nodes.map(el => ({
-      title: pick(el, "title", "titel", "summary", "description"), start: parseTumDate(pick(el, "dtstart", "start", "beginn", "von")), end: parseTumDate(pick(el, "dtend", "end", "ende", "bis")),
-      location: pick(el, "location", "ort", "raum", "room"), status: pick(el, "status"), url: pick(el, "url")
-    })).filter(e => e.start && e.end);
+    events = nodes.map(el => {
+      const start = parseTumDate(pick(el, "dtstart", "start", "beginn", "von"));
+      let end = parseTumDate(pick(el, "dtend", "end", "ende", "bis"));
+      if (start && !end) end = new Date(+start + 2 * 36e5);
+      const description = pick(el, "description", "beschrieb", "anmerkung", "bemerkung");
+      return {
+        title: pick(el, "title", "titel", "summary") || description,
+        description,
+        typ: pick(el, "typ", "type", "terminart", "eventtype", "art", "termintyp"),
+        start, end,
+        location: pick(el, "location", "ort", "raum", "room"), status: pick(el, "status"), url: pick(el, "url")
+      };
+    }).filter(e => e.start && e.end);
     cancelled = events.filter(isCancelled); events = events.filter(e => !isCancelled(e));
     if (!events.length && nodes.length) showError("Calendar", new Error(`Received ${nodes.length} entries but could not read their dates. First entry: ` + new XMLSerializer().serializeToString(nodes[0]).slice(0, 600)));
     if (!nodes.length) showError("Calendar", new Error("No events found in TUMonline response. Start of response: " + new XMLSerializer().serializeToString(doc).slice(0, 600)));
@@ -103,7 +119,9 @@ function parseICS(text) {
     else if (l === "END:VEVENT") { if (cur.start && cur.end) out.push(cur); cur = null; }
     else if (cur) { const i = l.indexOf(":"); if (i < 0) continue; const k = l.slice(0, i).split(";")[0], v = l.slice(i + 1);
       if (k === "SUMMARY") cur.title = unesc(v); else if (k === "DTSTART") cur.start = dt(v); else if (k === "DTEND") cur.end = dt(v);
-      else if (k === "LOCATION") cur.location = unesc(v); else if (k === "STATUS") cur.status = v; else if (k === "URL") cur.url = v; }
+      else if (k === "LOCATION") cur.location = unesc(v); else if (k === "DESCRIPTION") cur.description = unesc(v);
+      else if (k === "CATEGORIES") cur.typ = unesc(v); else if (k === "STATUS") cur.status = v; else if (k === "URL") cur.url = v;
+      if (cur.start && !cur.end && k === "DTSTART") cur.end = new Date(+cur.start + 2 * 36e5); }
   }
   return out;
 }
@@ -280,8 +298,8 @@ function render(dx = 0) {
 function setMode(m) { mode = m; $("vDay").classList.toggle("on", m === "day"); $("vWeek").classList.toggle("on", m === "week"); render(); }
 
 // --- Semester PDF: ONE A4 landscape page with a typical week + exceptions ---
-function isCancelled(e) { return /cancel|storn|abgesagt|entf(ä|ae)llt|f(ä|ae)llt aus/i.test((e.status || "").trim()) || /\b(abgesagt|entfällt|storniert|cancell?ed)\b/i.test(e.title || ""); }
-const APPV = 19;
+function isCancelled(e) { const st = (e.status || "").trim(); if (/^(cancel|cancelled|fa|fg|fv|wa|wg)$/i.test(st)) return true; return /cancel|storn|abgesagt|entf(ä|ae)llt|f(ä|ae)llt aus/i.test(st) || /\b(abgesagt|entfällt|storniert|cancell?ed)\b/i.test(e.title || ""); }
+const APPV = 22;
 const hm = d => d.getHours() * 60 + d.getMinutes();
 const dShort = d => `${DOW[(d.getDay() + 6) % 7]} ${d.getDate()}.${d.getMonth() + 1}.`;
 function semesterModel() {
@@ -413,12 +431,19 @@ async function deliverPdf(doc, name = "semester-timetable.pdf", ttl = "Semester 
 // --- Exams: read from the personal calendar (Kalender permission). TUMonline has no public "registered exams" webservice. ---
 const EXAM_RE = /(^|[\s:(\[–-])(wiederholungs|end|haupt|modul|semestral)?(pr(ü|ue)fung|klausur)|\bexam(ination)?\b|\bendterm\b|\bmidterm\b|\bretake\b|wiederholungs(prüfung|klausur)/i;
 const EXAM_NOT = /einsicht|anmeldung|vorbereitung|repetitorium|review|prep|probe|mock|exkursion/i;
-function isExam(e) { const s = `${e.title} ${e.status || ""}`; return EXAM_RE.test(s) && !EXAM_NOT.test(s); } // "PR" alone = Praktikum, never an exam
+const EXAM_TYP = /^(pt|pr)$/i; // CAMPUSonline: Pt = date of examination, Pr = examination (planned). "PR" in a course title is Praktikum.
+function isExam(e) {
+  const s = `${e.title || ""} ${e.description || ""} ${e.status || ""} ${e.typ || ""}`;
+  if (EXAM_NOT.test(s)) return false;
+  if (EXAM_TYP.test((e.typ || "").trim())) return true;
+  return EXAM_RE.test(s);
+}
 function examCourse(t) { return (t || "").replace(/\((schriftlich|mündlich|written|oral)[^)]*\)/gi, "").replace(/\b(schriftliche|mündliche|written|oral)\b/gi, "").replace(/\b(wiederholungs)?(pr(ü|ue)fung|klausur)(stermin)?\b|\b(final |re-?)?exam(ination)?\b|\b(endterm|midterm|retake)\b/gi, "").replace(/\(\s*\)/g, "").replace(/^[\s:–-]+|[\s:–-]+$/g, "").replace(/\s{2,}/g, " ").trim() || t; }
 function examReg() { return events.filter(isExam).sort((a, b) => a.start - b.start).map(e => ({ e, course: examCourse(e.title), h: hue(examCourse(e.title)), min: Math.round((e.end - e.start) / 6e4) })); }
 // --- Planned exams: public TUMonline exam list (no personal data), baked into data/ and matched locally by course name or module number ---
 let PLAN = null, planP = null;
-function loadPlan() { loadEcts(); return planP || (planP = fetch("data/exams-ws2026.json?v=" + APPV, { credentials: "omit" }).then(r => r.ok ? r.json() : null).catch(() => null).then(j => { PLAN = j; if (events.length) renderExams(); return j; })); }
+function dataUrl(path) { return path + "?v=" + APPV + "&d=" + Math.floor(Date.now() / 864e5); }
+function loadPlan() { loadEcts(); return planP || (planP = fetch(dataUrl("data/exams-ws2026.json"), { credentials: "omit", cache: "no-cache" }).then(r => r.ok ? r.json() : null).catch(() => null).then(j => { PLAN = j; if (events.length) renderExams(); return j; })); }
 const normE = t => examCourse(t || "").replace(/\s+[-–:]\s+(klausur|exam|prüfung)\b.*$/i, "").toLowerCase().normalize("NFC").replace(/[^\p{L}\p{N}]+/gu, " ").trim();
 const normC = t => examCourse(baseName(t || "")).replace(/\s+[-–:]\s+(klausur|exam|prüfung)\b.*$/i, "").toLowerCase().normalize("NFC").replace(/[^\p{L}\p{N}]+/gu, " ").trim();
 const MODNR = /\b([A-Z]{2,4}\d{3,6}(?:-\d+)?)\b/;
@@ -442,7 +467,7 @@ function plannedExams(reg) {
 }
 // --- ECTS: public module-handbook credits baked into data/ects.json (code -> ECTS, no personal data) ---
 let ECTS = null, ectsP = null;
-function loadEcts() { return ectsP || (ectsP = fetch("data/ects.json?v=" + APPV, { credentials: "omit" }).then(r => r.ok ? r.json() : null).catch(() => null).then(j => { ECTS = j; if (events.length) renderExams(); return j; })); }
+function loadEcts() { return ectsP || (ectsP = fetch(dataUrl("data/ects.json"), { credentials: "omit", cache: "no-cache" }).then(r => r.ok ? r.json() : null).catch(() => null).then(j => { ECTS = j; if (events.length) renderExams(); return j; })); }
 const modBase = c => String(c || "").trim().toUpperCase().replace(/-\d+$/, "");
 const ectsOf = c => { const m = ECTS && ECTS.m; if (!m || !c) return null; for (const k of String(c).split(/\s*\/\s*/)) { const v = m[modBase(k)]; if (v) return v; } return null; };
 function examCode(x) {
