@@ -299,7 +299,7 @@ function setMode(m) { mode = m; $("vDay").classList.toggle("on", m === "day"); $
 
 // --- Semester PDF: ONE A4 landscape page with a typical week + exceptions ---
 function isCancelled(e) { const st = (e.status || "").trim(); if (/^(cancel|cancelled|fa|fg|fv|wa|wg)$/i.test(st)) return true; return /cancel|storn|abgesagt|entf(ä|ae)llt|f(ä|ae)llt aus/i.test(st) || /\b(abgesagt|entfällt|storniert|cancell?ed)\b/i.test(e.title || ""); }
-const APPV = 22;
+const APPV = 23;
 const hm = d => d.getHours() * 60 + d.getMinutes();
 const dShort = d => `${DOW[(d.getDay() + 6) % 7]} ${d.getDate()}.${d.getMonth() + 1}.`;
 function semesterModel() {
@@ -438,8 +438,27 @@ function isExam(e) {
   if (EXAM_TYP.test((e.typ || "").trim())) return true;
   return EXAM_RE.test(s);
 }
-function examCourse(t) { return (t || "").replace(/\((schriftlich|mündlich|written|oral)[^)]*\)/gi, "").replace(/\b(schriftliche|mündliche|written|oral)\b/gi, "").replace(/\b(wiederholungs)?(pr(ü|ue)fung|klausur)(stermin)?\b|\b(final |re-?)?exam(ination)?\b|\b(endterm|midterm|retake)\b/gi, "").replace(/\(\s*\)/g, "").replace(/^[\s:–-]+|[\s:–-]+$/g, "").replace(/\s{2,}/g, " ").trim() || t; }
-function examReg() { return events.filter(isExam).sort((a, b) => a.start - b.start).map(e => ({ e, course: examCourse(e.title), h: hue(examCourse(e.title)), min: Math.round((e.end - e.start) / 6e4) })); }
+// TUMonline often suffixes exam titles with the attempt type, e.g. "Höhere Mathematik 1 für MW/CIW FA" (FA = first attempt, not cancelled).
+function stripAttempt(t) { return (t || "").replace(/\s*[–-]?\s*\b(Erstversuch|Zweitversuch|Drittversuch|Wiederholungsversuch|FA|SA|WA|AA)\s*$/i, "").trim(); }
+function examCourse(t) {
+  t = stripAttempt(t);
+  return (t || "").replace(/\((schriftlich|mündlich|written|oral)[^)]*\)/gi, "").replace(/\b(schriftliche|mündliche|written|oral)\b/gi, "").replace(/\b(wiederholungs)?(pr(ü|ue)fung|klausur)(stermin)?\b|\b(final |re-?)?exam(ination)?\b|\b(endterm|midterm|retake)\b/gi, "").replace(/\(\s*\)/g, "").replace(/^[\s:–-]+|[\s:–-]+$/g, "").replace(/\s{2,}/g, " ").trim() || t;
+}
+function examReg() {
+  const today = startOfDay(new Date());
+  const raw = events.filter(e => isExam(e) && e.start >= today).sort((a, b) => a.start - b.start || (a.location || "").localeCompare(b.location || ""));
+  const groups = new Map();
+  for (const e of raw) {
+    const k = [normC(e.title), startOfDay(e.start).getTime(), e.start.getHours(), e.start.getMinutes()].join("|");
+    (groups.get(k) || groups.set(k, []).get(k)).push(e);
+  }
+  return [...groups.values()].map(list => {
+    const rooms = [...new Set(list.map(x => (x.location || "").trim()).filter(Boolean))];
+    const e = { ...list[0], location: rooms.join(" · ") };
+    const course = examCourse(e.title);
+    return { e, course, h: hue(course), min: Math.round((e.end - e.start) / 6e4) };
+  });
+}
 // --- Planned exams: public TUMonline exam list (no personal data), baked into data/ and matched locally by course name or module number ---
 let PLAN = null, planP = null;
 function dataUrl(path) { return path + "?v=" + APPV + "&d=" + Math.floor(Date.now() / 864e5); }
@@ -451,7 +470,9 @@ function plannedExams(reg) {
   if (!PLAN || !PLAN.exams) return [];
   const today = startOfDay(new Date()), byName = new Map(), byCode = new Map();
   for (const x of PLAN.exams) { const d = new Date(x.d + "T" + x.s + ":00"); if (d < today) continue; const k = normE(x.t); (byName.get(k) || byName.set(k, []).get(k)).push(x); (byCode.get(x.c) || byCode.set(x.c, []).get(x.c)).push(x); }
-  const regN = new Set(reg.map(r => normC(r.course))), regT = reg.map(r => r.e.title).join(" "), seen = new Set(), out = [];
+  const regN = new Set(reg.flatMap(r => [normC(r.course), normC(r.e.title)].filter(Boolean)));
+  const regT = reg.map(r => r.e.title).join(" "), seen = new Set(), out = [];
+  const sameReg = (k, day) => reg.some(r => (normC(r.course) === k || normC(r.e.title) === k) && startOfDay(r.e.start).getTime() === day);
   const courses = new Map(); for (const e of events) if (!isExam(e) && !EXAM_NOT.test(e.title)) { const k = normC(e.title); if (k && !courses.has(k)) courses.set(k, e.title); }
   for (const [k, title] of courses) {
     const code = (title.match(MODNR) || [])[1], k2 = normC(title.split(/\s+[–-]\s+/)[0]); let c = code && byCode.get(code);
@@ -459,6 +480,8 @@ function plannedExams(reg) {
     if (!c || !c.length || regN.has(k) || regN.has(k2) || (code && regT.includes(code))) continue;
     c = [...c].sort((a, b) => (a.d + a.s).localeCompare(b.d + b.s)); const f = c[0], key = f.t + f.d;
     if (seen.has(key)) continue; seen.add(key);
+    const fDay = startOfDay(new Date(f.d + "T" + f.s + ":00")).getTime();
+    if (sameReg(k, fDay) || sameReg(k2, fDay)) continue;
     const alt = c.filter(x => x.d === f.d && x.s === f.s), rooms = [...new Set(alt.map(x => x.r).filter(Boolean))];
     const start = new Date(f.d + "T" + f.s + ":00"), end = f.e ? new Date(f.d + "T" + f.e + ":00") : new Date(+start + 9e5 * 6), course = baseName(title).split(/\s+[–-]\s+/)[0];
     out.push({ planned: true, code: alt.map(x => x.c).join(" / "), e: { title: course, start, end, location: rooms.length === 1 ? rooms[0] : rooms.length ? "Room depends on degree programme: " + rooms.join(" | ") : "Room not published yet" }, course, h: hue(course), min: Math.round((end - start) / 6e4), noRoom: !rooms.length });
@@ -494,7 +517,7 @@ async function loadCredits() {
   } catch (e) { CRED = { err: /berechtigung|permission|rechte|not allowed|keine/i.test(e.message) ? "Your token doesn’t have the “Noten” permission. Enable it in the TUMonline token settings, then tick again." : "Couldn’t load credits: " + e.message }; }
   credBusy = false; renderExams();
 }
-function examList() { const R = examReg(); return [...R, ...plannedExams(R)].sort((a, b) => a.e.start - b.e.start); }
+function examList() { const today = startOfDay(new Date()), R = examReg(); return [...R, ...plannedExams(R)].filter(x => x.e.start >= today).sort((a, b) => a.e.start - b.e.start); }
 const planNote = () => PLAN ? `Planned = not registered yet. Date/room from the public TUMonline exam list (${PLAN.source.replace(/^https?:\/\//, "").replace(/\?.*$/, "")}), as of ${PLAN.updated}; matched to your courses by name/module number on this device. Binding info only in TUMonline after you register (WiSe 26/27 registration 16.11.2026–15.01.2027).` : "";
 const dayDiff = (a, b) => Math.round((startOfDay(b) - startOfDay(a)) / 864e5);
 function studyDays(a, b) { // every calendar day without an exam between the two exam days (weekends included)
