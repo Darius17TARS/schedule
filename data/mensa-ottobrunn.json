@@ -2,90 +2,8 @@
  "canteen": "Mensa Ottobrunn",
  "address": "Willy-Messerschmitt-Str. 5, Taufkirchen",
  "source": "https://www.studierendenwerk-muenchen-oberbayern.de/mensa/speiseplan/speiseplan_433_-de.html",
- "fetched": "2026-11-20T12:59+00:00",
+ "fetched": "2026-11-23T14:46+00:00",
  "days": [
-  {
-   "date": "2026-11-20",
-   "dishes": [
-    {
-     "type": "Studitopf",
-     "name": "Couscous mit Tomaten und Paprika",
-     "diet": "vegan",
-     "allergens": [
-      "Gl",
-      "GlW"
-     ],
-     "additives": []
-    },
-    {
-     "type": "Fleisch",
-     "name": "Schaschlikspieß vom Hähnchen (1 Stück) mit Honig-Currysauce",
-     "diet": "meat",
-     "allergens": [
-      "Sf",
-      "Sl"
-     ],
-     "additives": [
-      "11"
-     ]
-    },
-    {
-     "type": "Fisch",
-     "name": "Paella (mit Meeresfrüchten und Hähnchenfleisch)",
-     "diet": "meat",
-     "allergens": [
-      "Kr",
-      "Sw",
-      "Wt"
-     ],
-     "additives": [
-      "1",
-      "5",
-      "6"
-     ]
-    },
-    {
-     "type": "Süßspeise",
-     "name": "Kaiserschmarrn mit Apfelmus",
-     "diet": "vegetarian",
-     "allergens": [
-      "Ei",
-      "Gl",
-      "GlW",
-      "Mi"
-     ],
-     "additives": [
-      "3"
-     ]
-    },
-    {
-     "type": "",
-     "name": "Gefüllte Paprikaschotenhälfte mit Tomatensauce",
-     "diet": "vegetarian",
-     "allergens": [
-      "Gl",
-      "GlD",
-      "Mi",
-      "Sf",
-      "Sl"
-     ],
-     "additives": [
-      "2",
-      "11",
-      "Kn"
-     ]
-    },
-    {
-     "type": "Dessert (Glas)",
-     "name": "Pudding Vanillegeschmack mit Beerenragout",
-     "diet": "vegetarian",
-     "allergens": [
-      "Mi"
-     ],
-     "additives": []
-    }
-   ]
-  },
   {
    "date": "2026-11-23",
    "dishes": [
@@ -122,10 +40,27 @@
     },
     {
      "type": "Vegetarisch/fleischlos",
-     "name": "Veganes Pastinaken-Kartoffel-Gulasch",
+     "name": "Gemüsecurry aus Blumenkohl und Broccoli",
      "diet": "vegan",
-     "allergens": [],
+     "allergens": [
+      "Sf",
+      "Sl"
+     ],
      "additives": []
+    },
+    {
+     "type": "",
+     "name": "Kaiserschmarrn mit Apfelmus",
+     "diet": "vegetarian",
+     "allergens": [
+      "Ei",
+      "Gl",
+      "GlW",
+      "Mi"
+     ],
+     "additives": [
+      "3"
+     ]
     },
     {
      "type": "Fleisch",
@@ -135,7 +70,8 @@
       "Ei",
       "Gl",
       "GlW",
-      "Mi"
+      "Mi",
+      "Sf"
      ],
      "additives": [
       "Kn"
@@ -143,14 +79,16 @@
     },
     {
      "type": "Dessert (Glas)",
-     "name": "Grießbrei mit Zimtzucker",
+     "name": "Lebkuchen Mousse",
      "diet": "vegetarian",
      "allergens": [
       "Gl",
       "GlW",
       "Mi"
      ],
-     "additives": []
+     "additives": [
+      "14"
+     ]
     }
    ]
   },
@@ -245,12 +183,12 @@
       "Sw"
      ],
      "additives": [
+      "Kn",
       "1",
       "2",
       "5",
       "9",
-      "99",
-      "Kn"
+      "99"
      ]
     },
     {
@@ -642,6 +580,50 @@
      "diet": "vegan",
      "allergens": [
       "Se"
+     ],
+     "additives": []
+    },
+    {
+     "type": "Dessert (Glas)",
+     "name": "Tagesdessert",
+     "diet": "meat",
+     "allergens": [],
+     "additives": []
+    }
+   ]
+  },
+  {
+   "date": "2026-12-04",
+   "dishes": [
+    {
+     "type": "Studitopf",
+     "name": "Grüner Erbseneintopf",
+     "diet": "vegan",
+     "allergens": [
+      "Sl"
+     ],
+     "additives": []
+    },
+    {
+     "type": "Fisch",
+     "name": "Zanderfilet (1 Stück) nach Müllerin Art mit Zitronensauce",
+     "diet": "meat",
+     "allergens": [
+      "Fi",
+      "Gl",
+      "GlW",
+      "Mi"
+     ],
+     "additives": []
+    },
+    {
+     "type": "Süßspeise",
+     "name": "Apfelstrudel mit Vanillesauce",
+     "diet": "vegetarian",
+     "allergens": [
+      "Gl",
+      "GlW",
+      "Mi"
      ],
      "additives": []
     },
