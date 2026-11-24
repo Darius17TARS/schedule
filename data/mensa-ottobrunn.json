@@ -2,96 +2,8 @@
  "canteen": "Mensa Ottobrunn",
  "address": "Willy-Messerschmitt-Str. 5, Taufkirchen",
  "source": "https://www.studierendenwerk-muenchen-oberbayern.de/mensa/speiseplan/speiseplan_433_-de.html",
- "fetched": "2026-11-23T14:46+00:00",
+ "fetched": "2026-11-24T14:55+00:00",
  "days": [
-  {
-   "date": "2026-11-23",
-   "dishes": [
-    {
-     "type": "Pasta",
-     "name": "Mac & Cheese",
-     "diet": "vegetarian",
-     "allergens": [
-      "Gl",
-      "GlG",
-      "GlW",
-      "Mi",
-      "Sf",
-      "So",
-      "Sw"
-     ],
-     "additives": [
-      "3",
-      "5",
-      "99"
-     ]
-    },
-    {
-     "type": "Studitopf",
-     "name": "Asiatischer Reis-Gemüse-Topf",
-     "diet": "vegan",
-     "allergens": [
-      "So"
-     ],
-     "additives": [
-      "Kn",
-      "2"
-     ]
-    },
-    {
-     "type": "Vegetarisch/fleischlos",
-     "name": "Gemüsecurry aus Blumenkohl und Broccoli",
-     "diet": "vegan",
-     "allergens": [
-      "Sf",
-      "Sl"
-     ],
-     "additives": []
-    },
-    {
-     "type": "",
-     "name": "Kaiserschmarrn mit Apfelmus",
-     "diet": "vegetarian",
-     "allergens": [
-      "Ei",
-      "Gl",
-      "GlW",
-      "Mi"
-     ],
-     "additives": [
-      "3"
-     ]
-    },
-    {
-     "type": "Fleisch",
-     "name": "Hähnchenschnitzel mit Kürbiskernpanade (1 Stück) und Kräuterdip",
-     "diet": "meat",
-     "allergens": [
-      "Ei",
-      "Gl",
-      "GlW",
-      "Mi",
-      "Sf"
-     ],
-     "additives": [
-      "Kn"
-     ]
-    },
-    {
-     "type": "Dessert (Glas)",
-     "name": "Lebkuchen Mousse",
-     "diet": "vegetarian",
-     "allergens": [
-      "Gl",
-      "GlW",
-      "Mi"
-     ],
-     "additives": [
-      "14"
-     ]
-    }
-   ]
-  },
   {
    "date": "2026-11-24",
    "dishes": [
@@ -127,6 +39,38 @@
       "GlW"
      ],
      "additives": [
+      "99",
+      "Kn"
+     ]
+    },
+    {
+     "type": "Fleisch",
+     "name": "Hähnchenschnitzel mit Kürbiskernpanade (1 Stück) und Kräuterdip",
+     "diet": "meat",
+     "allergens": [
+      "Ei",
+      "Gl",
+      "GlW",
+      "Mi",
+      "Sf"
+     ],
+     "additives": [
+      "Kn"
+     ]
+    },
+    {
+     "type": "",
+     "name": "Fleischpflanzerl (Frikadelle) mit Biersauce",
+     "diet": "meat",
+     "allergens": [
+      "Ei",
+      "Gl",
+      "GlG",
+      "GlW",
+      "Sf"
+     ],
+     "additives": [
+      "Kn",
       "99"
      ]
     },
@@ -144,12 +88,14 @@
     },
     {
      "type": "Dessert (Glas)",
-     "name": "Mousse au chocolat mit glasierten Kirschen",
-     "diet": "vegetarian",
+     "name": "Mousse Heidelbeer-Geschmack",
+     "diet": "meat",
      "allergens": [
       "Mi"
      ],
-     "additives": []
+     "additives": [
+      "14"
+     ]
     }
    ]
   },
@@ -158,7 +104,7 @@
    "dishes": [
     {
      "type": "Pasta",
-     "name": "Spätzlepfanne mit Gemüse",
+     "name": "Spinatspätzlepfanne mit Gemüse",
      "diet": "vegetarian",
      "allergens": [
       "Ei",
@@ -179,37 +125,43 @@
       "GlW",
       "Mi",
       "Sf",
-      "Sl",
-      "Sw"
+      "Sl"
      ],
      "additives": [
       "Kn",
       "1",
-      "2",
-      "5",
-      "9",
-      "99"
+      "9"
      ]
     },
     {
      "type": "Studitopf",
-     "name": "Reistopf mit Kidneybohnen, Paprika und Mais",
+     "name": "Gemüsecurry aus Blumenkohl und Broccoli",
      "diet": "vegan",
      "allergens": [],
+     "additives": [
+      "Kn"
+     ]
+    },
+    {
+     "type": "Vegetarisch/fleischlos",
+     "name": "Ravioli gefüllt mit Tomate und Basilikum, dazu Tomatensauce",
+     "diet": "vegetarian",
+     "allergens": [
+      "Ei",
+      "Gl",
+      "GlW",
+      "Mi"
+     ],
      "additives": []
     },
     {
-     "type": "Vegan",
-     "name": "Orientalischer Gemüse-Couscous mit Kichererbsen",
-     "diet": "vegan",
+     "type": "",
+     "name": "Kartoffeltaschen mit Kräuterfrischkäse und Sauerrahmdip",
+     "diet": "vegetarian",
      "allergens": [
-      "Gl",
-      "GlW",
-      "Se"
+      "Mi"
      ],
-     "additives": [
-      "2"
-     ]
+     "additives": []
     },
     {
      "type": "Dessert (Glas)",
@@ -626,6 +578,67 @@
       "Mi"
      ],
      "additives": []
+    },
+    {
+     "type": "Dessert (Glas)",
+     "name": "Tagesdessert",
+     "diet": "meat",
+     "allergens": [],
+     "additives": []
+    }
+   ]
+  },
+  {
+   "date": "2026-12-07",
+   "dishes": [
+    {
+     "type": "Pasta",
+     "name": "Tortellini mit Kürbis-Tomatensauce",
+     "diet": "vegan",
+     "allergens": [
+      "Gl",
+      "GlW",
+      "Sl"
+     ],
+     "additives": [
+      "Kn"
+     ]
+    },
+    {
+     "type": "Studitopf",
+     "name": "Grüne Bohnen in Kokos-Zitronensauce",
+     "diet": "vegan",
+     "allergens": [],
+     "additives": [
+      "Kn"
+     ]
+    },
+    {
+     "type": "Fleisch",
+     "name": "Pikante Chickenwings (6 Stück) mit Sweet-Chili-Sauce",
+     "diet": "meat",
+     "allergens": [
+      "Sf",
+      "Sl"
+     ],
+     "additives": [
+      "Kn",
+      "11"
+     ]
+    },
+    {
+     "type": "Vegan",
+     "name": "Thailändische Frühlingsrolle mit Sweet-Chilisauce",
+     "diet": "vegan",
+     "allergens": [
+      "Gl",
+      "GlW",
+      "Sl"
+     ],
+     "additives": [
+      "Kn",
+      "11"
+     ]
     },
     {
      "type": "Dessert (Glas)",
