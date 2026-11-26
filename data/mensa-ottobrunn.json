@@ -2,120 +2,59 @@
  "canteen": "Mensa Ottobrunn",
  "address": "Willy-Messerschmitt-Str. 5, Taufkirchen",
  "source": "https://www.studierendenwerk-muenchen-oberbayern.de/mensa/speiseplan/speiseplan_433_-de.html",
- "fetched": "2026-11-25T14:29+00:00",
+ "fetched": "2026-11-26T13:57+00:00",
  "days": [
-  {
-   "date": "2026-11-25",
-   "dishes": [
-    {
-     "type": "Pasta",
-     "name": "Spinatspätzlepfanne mit Champignons, Kraut und Paprika",
-     "diet": "vegetarian",
-     "allergens": [
-      "Ei",
-      "Gl",
-      "GlW",
-      "Mi"
-     ],
-     "additives": []
-    },
-    {
-     "type": "Wok",
-     "name": "Brasilianisches Brathähnchen (1 Stück)- Frango a Passarinho mit Sauerrahm-Dip",
-     "diet": "meat",
-     "allergens": [
-      "Ei",
-      "Gl",
-      "GlG",
-      "GlW",
-      "Mi",
-      "Sf",
-      "Sl"
-     ],
-     "additives": [
-      "1",
-      "Kn",
-      "9"
-     ]
-    },
-    {
-     "type": "Studitopf",
-     "name": "Gemüsecurry aus Blumenkohl und Broccoli",
-     "diet": "vegan",
-     "allergens": [],
-     "additives": [
-      "Kn"
-     ]
-    },
-    {
-     "type": "Vegetarisch/fleischlos",
-     "name": "Ravioli gefüllt mit Tomate und Basilikum, dazu Tomatensauce",
-     "diet": "vegetarian",
-     "allergens": [
-      "Ei",
-      "Gl",
-      "GlW",
-      "Mi"
-     ],
-     "additives": []
-    },
-    {
-     "type": "",
-     "name": "Kartoffeltaschen mit Kräuterfrischkäse und Sauerrahmdip",
-     "diet": "vegetarian",
-     "allergens": [
-      "Mi"
-     ],
-     "additives": []
-    },
-    {
-     "type": "Fleisch",
-     "name": "Schweineschnitzel Wiener Art (1 Stück) mit Sauerrahmdip",
-     "diet": "meat",
-     "allergens": [
-      "Gl",
-      "GlW",
-      "Mi"
-     ],
-     "additives": []
-    },
-    {
-     "type": "Dessert (Glas)",
-     "name": "Weiße Schokoladenmousse",
-     "diet": "meat",
-     "allergens": [
-      "Mi",
-      "So"
-     ],
-     "additives": [
-      "14"
-     ]
-    }
-   ]
-  },
   {
    "date": "2026-11-26",
    "dishes": [
     {
      "type": "Pasta",
-     "name": "Pasta mit Steinpilzen",
+     "name": "Pasta mit Pilzrahmsauce aus Steinpilzen und Champignons",
+     "diet": "vegetarian",
+     "allergens": [
+      "Gl",
+      "GlW",
+      "Mi",
+      "So"
+     ],
+     "additives": [
+      "1"
+     ]
+    },
+    {
+     "type": "",
+     "name": "Gefüllte Pasta mit Tomaten und Basilikum dazu Sahnesauce mit Steinpilzen und Champignons",
+     "diet": "vegetarian",
+     "allergens": [
+      "Ei",
+      "Gl",
+      "GlW",
+      "Mi",
+      "So"
+     ],
+     "additives": [
+      "1"
+     ]
+    },
+    {
+     "type": "Pasta",
+     "name": "Spinatspätzlepfanne mit Champignons, Kraut und Paprika dazu Bergkäsesauce",
+     "diet": "vegetarian",
+     "allergens": [
+      "Ei",
+      "Gl",
+      "GlW",
+      "Mi"
+     ],
+     "additives": []
+    },
+    {
+     "type": "Studitopf",
+     "name": "Bulgur mit Gemüse",
      "diet": "vegan",
      "allergens": [
       "Gl",
       "GlW",
-      "Sw"
-     ],
-     "additives": [
-      "1",
-      "5",
-      "99"
-     ]
-    },
-    {
-     "type": "Studitopf",
-     "name": "Grüner Erbseneintopf",
-     "diet": "vegan",
-     "allergens": [
       "Sl"
      ],
      "additives": []
@@ -128,13 +67,25 @@
       "Ei",
       "Gl",
       "GlW",
-      "Mi",
-      "Sw"
+      "Mi"
      ],
      "additives": [
-      "5",
-      "15",
-      "99"
+      "15"
+     ]
+    },
+    {
+     "type": "Fleisch",
+     "name": "Cordon bleu vom Schwein (1 Stück) (mit Formfleisch Kochschinken)",
+     "diet": "meat",
+     "allergens": [
+      "Gl",
+      "GlW",
+      "Mi"
+     ],
+     "additives": [
+      "2",
+      "3",
+      "8"
      ]
     },
     {
@@ -142,8 +93,6 @@
      "name": "Di Manzo - Rindfleisch in Balsamico",
      "diet": "meat",
      "allergens": [
-      "Gl",
-      "GlW",
       "Sw"
      ],
      "additives": [
@@ -153,7 +102,7 @@
     },
     {
      "type": "Dessert (Glas)",
-     "name": "Schokopudding mit Sahne",
+     "name": "Schokocreme mit Kirschen",
      "diet": "vegetarian",
      "allergens": [
       "Mi"
@@ -166,17 +115,6 @@
    "date": "2026-11-27",
    "dishes": [
     {
-     "type": "Pasta",
-     "name": "Pasta mit Tomaten-Frischkäse-Sauce",
-     "diet": "vegetarian",
-     "allergens": [
-      "Gl",
-      "GlW",
-      "Mi"
-     ],
-     "additives": []
-    },
-    {
      "type": "Studitopf",
      "name": "Kartoffelgulasch mit Paprika",
      "diet": "vegan",
@@ -185,20 +123,18 @@
     },
     {
      "type": "Fisch",
-     "name": "Seelachsfilet Lemon Koriander (1 Stück)",
+     "name": "Panierter Seelachs (1 Stück) mit Remouladensuce",
      "diet": "meat",
      "allergens": [
       "Ei",
       "Fi",
       "Gl",
-      "GlG",
       "GlW",
       "Mi",
-      "Sf",
-      "Sl"
+      "Sf"
      ],
      "additives": [
-      "1"
+      "9"
      ]
     },
     {
@@ -209,15 +145,6 @@
       "Ei",
       "Gl",
       "GlW",
-      "Mi"
-     ],
-     "additives": []
-    },
-    {
-     "type": "Dessert (Glas)",
-     "name": "Vanille-Zimtcreme mit Blaubeeren",
-     "diet": "vegetarian",
-     "allergens": [
       "Mi"
      ],
      "additives": []
@@ -553,8 +480,8 @@
       "Sl"
      ],
      "additives": [
-      "Kn",
-      "11"
+      "11",
+      "Kn"
      ]
     },
     {
@@ -624,6 +551,64 @@
       "1",
       "2"
      ]
+    },
+    {
+     "type": "Dessert (Glas)",
+     "name": "Tagesdessert",
+     "diet": "meat",
+     "allergens": [],
+     "additives": []
+    }
+   ]
+  },
+  {
+   "date": "2026-12-09",
+   "dishes": [
+    {
+     "type": "Wok",
+     "name": "Gemüsecurry aus Blumenkohl und Broccoli",
+     "diet": "vegan",
+     "allergens": [],
+     "additives": [
+      "Kn"
+     ]
+    },
+    {
+     "type": "Studitopf",
+     "name": "Eintopf mit Reis, Bohnen und Gemüse",
+     "diet": "vegan",
+     "allergens": [
+      "Sl"
+     ],
+     "additives": []
+    },
+    {
+     "type": "Vegetarisch/fleischlos",
+     "name": "Quinoa-Grünkern-Strudel mit Sauerrahm-Dip",
+     "diet": "vegetarian",
+     "allergens": [
+      "Gl",
+      "GlG",
+      "GlW",
+      "Mi",
+      "Sf",
+      "Sl",
+      "So"
+     ],
+     "additives": [
+      "1",
+      "Kn"
+     ]
+    },
+    {
+     "type": "Fleisch",
+     "name": "Putengulasch mit Paprika",
+     "diet": "meat",
+     "allergens": [
+      "Gl",
+      "GlW"
+     ],
+     "additives": []
     },
     {
      "type": "Dessert (Glas)",
