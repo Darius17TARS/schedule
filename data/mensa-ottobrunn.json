@@ -2,67 +2,22 @@
  "canteen": "Mensa Ottobrunn",
  "address": "Willy-Messerschmitt-Str. 5, Taufkirchen",
  "source": "https://www.studierendenwerk-muenchen-oberbayern.de/mensa/speiseplan/speiseplan_433_-de.html",
- "fetched": "2026-11-26T13:57+00:00",
+ "fetched": "2026-11-27T13:56+00:00",
  "days": [
   {
-   "date": "2026-11-26",
+   "date": "2026-11-27",
    "dishes": [
     {
-     "type": "Pasta",
-     "name": "Pasta mit Pilzrahmsauce aus Steinpilzen und Champignons",
-     "diet": "vegetarian",
-     "allergens": [
-      "Gl",
-      "GlW",
-      "Mi",
-      "So"
-     ],
-     "additives": [
-      "1"
-     ]
-    },
-    {
-     "type": "",
-     "name": "Gefüllte Pasta mit Tomaten und Basilikum dazu Sahnesauce mit Steinpilzen und Champignons",
-     "diet": "vegetarian",
-     "allergens": [
-      "Ei",
-      "Gl",
-      "GlW",
-      "Mi",
-      "So"
-     ],
-     "additives": [
-      "1"
-     ]
-    },
-    {
-     "type": "Pasta",
-     "name": "Spinatspätzlepfanne mit Champignons, Kraut und Paprika dazu Bergkäsesauce",
-     "diet": "vegetarian",
-     "allergens": [
-      "Ei",
-      "Gl",
-      "GlW",
-      "Mi"
-     ],
-     "additives": []
-    },
-    {
      "type": "Studitopf",
-     "name": "Bulgur mit Gemüse",
+     "name": "Kartoffelgulasch mit Paprika",
      "diet": "vegan",
-     "allergens": [
-      "Gl",
-      "GlW",
-      "Sl"
-     ],
+     "allergens": [],
      "additives": []
     },
     {
      "type": "Vegetarisch/fleischlos",
-     "name": "Spinatknödel mit Bergkäsesauce",
-     "diet": "meat",
+     "name": "Überbackene Spinatknödel in Bergkäsesauce",
+     "diet": "vegetarian",
      "allergens": [
       "Ei",
       "Gl",
@@ -74,18 +29,18 @@
      ]
     },
     {
-     "type": "Fleisch",
-     "name": "Cordon bleu vom Schwein (1 Stück) (mit Formfleisch Kochschinken)",
-     "diet": "meat",
+     "type": "",
+     "name": "Käsespätzle mit Röstzwiebeln",
+     "diet": "vegetarian",
      "allergens": [
+      "Ei",
       "Gl",
+      "GlD",
       "GlW",
       "Mi"
      ],
      "additives": [
-      "2",
-      "3",
-      "8"
+      "15"
      ]
     },
     {
@@ -99,27 +54,6 @@
       "1",
       "5"
      ]
-    },
-    {
-     "type": "Dessert (Glas)",
-     "name": "Schokocreme mit Kirschen",
-     "diet": "vegetarian",
-     "allergens": [
-      "Mi"
-     ],
-     "additives": []
-    }
-   ]
-  },
-  {
-   "date": "2026-11-27",
-   "dishes": [
-    {
-     "type": "Studitopf",
-     "name": "Kartoffelgulasch mit Paprika",
-     "diet": "vegan",
-     "allergens": [],
-     "additives": []
     },
     {
      "type": "Fisch",
@@ -148,6 +82,17 @@
       "Mi"
      ],
      "additives": []
+    },
+    {
+     "type": "Dessert (Glas)",
+     "name": "Veganer Pudding Vanillegeschmack",
+     "diet": "vegan",
+     "allergens": [
+      "Gl",
+      "GlH",
+      "So"
+     ],
+     "additives": []
     }
    ]
   },
@@ -156,7 +101,7 @@
    "dishes": [
     {
      "type": "Pasta",
-     "name": "Ravioli mit Tomate-Basilikumfüllung , dazu Tomatensauce",
+     "name": "Ravioli mit Tomate-Basilikumfüllung , dazu Tomaten-Frischkäse Sauce",
      "diet": "vegetarian",
      "allergens": [
       "Ei",
@@ -609,6 +554,64 @@
       "GlW"
      ],
      "additives": []
+    },
+    {
+     "type": "Dessert (Glas)",
+     "name": "Tagesdessert",
+     "diet": "meat",
+     "allergens": [],
+     "additives": []
+    }
+   ]
+  },
+  {
+   "date": "2026-12-10",
+   "dishes": [
+    {
+     "type": "Pasta",
+     "name": "Kürbis-Teigtaschen mit Käsesauce, Kirschtomaten und Basilikum",
+     "diet": "vegetarian",
+     "allergens": [
+      "Ei",
+      "Gl",
+      "GlW",
+      "Mi"
+     ],
+     "additives": [
+      "Kn"
+     ]
+    },
+    {
+     "type": "Grill",
+     "name": "Gegrillte Hähnchenbrust (1 Stück) mit Pfannengemüse",
+     "diet": "meat",
+     "allergens": [
+      "Gl",
+      "GlW"
+     ],
+     "additives": []
+    },
+    {
+     "type": "Studitopf",
+     "name": "Pikanter Eintopf mit weißen Bohnen und Paprika",
+     "diet": "vegan",
+     "allergens": [],
+     "additives": [
+      "2"
+     ]
+    },
+    {
+     "type": "Vegan",
+     "name": "Veganes Tomatenragout mit Falafel",
+     "diet": "vegan",
+     "allergens": [
+      "Gl",
+      "GlW",
+      "Sf"
+     ],
+     "additives": [
+      "Kn"
+     ]
     },
     {
      "type": "Dessert (Glas)",
